@@ -113,7 +113,7 @@ class Event
 
     public function getEventInfo(): ?string
     {
-        return $this->infosSortie;
+        return $this->eventInfo;
     }
 
     public function setEventInfo(?string $eventInfo): static

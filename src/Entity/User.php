@@ -6,27 +6,43 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
-class User
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(length: 180)]
+    private ?string $email = null;
+
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
+
     #[ORM\Column(length: 50)]
     private ?string $name = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $firstname = null;
+    private ?string $firstName = null;
 
     #[ORM\Column(length: 20)]
     private ?string $phoneNumber = null;
-
-    #[ORM\Column(length: 50)]
-    private ?string $email = null;
 
     #[ORM\Column]
     private ?bool $isAdmin = false;
@@ -37,8 +53,12 @@ class User
     /**
      * @var Collection<int, Event>
      */
-    #[ORM\ManyToMany(targetEntity: Event::class, inversedBy: 'users')]
+    #[ORM\ManyToMany(targetEntity: Event::class, inversedBy: 'participants')]
     private Collection $events;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Campus $campus = null;
 
     /**
      * @var Collection<int, Event>
@@ -46,9 +66,8 @@ class User
     #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'organizer')]
     private Collection $myEvents;
 
-    #[ORM\ManyToOne(inversedBy: 'users')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Campus $campus = null;
+    #[ORM\Column]
+    private bool $isVerified = false;
 
     public function __construct()
     {
@@ -59,6 +78,71 @@ class User
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    #[\Deprecated]
+    public function eraseCredentials(): void
+    {
+        // @deprecated, to be removed when upgrading to Symfony 8
     }
 
     public function getName(): ?string
@@ -73,14 +157,14 @@ class User
         return $this;
     }
 
-    public function getFirstname(): ?string
+    public function getFirstName(): ?string
     {
-        return $this->firstname;
+        return $this->firstName;
     }
 
-    public function setFirstname(string $firstname): static
+    public function setFirstName(string $firstName): static
     {
-        $this->firstname = $firstname;
+        $this->firstName = $firstName;
 
         return $this;
     }
@@ -93,18 +177,6 @@ class User
     public function setPhoneNumber(string $phoneNumber): static
     {
         $this->phoneNumber = $phoneNumber;
-
-        return $this;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
 
         return $this;
     }
@@ -157,6 +229,18 @@ class User
         return $this;
     }
 
+    public function getCampus(): ?Campus
+    {
+        return $this->campus;
+    }
+
+    public function setCampus(?Campus $campus): static
+    {
+        $this->campus = $campus;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Event>
      */
@@ -169,7 +253,7 @@ class User
     {
         if (!$this->myEvents->contains($myEvent)) {
             $this->myEvents->add($myEvent);
-            $myEvent->setOrganizer($this);
+            $myEvent->setUser($this);
         }
 
         return $this;
@@ -179,23 +263,24 @@ class User
     {
         if ($this->myEvents->removeElement($myEvent)) {
             // set the owning side to null (unless already changed)
-            if ($myEvent->getOrganizer() === $this) {
-                $myEvent->setOrganizer(null);
+            if ($myEvent->getUser() === $this) {
+                $myEvent->setUser(null);
             }
         }
 
         return $this;
     }
 
-    public function getCampus(): ?Campus
+    public function isVerified(): bool
     {
-        return $this->campus;
+        return $this->isVerified;
     }
 
-    public function setCampus(?Campus $campus): static
+    public function setIsVerified(bool $isVerified): static
     {
-        $this->campus = $campus;
+        $this->isVerified = $isVerified;
 
         return $this;
     }
+
 }

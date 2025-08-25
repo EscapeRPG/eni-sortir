@@ -6,7 +6,7 @@ use App\Repository\SortieRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SortieRepository::class)]
-class Sortie
+class Event
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -14,19 +14,19 @@ class Sortie
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $nom = null;
+    private ?string $name = null;
 
     #[ORM\Column]
-    private ?\DateTime $dateHeureDebut = null;
+    private ?\DateTime $startingDateHour = null;
 
     #[ORM\Column]
-    private ?\DateTime $dateHeureFin = null;
+    private ?\DateTime $endDateHour = null;
 
     #[ORM\Column]
     private ?int $nbInscriptionsMax = null;
 
     #[ORM\Column(length: 500, nullable: true)]
-    private ?string $infosSortie = null;
+    private ?string $eventInfo = null;
 
 
     public function getId(): ?int
@@ -34,38 +34,38 @@ class Sortie
         return $this->id;
     }
 
-    public function getNom(): ?string
+    public function getName(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom(string $nom): static
+    public function setName(string $nom): static
     {
         $this->nom = $nom;
 
         return $this;
     }
 
-    public function getDateHeureDebut(): ?\DateTime
+    public function getStartingDateHour(): ?\DateTime
     {
-        return $this->dateHeureDebut;
+        return $this->startingDateHour;
     }
 
-    public function setDateHeureDebut(\DateTime $dateHeureDebut): static
+    public function setStartingDateHour(\DateTime $startingDateHour): static
     {
-        $this->dateHeureDebut = $dateHeureDebut;
+        $this->startingDateHour = $startingDateHour;
 
         return $this;
     }
 
-    public function getDateHeureFin(): ?\DateTime
+    public function getEndDateHour(): ?\DateTime
     {
-        return $this->dateHeureFin;
+        return $this->endDateHour;
     }
 
-    public function setDateHeureFin(\DateTime $dateHeureFin): static
+    public function setEndDateHour(\DateTime $endDateHour): static
     {
-        $this->dateHeureFin = $dateHeureFin;
+        $this->endDateHour = $endDateHour;
 
         return $this;
     }
@@ -82,14 +82,14 @@ class Sortie
         return $this;
     }
 
-    public function getInfosSortie(): ?string
+    public function getEventInfo(): ?string
     {
         return $this->infosSortie;
     }
 
-    public function setInfosSortie(?string $infosSortie): static
+    public function setEventInfo(?string $eventInfo): static
     {
-        $this->infosSortie = $infosSortie;
+        $this->eventInfo = $eventInfo;
 
         return $this;
     }

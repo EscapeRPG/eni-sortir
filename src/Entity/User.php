@@ -29,10 +29,10 @@ class User
     private ?string $email = null;
 
     #[ORM\Column]
-    private ?bool $isAdmin = null;
+    private ?bool $isAdmin = false;
 
     #[ORM\Column]
-    private ?bool $isActive = null;
+    private ?bool $isActive = false;
 
     /**
      * @var Collection<int, Event>

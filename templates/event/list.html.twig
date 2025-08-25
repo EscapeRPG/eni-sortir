@@ -1,20 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello EventController!{% endblock %}
+{% block title %}{{ parent() }} - Liste des Sorties{% endblock %}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>D:/Emilien/Workspace/eni-sortir/src/Controller/EventController.php</code></li>
-        <li>Your template at <code>D:/Emilien/Workspace/eni-sortir/templates/event/index.html.twig</code></li>
-    </ul>
-</div>
+{% block main %}
+    <div class="events-container">
+        {% for event in events %}
+            <div class="event">
+                <h2>{{ event.name }}</h2>
+                <div class="event-date">
+                    <p>Début le {{ event.startingDateHour | date('d-m-Y h:i:s') }}</p>
+                    <p>Fin le {{ event.endDateHour | date('d-m-Y h:i:s') }}</p>
+                </div>
+                <div class="event-place">
+                    <p>{{ event.place.street }} {{ event.place.postalCode }} {{ event.place.city }}</p>
+                </div>
+                <a href="">>> Détails</a>
+                <div class="{{ event.state.label == "ouverte" ? 'event-green' : 'event-red' }}">
+                    {{ event.state.label }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

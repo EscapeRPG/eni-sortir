@@ -1,24 +1,52 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/events/event-list.css') }}">
+{% endblock %}
+
 {% block title %}{{ parent() }} - Liste des Sorties{% endblock %}
 
 {% block main %}
     <div class="events-container">
         {% for event in events %}
             <div class="event">
-                <h2>{{ event.name }}</h2>
-                <div class="event-date">
-                    <p>Début le {{ event.startingDateHour | date('d-m-Y h:i:s') }}</p>
-                    <p>Fin le {{ event.endDateHour | date('d-m-Y h:i:s') }}</p>
+                <div class="event-poster">
+                    <a href="{{ path('event_detail', {id: event.id}) }}">
+                        <img src="{{ asset('images/events/test.jpg') }}" alt="{{ event.name }}" title="{{ event.name }}">
+                    </a>
                 </div>
-                <div class="event-place">
+                <div class="event-description">
+                    <h2><a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a></h2>
+                    <p>{{ event.startingDateHour | date('d/m/Y h:i:s') }} ({{ duration }})</p>
                     <p>{{ event.place.street }} {{ event.place.postalCode }} {{ event.place.city }}</p>
-                </div>
-                <a href="">>> Détails</a>
-                <div class="{{ event.state.label == "ouverte" ? 'event-green' : 'event-red' }}">
-                    {{ event.state.label }}
+                    <img src="{{ asset('images/users/' ~ event.organizer.name) }}" class="event-organizer">
+                    <div class="event-state {{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
+                        {{ event.state.label }}
+                    </div>
                 </div>
             </div>
         {% endfor %}
+
+        <div class="pagination">
+            {% if page == 1 %}
+                <div></div>
+                <div></div>
+                <div><a href="{{ path('event_list', {page: page}) }}">{{ page }}</a></div>
+                <div><a href="{{ path('event_list', {page: page + 1}) }}">Next ></a></div>
+                <div><a href="{{ path('event_list', {page: pages}) }}">Last >></a></div>
+            {% elseif page < pages %}
+                <div><a href="{{ path('event_list', {page: 1}) }}"><< First</a></div>
+                <div><a href="{{ path('event_list', {page: page - 1}) }}">< Prev</a></div>
+                <div><a href="{{ path('event_list', {page: page}) }}">{{ page }}</a></div>
+                <div><a href="{{ path('event_list', {page: page + 1}) }}">Next ></a></div>
+                <div><a href="{{ path('event_list', {page: pages}) }}">Last >></a></div>
+            {% else %}
+                <div><a href="{{ path('event_list', {page: 1}) }}"><< First</a></div>
+                <div><a href="{{ path('event_list', {page: page - 1}) }}">< Prev</a></div>
+                <div><a href="{{ path('event_list', {page: page}) }}">{{ page }}</a></div>
+                <div></div>
+                <div></div>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

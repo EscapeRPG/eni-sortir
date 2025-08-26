@@ -52,6 +52,9 @@ class Event
     #[ORM\JoinColumn(nullable: false)]
     private ?Place $place = null;
 
+    #[ORM\Column(length: 300, nullable: true)]
+    private ?string $posterFile = null;
+
     public function __construct()
     {
         $this->participants = new ArrayCollection();
@@ -194,6 +197,18 @@ class Event
     public function setPlace(?Place $place): static
     {
         $this->place = $place;
+
+        return $this;
+    }
+
+    public function getPosterFile(): ?string
+    {
+        return $this->posterFile;
+    }
+
+    public function setPosterFile(?string $posterFile): static
+    {
+        $this->posterFile = $posterFile;
 
         return $this;
     }

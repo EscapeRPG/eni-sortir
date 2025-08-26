@@ -78,7 +78,7 @@ class RegistrationFormType extends AbstractType
                 'label' => 'J\'accepte les termes d\'utilisation ',
                 'constraints' => [
                     new IsTrue([
-                        'message' => 'You should agree to our terms.',
+                        'message' => "Veuillez accepter les conditions d'utilisation",
                     ]),
                 ],
             ])
@@ -99,7 +99,7 @@ class RegistrationFormType extends AbstractType
                     ]),
                     new Regex([
                         'pattern' => '/^(?=.*[A-Z])(?=.*[@#$%^&*+=!?]).{8,}$/',
-                        'message' => 'Le mot de passe doit contenir au moins 8 carcactères, une majuscule et un caractère spécial',
+                        'message' => 'Le mot de passe doit contenir au moins 8 caractères, une majuscule et un caractère spécial',
                     ]),
                 ],
             ])

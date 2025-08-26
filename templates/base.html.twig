@@ -1,48 +1,54 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}ENI SORTIR{% endblock %}</title>
-    <link rel="icon"
-          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-    {% block stylesheets %}
-    {% endblock %}
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Eni Sortir{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        {% block stylesheets %}
+        {% endblock %}
 
-    {% block javascripts %}
-        {% block importmap %}{{ importmap('app') }}{% endblock %}
-    {% endblock %}
-</head>
-<body>
-<header>
-    <nav>
-        <div class="logo-nav">
-            <img>
-            <h1>ENI SORTIR</h1>
-        </div>
-        <ul>
-            {% if is_granted('IS_AUTHENTICATED') %}
-                <li><a href="{{ path('app_logout') }}">Se déconnecter</a></li>
-            {% else %}
-                <li><a href="{{ path('app_login') }}">Se connecter</a></li>
-                <li><a href="{{ path ('app_register') }}">S'inscrire</a></li>
-            {% endif %}
-        </ul>
-    </nav>
-</header>
-<main>
-    {% for type, messages in app.flashes %}
-        {% for message in messages %}
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+        <header>
+            <nav>
+                <div class="logo-nav">
+                    <img>
+                    <h1>ENI SORTIR</h1>
+                </div>
+                <ul>
+                    {% if is_granted('IS_AUTHENTICATED') %}
+                        <li><a href="{{ path('app_logout') }}">Se déconnecter</a></li>
+
+{#                        @TODO ajouter un lien vers le profil utilisateur depuis l'accueil#}
+{#                        <li><a href="{{ path('app_profile', {'id':userConnected.id}) }}">Profil</a></li>#}
+
+                        <li><a href="{{ path('event_create') }}">Créer un évènement</a></li>
+
+                    {% else %}
+                        <li><a href="{{ path('app_login') }}">Se connecter</a></li>
+                        <li><a href="{{ path ('app_register') }}">S'inscrire</a></li>
+
+                    {% endif %}
+
+                </ul>
+            </nav>
+        </header>
+        <main>
+                {% for type, messages in app.flashes %}
+                     {% for message in messages %}
             <div class="alert alert-{{ type }}">
-                {{ message }}
+                    {{ message }}
             </div>
-        {% endfor %}
-    {% endfor %}
-
-    {% block main %}
-        <h2>Bienvenue sur le site de Sortir.com !</h2>
-        <p>Salut !</p>
-    {% endblock %}
-</main>
-<footer></footer>
-</body>
+                     {% endfor %}
+                {% endfor %}
+            {% block main %}
+                <h2>Bienvenue sur le site de Sortir.com !</h2>
+                <p>Salut !</p>
+            {% endblock %}
+        </main>
+        <footer></footer>
+    </body>
 </html>

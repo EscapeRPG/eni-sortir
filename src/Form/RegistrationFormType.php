@@ -10,36 +10,68 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class RegistrationFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('profilPicture', FileType::class, [
+                'required' => false,
+                'label' => 'Photo de profil ',
+                'mapped' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'maxSizeMessage' => 'Votre fichier est trop lourd !',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'image/jpg'
+                        ],
+                        'mimeTypesMessage' => 'Les formats acceptés sont jpg, png ou jpeg !',
+                    ])
+                ]
+            ])
             ->add('name', TextType::class, [
-                'label'=> 'Nom '
+                'label'=> 'Nom* '
             ])
             ->add('firstName', TextType::class, [
-                'label' => 'Prénom '
+                'label' => 'Prénom* '
             ])
             ->add('phoneNumber' , TextType::class, [
-                'label' => 'Numéro de téléphone '
+                'label' => 'Numéro de téléphone* ',
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^((0[1-9])|(\+33))[ .-]?((?:[ .-]?\d{2}){4}|\d{8})$/',
+                        'message' => "Le numéro de téléphone doit commencer par 0 ou +33."
+                    ]),
+                ]
             ])
             ->add('campus', EntityType::class, [
                 'class' => Campus::class,
-                'label' => 'Campus ',
+                'label' => 'Campus* ',
                 'placeholder' => '-- Choisir un campus --',
                 'choice_label' => 'name'
             ])
             ->add('email', EmailType::class, [
-                'label' => 'Email ',
+                'label' => 'Email* ',
+                'constraints' => [
+                    new Regex([
+                        'pattern' => '/^[^@]+@campus-eni\.fr$/',
+                        'message' => "L'adresse email doit appartenir au domaine @campus-eni.fr"
+                    ])
+                ]
             ])
             ->add('agreeTerms', CheckboxType::class, [
                                 'mapped' => false,
@@ -53,7 +85,7 @@ class RegistrationFormType extends AbstractType
             ->add('plainPassword', PasswordType::class, [
                                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller
-                'label' => 'Mot de passe ',
+                'label' => 'Mot de passe* ',
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
@@ -61,10 +93,13 @@ class RegistrationFormType extends AbstractType
                         'message' => 'Veuillez entrer votre mot de passe',
                     ]),
                     new Length([
-                        'min' => 6,
-                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
+                        'min' => 8,
                         // max length allowed by Symfony for security reasons
                         'max' => 4096,
+                    ]),
+                    new Regex([
+                        'pattern' => '/^(?=.*[A-Z])(?=.*[@#$%^&*+=!?]).{8,}$/',
+                        'message' => 'Le mot de passe doit contenir au moins 8 carcactères, une majuscule et un caractère spécial',
                     ]),
                 ],
             ])

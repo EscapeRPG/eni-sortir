@@ -23,7 +23,7 @@
                             <h2><a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a></h2>
                             <p>{{ event.startingDateHour | date('d/m/Y H:i:s') }}
                                 - {{ event.endDateHour | date('d/m/Y H:i:s') }}</p>
-                            <p>({{ duration }})</p>
+                            <p>({{ event.duration }})</p>
                             <p>{{ event.place.street }} {{ event.place.postalCode }} {{ event.place.city }}</p>
                         </div>
                         <div class="participants">

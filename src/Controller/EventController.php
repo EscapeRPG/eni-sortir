@@ -18,14 +18,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class EventController extends AbstractController
 {
-    #[Route('/event', name: 'app_event')]
-    public function index(): Response
-    {
-        return $this->render('event/create.html.twig', [
-            'controller_name' => 'EventController',
-        ]);
-    }
-
 
     #[Route('/event/create', name: 'event_create')]
     public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader): Response
@@ -63,7 +55,7 @@ final class EventController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Event created!');
-            return $this->redirectToRoute('app_event');
+            return $this->redirectToRoute('app_main');
         }
         return $this->render('event/create.html.twig', [
             'event_form'=>$form,
@@ -115,5 +107,5 @@ final class EventController extends AbstractController
     public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response {
         return $this->render('event/detail.html.twig', []);
     }
-}
+
 }

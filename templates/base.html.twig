@@ -21,17 +21,18 @@
                 <ul>
                     {% if is_granted('IS_AUTHENTICATED') %}
                         <li><a href="{{ path('app_logout') }}">Se déconnecter</a></li>
+                        <li><a href="{{ path('event_create') }}">Créer un évènement</a></li>
                     {% else %}
                         <li><a href="{{ path('app_login') }}">Se connecter</a></li>
                         <li><a href="{{ path ('app_register') }}">S'inscrire</a></li>
-                        <li><a href="{{ path('event_create') }}">Créer un évènement</a></li>
+
                     {% endif %}
 
                 </ul>
             </nav>
         </header>
         <main>
-                {% for type, message in app.flashes %}
+                {% for type, messages in app.flashes %}
                      {% for message in messages %}
             <div class="alert alert-{{ type }}">
                     {{ message }}

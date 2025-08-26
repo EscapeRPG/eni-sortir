@@ -1,0 +1,104 @@
+.events-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    width: 60%;
+    margin: auto;
+
+    .event {
+        display: flex;
+        width: 100%;
+        background-color: var(--event-bg-color);
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 5px 5px 5px var(--event-shadow);
+        position: relative;
+
+        .event-poster {
+            width: 25%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .event-description {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+
+            h2 {
+                margin: 0;
+                padding: 10px;
+
+                a {
+                    text-decoration: none;
+                    font-weight: bold;
+                    color: var(--a-color);
+
+                    &:hover {
+                        text-decoration: underline;
+                        color: var(--a-color-hover);
+                    }
+                }
+            }
+
+            p {
+                margin: 0;
+                padding: 0 20px;
+            }
+
+            .event-organizer {
+                position: absolute;
+                width: 5%;
+                aspect-ratio: 1 / 1;
+                border: 1px solid grey;
+                border-radius: 50%;
+                top: 1em;
+                right: 1em;
+            }
+
+            .event-state {
+                text-align: right;
+                font-weight: bold;
+                padding: 5px 20px;
+            }
+
+            .event-green {
+                background-color: #b3ffb3;
+                color: #04d804;
+            }
+
+            .event-red {
+                background-color: #ffb2b2;
+                color: red;
+            }
+        }
+    }
+}
+
+.pagination {
+    margin: 40px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    div {
+        width: 100px;
+        text-align: center;
+    }
+
+    a {
+        color: white;
+        text-decoration: none;
+
+        &:hover {
+            color: orange;
+            text-decoration: underline;
+        }
+    }
+}

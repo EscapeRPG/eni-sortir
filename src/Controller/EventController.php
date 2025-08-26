@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 
 final class EventController extends AbstractController
@@ -62,21 +63,7 @@ final class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/event/{id}/edit', name: 'event_edit', requirements : ['id'=> '\d+'])]
-    public function edit(Event $event, Request $request, EntityManagerInterface $em): Response
-    {
-        $form = $this->createForm(EventType::class, $event);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted()){
-            $em->flush();
-            $this->addFlash('success', 'Event edited!');
-            return $this->redirectToRoute('app_main', ['id'=>$event->getId()]);
-        }
-        return $this->render('event/create.html.twig', [
-            'event_form'=>$form,
-        ]);
-    }
     #[Route('/list{page}',
         name: '_list',
         requirements: ['page' => '\d+'],
@@ -108,4 +95,20 @@ final class EventController extends AbstractController
         return $this->render('event/detail.html.twig', []);
     }
 
+    #[Route('/event/{id}/edit', name: 'event_edit', requirements : ['id'=> '\d+'])]
+    #[IsGranted('ROLE_ORGANIZER')]
+    public function edit(Event $event, Request $request, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(EventType::class, $event);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()){
+            $em->flush();
+            $this->addFlash('success', 'Event edited!');
+            return $this->redirectToRoute('app_main', ['id'=>$event->getId()]);
+        }
+        return $this->render('event/create.html.twig', [
+            'event_form'=>$form,
+        ]);
+    }
 }

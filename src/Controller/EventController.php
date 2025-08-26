@@ -78,6 +78,8 @@ final class EventController extends AbstractController
         ]);
     }
     #[Route('/list{page}',
+
+
         name: '_list',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 1])]
@@ -92,7 +94,7 @@ final class EventController extends AbstractController
         $pages = ceil($events->count() / $limit);
 
         foreach ($events as $eniEvent) {
-            $duration = $eniEvent->getEndDateHour()->getTimestamp() - $eniEvent->getStartingDateHour()->getTimestamp();
+            $duration = $eniEvent->getStartingDateHour()->diff($eniEvent->getEndDateHour())->format('%d jours %H heures %i minutes %s secondes');
         }
 
         return $this->render('event/list.html.twig', [

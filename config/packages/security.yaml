@@ -20,8 +20,8 @@ security:
                 secret: '%kernel.secret%'
                 lifetime: 604800
             login_throttling:
-              max_attempts: 3
-              interval: '3 minutes'
+                max_attempts: 3
+                interval: '3 minutes'
             form_login:
                 login_path: app_login
                 check_path: app_login

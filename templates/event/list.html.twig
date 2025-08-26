@@ -12,7 +12,7 @@
             <div class="event">
                 <div class="event-poster">
                     <a href="{{ path('event_detail', {id: event.id}) }}">
-                        <img src="{{ asset('uploads/events/test.jpg') }}" alt="{{ event.name }}"
+                        <img src="{{ asset('uploads/events/' ~ event.posterFile) }}" alt="{{ event.name }}"
                              title="{{ event.name }}">
                     </a>
                 </div>

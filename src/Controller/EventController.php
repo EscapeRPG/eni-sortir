@@ -61,7 +61,7 @@ final class EventController extends AbstractController
             'event_form' => $form,
         ]);
     }
-  
+
     #[Route('/{id}/edit', name: '_edit', requirements: ['id' => '\d+'])]
     public function edit(Event $event, Request $request, EntityManagerInterface $em): Response
     {
@@ -107,6 +107,8 @@ final class EventController extends AbstractController
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
     public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response
     {
-        return $this->render('event/detail.html.twig', []);
+        return $this->render('event/list.html.twig', []);
+
     }
+
 }

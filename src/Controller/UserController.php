@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,31 +36,31 @@ class UserController extends AbstractController
     }
 
     #[Route('/profile/{id}', name: 'app_profile', requirements: ['id' => '\d+'])]
-    public function editProfile(User $user, Request $request, EntityManagerInterface $em): Response
+    public function editProfile(UserRepository $userRepository,int $id, Request $request, EntityManagerInterface $em): Response
     {
 
         $userConnected = $this->getUser();
 
-        if ($userConnected->getUserIdentifier() !== $user->getUserIdentifier()) {
+        if ($userConnected->getUserIdentifier() !== $userRepository->findUserById('id')) {
             throw $this->createAccessDeniedException('Vous ne pouvez pas accéder à cette page');
 
         } else {
-            $form = $this->createForm(RegistrationFormType::class, $user);
+            $form = $this->createForm(RegistrationFormType::class, $userRepository);
 
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
+                $id = $form->getData()->getId();
                 $em->flush();
 
                 $this->addFlash('success', "Mise à jour enregistrée");
 
-                return $this->redirectToRoute('app_main', ['id' => $user->getId()]);
+                return $this->redirectToRoute('app_main', ['id' => $id]);
             }
 
             return $this->render('user/edit.html.twig', [
                 'edit_form' => $form,
-                'user' => $user,
-                'userConnected' => $userConnected,
+                'user' => $userConnected,
             ]);
         }
     }

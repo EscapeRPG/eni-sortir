@@ -104,9 +104,18 @@ final class EventController extends AbstractController
     }
 
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
-    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response
+    public function detail(SortieRepository $sortieRepository, int $id): Response
     {
-        return $this->render('event/detail.html.twig', []);
+        $event = $sortieRepository->find($id);
+
+        if (!$event){
+            throw $this->createNotFoundException('Cet évènement n\'existe pas');
+        }
+
+        return $this->render('event/detail.html.twig', [
+            'id' => $id,
+            'event' =>$event
+        ]);
     }
 
 }

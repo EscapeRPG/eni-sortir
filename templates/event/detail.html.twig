@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{ parent() }} - Détails
+{% endblock %}
+
+{% block main %}
+    <img src="{{ event.posterFile }}" alt="image de l'évènement">
+    <h1>Détail de l'évènement : {{ event.name }}</h1>
+    <p>crée par {{ event.organizer.firstName }} {{ event.organizer.name }}</p>
+    <p>Campus de {{ event.campus.name }}</p>
+
+    <p>participants : {{ event.nbParticipants }} / {{ event.nbInscriptionsMax }}</p>
+    <p>date : {{ event.startingDateHour | date('d/m/Y H:i:s') }}</p>
+    <p>informations pratiques :  {{ event.eventInfo }}</p>
+    <p>On se retrouve ici : {{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>
+
+    {% set address = event.place.street ~ ', ' ~ event.place.postalCode ~ ' ' ~ event.place.city %}
+    {% set addressGoogle = address|replace({' ': '+'}) %}
+
+    <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&output=embed"></iframe>
+{% endblock %}
+
+

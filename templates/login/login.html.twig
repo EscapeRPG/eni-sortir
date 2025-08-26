@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}{{ parent() }} - Log in!{% endblock %}
 
 {% block main %}
     <form method="post">
@@ -29,5 +29,7 @@
         <button class="btn btn-lg btn-primary" type="submit">
             S'identifier
         </button>
+
+        <a href="{{ path('app_forgot_password_request') }}">Mot de passe oublié</a>
     </form>
 {% endblock %}

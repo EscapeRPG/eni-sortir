@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Event;
-use App\Entity\Place;
 use App\Form\EventType;
 use App\Helper\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,11 +15,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-
+#[Route('/event', name: 'event')]
 final class EventController extends AbstractController
 {
 
-    #[Route('/event/create', name: 'event_create')]
+    #[Route('/create', name: '_create')]
     public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader): Response
     {
         $event = new Event();
@@ -36,12 +35,12 @@ final class EventController extends AbstractController
 
             $file = $form->get('poster_file')->getData();
             if ($file instanceof UploadedFile) {
-                $name = $fileUploader->upload($file,$event->getName(),$parameterBag->get('event')['poster_file']);
-                    $event->setPosterFile($name);
+                $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_file']);
+                $event->setPosterFile($name);
             }
 
             $interval = $start->diff($end);
-            $minutes = ($interval->days * 24 * 60) + ($interval->h * 60)+$interval->i;
+            $minutes = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i;
             $event->setDuration($minutes);
 
             $user = $this->getUser();
@@ -59,10 +58,25 @@ final class EventController extends AbstractController
             return $this->redirectToRoute('app_main');
         }
         return $this->render('event/create.html.twig', [
-            'event_form'=>$form,
+            'event_form' => $form,
         ]);
     }
+  
+    #[Route('/{id}/edit', name: '_edit', requirements: ['id' => '\d+'])]
+    public function edit(Event $event, Request $request, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(EventType::class, $event);
+        $form->handleRequest($request);
 
+        if ($form->isSubmitted()) {
+            $em->flush();
+            $this->addFlash('success', 'Event edited!');
+            return $this->redirectToRoute('app_main', ['id' => $event->getId()]);
+        }
+        return $this->render('event/create.html.twig', [
+            'event_form' => $form,
+        ]);
+    }
 
     #[Route('/list{page}',
         name: '_list',
@@ -79,7 +93,7 @@ final class EventController extends AbstractController
         $pages = ceil($events->count() / $limit);
 
         foreach ($events as $eniEvent) {
-            $duration = $eniEvent->getEndDateHour()->getTimestamp() - $eniEvent->getStartingDateHour()->getTimestamp();
+            $duration = $eniEvent->getStartingDateHour()->diff($eniEvent->getEndDateHour())->format('%d jours %H heures %i minutes %s secondes');
         }
 
         return $this->render('event/list.html.twig', [
@@ -91,24 +105,8 @@ final class EventController extends AbstractController
     }
 
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
-    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response {
-        return $this->render('event/detail.html.twig', []);
-    }
-
-    #[Route('/event/{id}/edit', name: 'event_edit', requirements : ['id'=> '\d+'])]
-    #[IsGranted('ROLE_ORGANIZER')]
-    public function edit(Event $event, Request $request, EntityManagerInterface $em): Response
+    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response
     {
-        $form = $this->createForm(EventType::class, $event);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted()){
-            $em->flush();
-            $this->addFlash('success', 'Event edited!');
-            return $this->redirectToRoute('app_main', ['id'=>$event->getId()]);
-        }
-        return $this->render('event/create.html.twig', [
-            'event_form'=>$form,
-        ]);
+        return $this->render('event/detail.html.twig', []);
     }
 }

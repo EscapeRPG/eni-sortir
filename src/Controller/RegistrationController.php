@@ -38,6 +38,8 @@ class RegistrationController extends AbstractController
             $plainPassword = $form->get('plainPassword')->getData();
 
             // encode the plain password
+
+            //@TODO add a double verification of password
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
             $file = $form->get('profilPicture')->getData();
@@ -64,7 +66,7 @@ class RegistrationController extends AbstractController
             );
 
             // do anything else you need here, like send an email
-
+            $this->addFlash('success', 'Votre compte a été créé, veuillez vérifier votre boite mail pour valider votre profil.');
             return $this->redirectToRoute('app_login');
         }
 

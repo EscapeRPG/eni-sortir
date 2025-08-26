@@ -13,7 +13,6 @@
         border-radius: 20px;
         overflow: hidden;
         box-shadow: 5px 5px 5px var(--event-shadow);
-        position: relative;
 
         .event-poster {
             width: 25%;
@@ -24,41 +23,63 @@
             justify-content: center;
         }
 
-        .event-description {
+        .event-info {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             width: 100%;
 
-            h2 {
-                margin: 0;
-                padding: 10px;
+            .event-body {
+                display: flex;
+                height: 100%;
 
-                a {
-                    text-decoration: none;
-                    font-weight: bold;
-                    color: var(--a-color);
+                .event-description {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    width: 100%;
 
-                    &:hover {
-                        text-decoration: underline;
-                        color: var(--a-color-hover);
+                    h2 {
+                        margin: 0;
+                        padding: 10px;
+
+                        a {
+                            text-decoration: none;
+                            font-weight: bold;
+                            color: var(--a-color);
+
+                            &:hover {
+                                text-decoration: underline;
+                                color: var(--a-color-hover);
+                            }
+                        }
+                    }
+
+                    p {
+                        margin: 0;
+                        padding: 0 20px;
                     }
                 }
-            }
 
-            p {
-                margin: 0;
-                padding: 0 20px;
-            }
+                .participants {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: space-around;
+                    width: 10%;
 
-            .event-organizer {
-                position: absolute;
-                width: 5%;
-                aspect-ratio: 1 / 1;
-                border: 1px solid grey;
-                border-radius: 50%;
-                top: 1em;
-                right: 1em;
+                    .event-organizer {
+                        width: 80%;
+                        aspect-ratio: 1 / 1;
+                        margin: 0 auto;
+                        border: 1px solid grey;
+                        border-radius: 50%;
+                    }
+
+                    p {
+                        margin: 0;
+                    }
+                }
             }
 
             .event-state {
@@ -93,11 +114,11 @@
     }
 
     a {
-        color: white;
+        color: var(--a-color);
         text-decoration: none;
 
         &:hover {
-            color: orange;
+            color: var(--a-color-hover);
             text-decoration: underline;
         }
     }

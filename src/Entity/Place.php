@@ -61,6 +61,10 @@ class Place
         return $this;
     }
 
+    public function __toString(){
+        return $this->name;
+    }
+
     public function getStreet(): ?string
     {
         return $this->street;

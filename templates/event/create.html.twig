@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un super event{% endblock %}
+
+{% block main %}
+    <h1> Créez une super teuf ouais les jeunes </h1>
+
+    {{ form_start(event_form) }}
+
+    {{ form_row(event_form.name) }}
+    {{ form_row(event_form.startingDateHour) }}
+    {{ form_row(event_form.endDateHour) }}
+    {{ form_row(event_form.nbInscriptionsMax) }}
+    {{ form_row(event_form.eventInfo) }}
+    {{ form_row(event_form.state) }}
+    {{ form_row(event_form.campus) }}
+    {{ form_row(event_form.place) }}
+
+    <div class="button-place">
+        <a href="{{ path('place_create') }}" class="btn">
+             Ou créez un lieu
+        </a>
+
+    </div>
+
+    {{ form_row(event_form.poster_file) }}
+    <button class="btn btn-primary"> Enregistrer </button>
+
+    {{ form_end(event_form) }}
+
+
+{% endblock %}

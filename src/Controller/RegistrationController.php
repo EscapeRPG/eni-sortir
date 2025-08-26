@@ -66,7 +66,7 @@ class RegistrationController extends AbstractController
             );
 
             // do anything else you need here, like send an email
-            $this->addFlash('success', 'Votre compte a été créé, veuillez vérifier votre boite mail pour valider votre profil.');
+            $this->addFlash('success', 'Votre compte a été créé, veuillez vérifier votre boîte mail pour valider votre profil.');
             return $this->redirectToRoute('app_login');
         }
 

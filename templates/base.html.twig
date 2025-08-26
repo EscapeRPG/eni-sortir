@@ -26,6 +26,13 @@
             </nav>
         </header>
         <main>
+                {% for type, message in app.flashes %}
+                     {% for message in messages %}
+            <div class="alert alert-{{ type }}">
+                    {{ message }}
+            </div>
+                     {% endfor %}
+                {% endfor %}
             {% block main %}
                 <h2>Bienvenue sur le site de Sortir.com !</h2>
                 <p>Salut !</p>

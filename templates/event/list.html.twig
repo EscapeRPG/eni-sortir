@@ -12,21 +12,35 @@
             <div class="event">
                 <div class="event-poster">
                     <a href="{{ path('event_detail', {id: event.id}) }}">
-                        <img src="{{ asset('images/events/test.jpg') }}" alt="{{ event.name }}" title="{{ event.name }}">
+                        <img src="{{ asset('uploads/events/test.jpg') }}" alt="{{ event.name }}"
+                             title="{{ event.name }}">
                     </a>
                 </div>
-                <div class="event-description">
-                    <h2><a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a></h2>
-                    <p>{{ event.startingDateHour | date('d/m/Y h:i:s') }} ({{ duration }})</p>
-                    <p>{{ event.place.street }} {{ event.place.postalCode }} {{ event.place.city }}</p>
-                    <img src="{{ asset('images/users/' ~ event.organizer.name) }}" class="event-organizer">
+
+                <div class="event-info">
+                    <div class="event-body">
+                        <div class="event-description">
+                            <h2><a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a></h2>
+                            <p>{{ event.startingDateHour | date('d/m/Y H:i:s') }}
+                                - {{ event.endDateHour | date('d/m/Y H:i:s') }}</p>
+                            <p>({{ duration }})</p>
+                            <p>{{ event.place.street }} {{ event.place.postalCode }} {{ event.place.city }}</p>
+                        </div>
+                        <div class="participants">
+                            <img src="{{ asset('uploads/users/' ~ event.organizer.name) }}" class="event-organizer">
+                            <p>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
+                        </div>
+                    </div>
+
                     <div class="event-state {{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
                         {{ event.state.label }}
                     </div>
                 </div>
             </div>
         {% endfor %}
+    </div>
 
+    {% if pages != 1 %}
         <div class="pagination">
             {% if page == 1 %}
                 <div></div>
@@ -48,5 +62,5 @@
                 <div></div>
             {% endif %}
         </div>
-    </div>
+    {% endif %}
 {% endblock %}

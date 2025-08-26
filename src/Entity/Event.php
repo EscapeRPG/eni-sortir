@@ -201,7 +201,6 @@ class Event
         return $this;
     }
 
-
     public function getPosterFile(): ?string
     {
         return $this->posterFile;
@@ -215,5 +214,3 @@ class Event
     }
 
 }
-
-

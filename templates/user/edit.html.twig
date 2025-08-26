@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} - Profil{% endblock %}
+
+{% block main %}
+
+    <h2>Profil de {{ user.firstName }}</h2>
+
+    {{ form_errors(edit_form) }}
+
+    {{ form_start(edit_form) }}
+    {{ form_row(edit_form.name) }}
+    {{ form_row(edit_form.firstName) }}
+    {{ form_row(edit_form.campus) }}
+    {{ form_row(edit_form.phoneNumber) }}
+    {{ form_row(edit_form.email) }}
+    {{ form_row(edit_form.plainPassword) }}
+
+    <button type="submit" class="btn">Enregistrer</button>
+    <a href="{{ path('app_main') }}">Retour</a>
+{% endblock %}
+

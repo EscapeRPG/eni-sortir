@@ -38,6 +38,8 @@ class RegistrationController extends AbstractController
             $plainPassword = $form->get('plainPassword')->getData();
 
             // encode the plain password
+
+            //@TODO add a double verification of password
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
             $file = $form->get('profilPicture')->getData();

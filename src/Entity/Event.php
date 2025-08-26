@@ -55,11 +55,11 @@ class Event
     #[ORM\Column]
     private ?int $duration = null;
 
-    #[ORM\Column(length: 300, nullable: true)]
-    private ?string $poster_file = null;
-
     #[ORM\Column(nullable: true)]
     private ?int $nb_participants = null;
+
+    #[ORM\Column(length: 300, nullable: true)]
+    private ?string $posterFile = null;
 
     public function __construct()
     {
@@ -207,6 +207,19 @@ class Event
         return $this;
     }
 
+
+    public function getPosterFile(): ?string
+    {
+        return $this->posterFile;
+    }
+
+    public function setPosterFile(?string $posterFile): static
+    {
+        $this->posterFile = $posterFile;
+
+        return $this;
+    }
+
     public function getDuration(): ?int
     {
         return $this->duration;
@@ -219,17 +232,6 @@ class Event
         return $this;
     }
 
-    public function getPosterFile(): ?string
-    {
-        return $this->poster_file;
-    }
-
-    public function setPosterFile(?string $poster_file): static
-    {
-        $this->poster_file = $poster_file;
-
-        return $this;
-    }
 
     public function getNbParticipants(): ?int
     {

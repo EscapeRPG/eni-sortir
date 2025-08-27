@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} - Liste d'utilisateur{% endblock %}
+
+{% block main %}
+
+    <h2>Liste des utilisateurs</h2>
+
+    <ul>
+        {% for user in users %}
+
+            <li><a href="">{{ user.name | upper }} {{ user.firstName }} </a>
+                <a href="{{ path('app_users_delete', {id: user.id, _token : csrf_token('delete'~user.id)}) }}" onclick="return confirm('Etes vous sûr?')" >Supprimer</a>
+                {% if user.isActive == true %}
+                    <a href="{{ path('app_users_disable', {id: user.id}) }}" onclick="return confirm('Etes vous sûr?')">Désactiver</a>
+                {% else %}
+                    <a href="{{ path('app_users_disable', {id: user.id}) }}" onclick="return confirm('Etes vous sûr?')">Activer</a>
+                {% endif %}
+
+                {% if user.isAdmin == false %}
+                    <a href="{{ path('app_users_promote', {id: user.id}) }}">Promouvoir </a>
+                {% else %}
+                    <a href="{{ path('app_users_promote', {id: user.id}) }}">Retrograder </a>
+                {% endif %}
+            </li>
+
+
+        {% endfor %}
+    </ul>
+
+{% endblock %}

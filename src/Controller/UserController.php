@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Campus;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class UserController extends AbstractController
@@ -67,6 +69,92 @@ class UserController extends AbstractController
             'user' => $user,
             'id' => $id
         ]);
+    }
+
+    #[Route('/users/list', name: 'app_users_list')]
+    public function usersList(UserRepository $userRepository, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+
+        $users = $userRepository->findUsersByCampus($userConnected->getCampus());
+        return $this->render('user/users_list.html.twig', [
+            'users' => $users,
+        ]);
+    }
+
+    #[Route('users/delete/{id}', name: 'app_users_delete', requirements: ['id' => '\d+'])]
+    public function deleteUser(Request $request, User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->get('_token'))) {
+            $em->remove($user);
+            $em->flush();
+
+            $this->addFlash('success', "L'utilisateur a été supprimé");
+
+        }else{
+            $this->addFlash('success', "Impossible de supprimer l'utilisateur");
+        }
+        return $this->redirectToRoute('app_users_list');
+    }
+
+    #[Route('users/disable/{id}', name: 'app_users_disable', requirements: ['id' => '\d+'])]
+    public function disableUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+
+    if($user->isActive() === true) {
+        $user->setIsActive(false);
+        $em->flush();
+        $em->persist($user);
+
+        $this->addFlash('success', "L'utilisateur a été désactivé");
+
+    }else{
+        $user->setIsActive(true);
+        $em->flush();
+        $em->persist($user);
+
+        $this->addFlash('success', "L'utilisateur a été activé");
+    }
+
+    return $this->redirectToRoute('app_users_list');
+    }
+
+    #[Route('users/promote/{id}', name: 'app_users_promote', requirements: ['id' => '\d+'])]
+    public function promoteUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+        $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+        return $this->redirectToRoute('app_main');
+        }
+
+        if($user->isAdmin() === false) {
+            $user->setIsAdmin(true);
+            $em->flush();
+            $em->persist($user);
+
+            $this->addFlash('success', "L'utilisateur est maintenant administrateur");
+
+        }else{
+            $user->setIsAdmin(false);
+            $em->flush();
+            $em->persist($user);
+
+            $this->addFlash('success', "L'utilisateur n'est plus administrateur");
+        }
+
+        return $this->redirectToRoute('app_users_list');
     }
 
 

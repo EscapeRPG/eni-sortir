@@ -5,6 +5,8 @@
     --a-color: orange;
     --a-color-hover: #a54b0c;
     --event-shadow: rgba(20, 115, 168, 0.6);
+    --events-dates-container-bg-color: #ffc59b;
+    --events-dates-bg-color: #ff9346;
 }
 
 body {

@@ -15,11 +15,10 @@
     <p>informations pratiques :  {{ event.eventInfo }}</p>
     <p>On se retrouve ici : {{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>
 
-    {% set address = event.place.street ~ ', ' ~ event.place.postalCode ~ ' ' ~ event.place.city %}
-    {% set addressGoogle = address|replace({' ': '+'}) %}
 
-
-    
+{#    {% if app.user !== event.organizer.id %}#}
+        <a href="{{ path('event_join', { id: event.id}) }}">S'inscrire</a>
+{#    {% endif %}#}
 
     {%  if app.user and event.organizer.id and app.user.admin == app.user.id %}
 
@@ -36,7 +35,17 @@
 
     {% endif %}
 
+    {% set address = event.place.street ~ ', ' ~ event.place.postalCode ~ ' ' ~ event.place.city %}
+    {% set addressGoogle = address|replace({' ': '+'}) %}
     <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&amp;output=embed"></iframe>
+
+    <h3>Liste des participants</h3>
+    {% for participant in participants %}
+        {%  for value in participant %}
+       {{value}}
+        {% endfor %}
+
+    {% endfor %}
 
 {% endblock %}
 

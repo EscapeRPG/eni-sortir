@@ -10,6 +10,7 @@ use App\Helper\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,7 @@ final class EventController extends AbstractController
 {
 
     #[Route('/create', name: '_create')]
-    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader): Response
+    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
         $event = new Event();
 
@@ -35,6 +36,8 @@ final class EventController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+
+
             $file = $form->get('poster_file')->getData();
             if ($file instanceof UploadedFile) {
                 $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_file']);
@@ -44,6 +47,7 @@ final class EventController extends AbstractController
             $interval = $start->diff($end);
             $minutes = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i;
             $event->setDuration($minutes);
+
 
             $user = $this->getUser();
             $event->setOrganizer($user);
@@ -70,17 +74,38 @@ final class EventController extends AbstractController
             'event_form' => $form,
         ]);
     }
-  
-    #[Route('/{id}/edit', name: '_edit', requirements: ['id' => '\d+'])]
-    public function edit(Event $event, Request $request, EntityManagerInterface $em): Response
+
+    #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
+    public function edit(Event $event, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
+        if($event->getOrganizer() !== $security->getUser()){
+            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
+        }
+
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /*$file = $form->get('poster_file')->getData();
+
+            if($file instanceof UploadedFile){
+                $dir = $parameterBag->get('event')['poster_dir'];
+                $name = $fileUploader->upload($file, $event->getName(), $dir);
+
+                $event->setPosterFile($name);
+
+                if ($event->getPosterFile() && file_exists($dir . '/' . $event->getPosterFile()){
+                    unlink($dir . '/' . $event->getPosterFile());
+                    }
+                    $event->setPosterFile($name);
+            }
+            $event->setPosterFile($name);*/
+
             $em->flush();
             $this->addFlash('success', 'Event edited!');
-            return $this->redirectToRoute('app_main', ['id' => $event->getId()]);
+            return $this->redirectToRoute('event_list', ['id' => $event->getId()]);
         }
         return $this->render('event/create.html.twig', [
             'event_form' => $form,
@@ -115,7 +140,7 @@ final class EventController extends AbstractController
     }
 
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
-    public function detail(SortieRepository $sortieRepository, int $id): Response
+    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response
     {
         $event = $sortieRepository->find($id);
 
@@ -128,4 +153,39 @@ final class EventController extends AbstractController
             'event' =>$event
         ]);
     }
+
+    #[Route ('/cancel/{id}', name: '_cancel', requirements: ['id' => '\d+'])]
+    public function cancel( Event $event, EntityManagerInterface $em, Security $security, SortieRepository $sortieRepository ):Response
+    {
+        if($event->getOrganizer() !== $security->getUser()){
+            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
+        }
+
+        $cancel = $sortieRepository->findBy(['name' => 'Annulée']);
+        if(!$cancel){
+            throw $this->createNotFoundException('statut introuvable !');
+        }
+
+        $event->setState($cancel);
+
+    }
+
+    #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
+    public function delete(Event $event, Request $request, EntityManagerInterface $em, Security $security): Response
+    {
+        if($event->getOrganizer() !== $security->getUser()){
+            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
+        }
+        if($this->isCsrfTokenValid('delete'.$event->getId(), $request->get('token'))) {
+            $em->remove($event);
+            $em->flush();
+
+            $this->addFlash('success', 'Event deleted!');
+        }else{
+            $this->addFlash('danger', 'Suppression impossible !');
+
+        }
+        return $this->redirectToRoute('event_list');
+    }
+
 }

@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{ parent() }} - Détails
+{% endblock %}
+
+{% block main %}
+
+    <h1>Détail du lieu : </h1>
+    <p>{{ place.name }}</p>
+    <p>{{ place.street }}</p>
+    <p>{{ place.city }}</p>
+    <p>{{ place.postalCode }}</p>
+
+    {% if app.user and app.user.admin == app.user.id %}
+    <a href="{{ path('place_edit', { id: place.id}) }}"> Modifier ce lieu</a>
+    <a href=""> Supprimer ce lieu</a>
+    {% endif %}
+
+
+
+{% endblock %}
+
+

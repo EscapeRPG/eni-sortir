@@ -7,6 +7,8 @@
 {% block title %}{{ parent() }} - Liste des Sorties{% endblock %}
 
 {% block main %}
+
+    <a href="{{ path('place_list') }}">Liste des lieux de sortie !</a>
     <div class="events-container">
         {% for event in events %}
             <div class="event">

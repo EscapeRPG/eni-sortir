@@ -31,11 +31,28 @@ class SortieRepository extends ServiceEntityRepository
             ->addSelect('participants')
             ->andWhere('e.campus = :campus')
             ->setParameter(':campus', $campus)
+            ->andWhere('e.state != 1')
+            ->andWhere('e.state != 7')
             ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery();
 
         return new Paginator($events);
+    }
+
+    public function findEventsDates(int $limit, int $offset, string $campus): array
+    {
+        return $this->createQueryBuilder('e')
+            ->select('e.startingDateHour')
+            ->orderBy('e.startingDateHour', 'ASC')
+            ->where('e.campus = :campus')
+            ->setParameter(':campus', $campus)
+            ->andWhere('e.state != 1')
+            ->andWhere('e.state != 7')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
     //    /**

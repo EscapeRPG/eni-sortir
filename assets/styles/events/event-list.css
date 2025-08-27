@@ -5,14 +5,36 @@
     width: 60%;
     margin: auto;
 
+    .event-date-container {
+        width: calc(100% - 40px);
+        padding: 20px;
+        box-shadow: 5px 5px 5px var(--event-shadow);
+        border-radius: 10px;
+        background-color: var(--events-dates-container-bg-color);
+
+        .event-date {
+            width: calc(100% - 20px);
+            text-align: right;
+            font-size: 1.2em;
+            padding: 5px 10px;
+            border-radius: 10px;
+            background-color: var(--events-dates-bg-color);
+            margin-bottom: 1em;
+        }
+    }
+
     .event {
         display: flex;
         width: 100%;
-        background-color: var(--event-bg-color);
         border: none;
         border-radius: 20px;
         overflow: hidden;
-        box-shadow: 5px 5px 5px var(--event-shadow);
+        margin-top: 20px;
+        background-color: var(--event-bg-color);
+
+        &:hover {
+            transform: scale(1.02);
+        }
 
         .event-poster {
             width: 25%;

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Campus;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class UserController extends AbstractController
@@ -69,5 +71,38 @@ class UserController extends AbstractController
         ]);
     }
 
+    #[Route('/users/list', name: 'app_users_list')]
+    public function usersList(UserRepository $userRepository, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+
+        $users = $userRepository->findUsersByCampus($userConnected->getCampus());
+        return $this->render('user/users_list.html.twig', [
+            'users' => $users,
+        ]);
+    }
+
+    #[Route('users/delete/{id}', name: 'app_users_delete', requirements: ['id' => '\d+'])]
+    public function deleteUser(Request $request, User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->get('_token'))) {
+            $em->remove($user);
+            $em->flush();
+
+            $this->addFlash('success', "L'utilisateur a été supprimé");
+
+        }else{
+            $this->addFlash('success', "Impossible de supprimer l'utilisateur");
+        }
+        return $this->redirectToRoute('app_users_list');
+    }
 
 }

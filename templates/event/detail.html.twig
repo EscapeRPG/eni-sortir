@@ -20,9 +20,19 @@
         <a href="{{ path('event_join', { id: event.id}) }}">S'inscrire</a>
 {#    {% endif %}#}
 
-    {%  if app.user and event.organizer.id == app.user.id %}
+    {%  if app.user and event.organizer.id and app.user.admin == app.user.id %}
+
     <a href="{{ path('event_edit', { id: event.id}) }}"> Éditez votre sortie </a>
         <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}" onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')"> Supprimez votre sortie </a>
+
+    {% if event.state.label != 'Annulée' %}
+        <a href ="{{ path('event_cancel', {id:event.id}) }}" onclick="return confirm('êtes vous sûr de vouloir annuler votre event ?')"> Annulez votre event </a>
+    {% endif %}
+
+        {% if event.state.label == 'Annulée' %}
+                <a href="{{ path('event_reactivate', {id:event.id}) }}"> Réactivez votre sortie </a>
+            {% endif %}
+
     {% endif %}
 
     {% set address = event.place.street ~ ', ' ~ event.place.postalCode ~ ' ' ~ event.place.city %}

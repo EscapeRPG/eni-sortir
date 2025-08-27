@@ -154,9 +154,6 @@ final class EventController extends AbstractController
             throw $this->createNotFoundException('Cet évènement n\'existe pas');
         }
 
-        return $this->render('event/detail.html.twig', [
-            'id' => $id,
-
         $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
 
         return $this->render('event/detail.html.twig', [

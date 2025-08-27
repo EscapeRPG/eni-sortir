@@ -16,7 +16,9 @@
     {{ form_row(edit_form.email) }}
     {{ form_row(edit_form.plainPassword) }}
 
-    <button type="submit" class="btn">Enregistrer</button>
+    {{ form_widget(edit_form) }}
+    <button type="submit">Enregistrer</button>
+    {{ form_end(edit_form) }}
     <a href="{{ path('app_main') }}">Retour</a>
 {% endblock %}
 

@@ -7,12 +7,14 @@
 {% block title %}{{ parent() }} - Liste des Sorties{% endblock %}
 
 {% block main %}
+
 <div class="events-container">
     {% if events|length != 0 %}
         {% for date in eventsDates %}
             <div class="event-date-container">
                 <div class="event-date">
                     {{ date }}
+
                 </div>
 
                 {% for event in events %}

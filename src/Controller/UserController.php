@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Campus;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
@@ -10,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class UserController extends AbstractController
@@ -36,33 +39,96 @@ class UserController extends AbstractController
     }
 
     #[Route('/profile/{id}', name: 'app_profile', requirements: ['id' => '\d+'])]
-    public function editProfile(UserRepository $userRepository,int $id, Request $request, EntityManagerInterface $em): Response
+    public function editProfile(
+        UserRepository         $userRepository,
+        int                    $id,
+        Request                $request,
+        EntityManagerInterface $em,
+        #[CurrentUser] ?User   $userConnected
+    ): Response
     {
+        $user = $userRepository->findUserById($id);
 
-        $userConnected = $this->getUser();
+        if ($userConnected !== $user) {
+            throw $this->createAccessDeniedException('Accès refusé');
 
-        if ($userConnected->getUserIdentifier() !== $userRepository->findUserById('id')) {
-            throw $this->createAccessDeniedException('Vous ne pouvez pas accéder à cette page');
-
-        } else {
-            $form = $this->createForm(RegistrationFormType::class, $userRepository);
-
-            $form->handleRequest($request);
-
-            if ($form->isSubmitted() && $form->isValid()) {
-                $id = $form->getData()->getId();
-                $em->flush();
-
-                $this->addFlash('success', "Mise à jour enregistrée");
-
-                return $this->redirectToRoute('app_main', ['id' => $id]);
-            }
-
-            return $this->render('user/edit.html.twig', [
-                'edit_form' => $form,
-                'user' => $userConnected,
-            ]);
         }
+
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($user);
+            $em->flush();
+            $this->addFlash('success', "Mise à jour enregistrée");
+            return $this->redirectToRoute('event_list');
+        }
+
+        return $this->render('user/edit.html.twig', [
+            'edit_form' => $form->createView(),
+            'user' => $user,
+            'id' => $id
+        ]);
+    }
+
+    #[Route('/users/list', name: 'app_users_list')]
+    public function usersList(UserRepository $userRepository, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+
+        $users = $userRepository->findUsersByCampus($userConnected->getCampus());
+        return $this->render('user/users_list.html.twig', [
+            'users' => $users,
+        ]);
+    }
+
+    #[Route('users/delete/{id}', name: 'app_users_delete', requirements: ['id' => '\d+'])]
+    public function deleteUser(Request $request, User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->get('_token'))) {
+            $em->remove($user);
+            $em->flush();
+
+            $this->addFlash('success', "L'utilisateur a été supprimé");
+
+        }else{
+            $this->addFlash('success', "Impossible de supprimer l'utilisateur");
+        }
+        return $this->redirectToRoute('app_users_list');
+    }
+
+    #[Route('users/disable/{id}', name: 'app_users_disable', requirements: ['id' => '\d+'])]
+    public function disableUser(Request $request, User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+
+    if($user->isActive() === true) {
+        $user->setIsActive(false);
+        $em->flush();
+        $em->persist($user);
+
+        $this->addFlash('success', "L'utilisateur a été désactivé");
+
+    }else{
+        $user->setIsActive(true);
+        $em->flush();
+        $em->persist($user);
+
+        $this->addFlash('success', "L'utilisateur a été activé");
+    }
+
+    return $this->redirectToRoute('app_users_list');
     }
 
 }

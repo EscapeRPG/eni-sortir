@@ -48,7 +48,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $isAdmin = false;
 
     #[ORM\Column]
-    private ?bool $isActive = false;
+    private ?bool $isActive = true;
 
     /**
      * @var Collection<int, Event>

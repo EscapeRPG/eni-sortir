@@ -26,9 +26,19 @@ And add the execution file to the wampServer bin.
 
 Download and run Composer-Setup.exe from [https://getcomposer.org/download/]
 
+### Mailing
+
+Download and execute your version on [https://github.com/mailhog/MailHog/releases]
+
+Add in env.dev file : MAILER_DSN=smtp://localhost:**** (look at your terminal  (e.g.,  [SMTP] Binding to address: 0.0.0.0:1025))
+
+Modify messenger.yaml :
+ - 'sync://' ==>> 'sync'
+ - Symfony\Component\Mailer\Messenger\SendEmailMessage: async ==>> Symfony\Component\Mailer\Messenger\SendEmailMessage: sync
+
 ### Database
 
 The project uses a My SQL Database
 | Name  | User          | Password | Port |
 | :--------------- |:---------------:| -----:| -----:|
-|+++++  |   root       |  none | 3306
+| eni-sortir  |   root       |  none | 3306

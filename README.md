@@ -33,8 +33,8 @@ Download and execute your version on [https://github.com/mailhog/MailHog/release
 Add in env.dev file : MAILER_DSN=smtp://localhost:**** (look at your terminal  (e.g.,  [SMTP] Binding to address: 0.0.0.0:1025))
 
 Modify messenger.yaml :
--- 'sync://' ==>> 'sync'
--- Symfony\Component\Mailer\Messenger\SendEmailMessage: async ==>> Symfony\Component\Mailer\Messenger\SendEmailMessage: sync
+ - 'sync://' ==>> 'sync'
+ - Symfony\Component\Mailer\Messenger\SendEmailMessage: async ==>> Symfony\Component\Mailer\Messenger\SendEmailMessage: sync
 
 ### Database
 

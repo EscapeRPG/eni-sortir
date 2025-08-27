@@ -22,8 +22,7 @@
                     {% if is_granted('IS_AUTHENTICATED') %}
                         <li><a href="{{ path('app_logout') }}">Se déconnecter</a></li>
 
-{#                        @TODO ajouter un lien vers le profil utilisateur depuis l'accueil#}
-{#                        <li><a href="{{ path('app_profile', {'id':userConnected.id}) }}">Profil</a></li>#}
+                        <li><a href="{{ path('app_profile', {id:app.user.id}) }}">Profil</a></li>
 
                         <li><a href="{{ path('event_create') }}">Créer un évènement</a></li>
 

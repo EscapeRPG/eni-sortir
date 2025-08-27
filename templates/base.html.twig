@@ -33,7 +33,8 @@
                     {% endif %}
 
                     {% if is_granted('ROLE_ADMIN') %}
-                    <li><a href="{{ path('app_users_list') }}">Liste des utilisateurs</a></li>
+                        <li><a href="{{ path('app_users_list') }}">Liste des utilisateurs</a></li>
+                        <li><a href="{{ path('app_register') }}">Ajouter un utilisateur</a></li>
                     {% endif %}
 
 

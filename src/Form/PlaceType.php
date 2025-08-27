@@ -29,9 +29,11 @@ class PlaceType extends AbstractType
             ->add('longitude', IntegerType::class, [
                 'label' => 'Longitude'
             ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Enregistrer',
+            ->add('save', SubmitType::class, [
+                'label' => 'Enregistrer'
             ]);
+
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -4,14 +4,21 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Entity\Place;
+use App\Entity\User;
 use App\Form\EventType;
 use App\Form\PlaceType;
-use App\Form\PlaceType22;
+use App\Repository\PlaceRepository;
+use App\Repository\SortieRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Bundle\SecurityBundle\SecurityBundle;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/place', name: 'place')]
 final class PlaceController extends AbstractController
@@ -35,10 +42,60 @@ final class PlaceController extends AbstractController
             return $this->redirectToRoute('event_create');
         }
         return $this->render('place/place.html.twig', [
-            'place_create' => $form,
+            'place_create' => $form->createView(),
         ]);
 
+    }
 
+    #[Route('/list{page}', name: '_list',requirements: ['page' => '\d+'],defaults: ['page' => 1])]
+    public function list(PlaceRepository $placeRepository, ParameterBagInterface $param, int $page, #[CurrentUser] ?user $user): Response
+    {
+        $nbParPage = $param->get('place')['nb_max'];
+        $offset = ($page - 1) * $nbParPage;
+        $campus = $user->getCampus()->getId();
+
+        $places = $placeRepository->findAllPlaces($nbParPage, $offset);
+        $pages = ceil($places->count() / $nbParPage);
+
+       return $this->render('place/list.html.twig', [
+           'places' => $places,
+           'page' => $page,
+           'pages' => $pages,
+       ]);
+    }
+
+    #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
+    public function detail(PlaceRepository $placeRepository,int $id, ParameterBagInterface $param): Response
+    {
+        $place = $placeRepository->find($id);
+
+        if(!$place){
+            throw $this->createNotFoundException('Cet endroit n\'existe pas');
+        }
+
+        return $this->render('place/detail.html.twig', [
+            'place' => $place,
+            'id' => $id
+        ]);
+    }
+
+    #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
+    #[ISGranted('ROLE_ADMIN')]
+    public function edit(Place $place, Request $request, EntityManagerInterface $em, Security $security): Response
+    {
+    $form = $this->createForm(PlaceType::class, $place);
+    $form->handleRequest($request);
+
+    if($form->isSubmitted() && $form->isValid()){
+    $em->flush();
+    $this->addFlash('success', 'Place updated!');
+    return $this->redirectToRoute('event_list', ['id' => $place->getId()]);
+
+    }
+    return $this->render('place/place.html.twig', [
+        'place_create' => $form->createView(),
+        'place' => $place,
+    ]);
     }
 
 }

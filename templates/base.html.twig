@@ -22,9 +22,11 @@
                     {% if is_granted('IS_AUTHENTICATED') %}
                         <li><a href="{{ path('app_logout') }}">Se déconnecter</a></li>
 
-                        <li><a href="{{ path('app_profile', {id:app.user.id}) }}">Profil</a></li>
+                        <li><a href="{{ path('app_update', {id:app.user.id}) }}">Profil</a></li>
 
                         <li><a href="{{ path('event_create') }}">Créer un évènement</a></li>
+
+                        <li><a href="{{ path('place_create') }}">Créer un lieu de sortie</a></li>
 
                     {% else %}
                         <li><a href="{{ path('app_login') }}">Se connecter</a></li>

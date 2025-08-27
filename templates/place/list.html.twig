@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un super event{% endblock %}
+
+{% block main %}
+
+    <h1> Liste des endroits de jeunes !! </h1>
+
+    {% for place in places %}
+        <a href="{{ path('place_detail', {id:place.id }) }}">
+    <h2>Titre : {{ place.name }}</h2>
+    {% endfor %}
+
+
+
+
+{% endblock %}

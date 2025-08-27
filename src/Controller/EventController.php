@@ -39,7 +39,6 @@ final class EventController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
 
-
             $file = $form->get('poster_file')->getData();
             if ($file instanceof UploadedFile) {
                 $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_file']);
@@ -78,13 +77,12 @@ final class EventController extends AbstractController
     #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
     public function edit(Event $event, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
-        if($event->getOrganizer() !== $security->getUser()){
+        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
         }
 
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
-
 
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -150,6 +148,12 @@ final class EventController extends AbstractController
     public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response
     {
         $event = $sortieRepository->find($id);
+
+
+        if (!$event) {
+            throw $this->createNotFoundException('Cet évènement n\'existe pas');
+        }
+
         $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
 
         return $this->render('event/detail.html.twig', [
@@ -226,25 +230,47 @@ final class EventController extends AbstractController
     }
 
     #[Route ('/cancel/{id}', name: '_cancel', requirements: ['id' => '\d+'])]
-    public function cancel( Event $event, EntityManagerInterface $em, Security $security, SortieRepository $sortieRepository ):Response
+    public function cancel(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
     {
-        if($event->getOrganizer() !== $security->getUser()){
-            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
+        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement (ou admin)");
         }
 
-        $cancel = $sortieRepository->findBy(['name' => 'Annulée']);
-        if(!$cancel){
+        $cancel = $stateRepository->findOneBy(['label' => 'Annulée']);
+        if (!$cancel) {
             throw $this->createNotFoundException('statut introuvable !');
         }
 
         $event->setState($cancel);
+        $em->flush();
+        $this->addFlash('success', 'Event annulé !');
 
-    }
+        return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+        }
+
+        #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
+        public function reactivate(Event $event, EntityManagerInterface $em, Security $security,StateRepository $stateRepository): Response
+        {
+            if ($event->getOrganizer() !== $security->getUser()&& !$security->isGranted('ROLE_ADMIN')) {
+                throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
+            }
+            $reac = $stateRepository->findOneBy(['label' => 'Créée']);
+            if (!$reac) {
+                throw $this->createNotFoundException('statut introuvable !');
+            }
+            $event->setState($reac);
+            $em->flush();
+            $this->addFlash('success','Event réactivé !');
+
+            return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+
+
+        }
 
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
     public function delete(Event $event, Request $request, EntityManagerInterface $em, Security $security): Response
     {
-        if($event->getOrganizer() !== $security->getUser()){
+        if($event->getOrganizer() !== $security->getUser()&& !$security->isGranted('ROLE_ADMIN')){
             throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
         }
         if($this->isCsrfTokenValid('delete'.$event->getId(), $request->get('token'))) {

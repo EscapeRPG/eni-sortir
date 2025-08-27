@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Campus;
 use App\Entity\User;
+use App\Form\EditType;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,7 +39,7 @@ class UserController extends AbstractController
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
-    #[Route('/profile/{id}', name: 'app_profile', requirements: ['id' => '\d+'])]
+    #[Route('/update/{id}', name: 'app_update', requirements: ['id' => '\d+'])]
     public function editProfile(
         UserRepository         $userRepository,
         int                    $id,
@@ -49,26 +50,34 @@ class UserController extends AbstractController
     {
         $user = $userRepository->findUserById($id);
 
-        if ($userConnected !== $user) {
+        if ($userConnected === $user || in_array('ROLE_ADMIN', $userConnected->getRoles(), true)) {
+            $form = $this->createForm(EditType::class, $user, [
+                'is_admin' => $this->isGranted('ROLE_ADMIN'),
+            ]);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em->flush();
+
+                $this->addFlash('success', "Mise à jour enregistrée");
+
+                if ($user->isAdmin() === true){
+                    return $this->redirectToRoute('app_users_list');
+                }else{
+                    return $this->redirectToRoute('event_list');
+                }
+            }
+
+            return $this->render('user/edit.html.twig', [
+                'edit_form' => $form,
+                'user' => $user,
+                'id' => $id
+            ]);
+
+        } else {
             throw $this->createAccessDeniedException('Accès refusé');
-
         }
 
-        $form = $this->createForm(RegistrationFormType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($user);
-            $em->flush();
-            $this->addFlash('success', "Mise à jour enregistrée");
-            return $this->redirectToRoute('event_list');
-        }
-
-        return $this->render('user/edit.html.twig', [
-            'edit_form' => $form->createView(),
-            'user' => $user,
-            'id' => $id
-        ]);
     }
 
     #[Route('/users/list', name: 'app_users_list')]
@@ -128,7 +137,7 @@ class UserController extends AbstractController
         $this->addFlash('success', "L'utilisateur a été activé");
     }
 
-    return $this->redirectToRoute('app_users_list');
+    return $this->redirectToRoute('app_update', ['id' => $user->getId()]);
     }
 
     #[Route('users/promote/{id}', name: 'app_users_promote', requirements: ['id' => '\d+'])]
@@ -154,7 +163,7 @@ class UserController extends AbstractController
             $this->addFlash('success', "L'utilisateur n'est plus administrateur");
         }
 
-        return $this->redirectToRoute('app_users_list');
+        return $this->redirectToRoute('app_update', ['id' => $user->getId()]);
     }
 
 

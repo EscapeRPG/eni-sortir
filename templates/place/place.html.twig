@@ -5,7 +5,19 @@
 {% block main %}
     <h1> Créez une discothèque ou tout autre lieu d'ambiançage de jeune</h1>
 
-{{ form(place_create) }}
+{{ form_start(place_create) }}
+
+{{ form_row(place_create.name) }}
+    {{ form_row(place_create.street) }}
+    {{ form_row(place_create.postalCode) }}
+    {{ form_row(place_create.city) }}
+    {{ form_row(place_create.latitude) }}
+    {{ form_row(place_create.longitude) }}
+
+    {{ form_row(place_create.save) }}
+
+    {{ form_end(place_create) }}
+
 
 
 {% endblock %}

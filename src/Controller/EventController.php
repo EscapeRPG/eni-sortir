@@ -163,7 +163,7 @@ final class EventController extends AbstractController
      * @throws Exception
      */
 
-    public function close(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
+    public function closeIfFullParticipants(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
     {
         $event = $sortieRepository->find($id);
         $listParticpants = $sortieRepository->findParticipantsByEvent($event->getId());
@@ -179,6 +179,18 @@ final class EventController extends AbstractController
         }
     }
 
+    public function closeIfOutDate(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void {
+        $event = $sortieRepository->find($id);
+        $today = new \DateTime();
+        $closureDate = $event->getRegistrationDeadline();
+        $closureState = $stateRepository->find(3);
+
+        if($closureDate == $today){
+            $event->setState($closureState);
+            $entityManager->persist($event);
+            $entityManager->flush();
+        }
+    }
 
     /**
      * @throws Exception
@@ -202,7 +214,7 @@ final class EventController extends AbstractController
             $entityManager->persist($event);
             $entityManager->flush();
 
-            $this->close($stateRepository, $sortieRepository, $event->getId(), $bag, $entityManager);
+            $this->closeIfFullParticipants($stateRepository, $sortieRepository, $event->getId(), $bag, $entityManager);
             $this->redirectToRoute('event_list', ['id' => $event->getId()]);
 
         }

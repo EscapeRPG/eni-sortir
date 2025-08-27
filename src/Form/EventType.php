@@ -32,7 +32,7 @@ class EventType extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Nom',
+                'label' => 'Nom de l\'evènement',
                 'required' => true,
             ])
             ->add('startingDateHour', DateTimeType::class, [
@@ -56,31 +56,31 @@ class EventType extends AbstractType
             ])
 
             ->add('eventInfo', TextareaType::class, [
-                'label' => 'Information',
+                'label' => 'Informations',
                 'required' => false,
             ])
 
             /*la personne qui crée l'évènement est l'oganisateur, à ajouter*/
 
-            ->add('state', EntityType::class, [
-                'placeholder'=>'--Choisir un "état--',
-                'class' => State::class,
-                'choice_label' => function (State $state) {
-                    return sprintf('%s (%s)', $state->getLabel(), count($state->getEvents()));
-                },
-            ])
-
-            ->add('campus', EntityType::class, [
-                'placeholder'=>'--Choisir un campus--',
-                'class' => Campus::class,
-                'choice_label' => function (Campus $campus) {
-                    return sprintf('%s (%s)', $campus->getName(), count($campus->getEvents()));
-                }
-            ])
+//            ->add('state', EntityType::class, [
+//                'placeholder'=>'--Choisir un "état--',
+//                'class' => State::class,
+//                'choice_label' => function (State $state) {
+//                    return sprintf('%s (%s)', $state->getLabel(), count($state->getEvents()));
+//                },
+//            ])
+//
+//            ->add('campus', EntityType::class, [
+//                'placeholder'=>'--Choisir un campus--',
+//                'class' => Campus::class,
+//                'choice_label' => function (Campus $campus) {
+//                    return sprintf('%s (%s)', $campus->getName(), count($campus->getEvents()));
+//                }
+//            ])
 
             ->add('place', EntityType::class, [
                 'class' => Place::class,
-                'label'=>'Lieux',
+                'label'=>'Choisissez un lieu',
                 'required' => true,
                 'choice_label' => 'name',
             ])
@@ -88,6 +88,7 @@ class EventType extends AbstractType
 
 
             ->add('poster_file', FileType::class, [
+                'label' => 'Image',
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
@@ -103,6 +104,13 @@ class EventType extends AbstractType
                     ])
                 ]
             ])
+
+            ->add('saveDraft', SubmitType::class, [
+                'label' => 'Enregistrer pour plus tard',
+            ])
+            ->add('publish', SubmitType::class, [
+                'label' => 'Ouvrir aux inscriptions',
+            ]);
         ;
     }
 

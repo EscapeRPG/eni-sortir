@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\State;
+use App\Entity\User;
 use App\Form\EventType;
 use App\Helper\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,6 +16,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/event', name: 'event')]
@@ -24,7 +27,6 @@ final class EventController extends AbstractController
     public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
         $event = new Event();
-
 
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
@@ -49,11 +51,18 @@ final class EventController extends AbstractController
 
             $user = $this->getUser();
             $event->setOrganizer($user);
-
+            $event->setCampus($user->getCampus());
 
             $place = $form->get('place')->getData();
             $event->setPlace($place);
 
+            if ($form->get('saveDraft')->isClicked()) {
+                $state = $em->getRepository(State::class)->find(1);
+            } elseif ($form->get('publish')->isClicked()) {
+                $state = $em->getRepository(State::class)->find(2);
+            }
+
+            $event->setState($state);
 
             $em->persist($event);
             $em->flush();
@@ -107,13 +116,14 @@ final class EventController extends AbstractController
         name: '_list',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 1])]
-    public function index(SortieRepository $sortieRepository, ParameterBagInterface $bag, int $page): Response
+    public function index(SortieRepository $sortieRepository, ParameterBagInterface $bag, int $page, #[CurrentUser] ?User $user): Response
     {
         $limit = $bag->get('event')['nb_max'];
         $offset = ($page - 1) * $limit;
+        $campus = $user->getCampus()->getId();
 
         // $events = $sortieRepository->findAll();
-        $events = $sortieRepository->findAllEvents($limit, $offset);
+        $events = $sortieRepository->findAllEvents($limit, $offset, $campus);
 
         $pages = ceil($events->count() / $limit);
 

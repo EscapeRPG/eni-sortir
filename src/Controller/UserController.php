@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class UserController extends AbstractController
@@ -36,33 +37,37 @@ class UserController extends AbstractController
     }
 
     #[Route('/profile/{id}', name: 'app_profile', requirements: ['id' => '\d+'])]
-    public function editProfile(UserRepository $userRepository,int $id, Request $request, EntityManagerInterface $em): Response
+    public function editProfile(
+        UserRepository         $userRepository,
+        int                    $id,
+        Request                $request,
+        EntityManagerInterface $em,
+        #[CurrentUser] ?User   $userConnected
+    ): Response
     {
+        $user = $userRepository->findUserById($id);
 
-        $userConnected = $this->getUser();
+        if ($userConnected !== $user) {
+            throw $this->createAccessDeniedException('Accès refusé');
 
-        if ($userConnected->getUserIdentifier() !== $userRepository->findUserById('id')) {
-            throw $this->createAccessDeniedException('Vous ne pouvez pas accéder à cette page');
-
-        } else {
-            $form = $this->createForm(RegistrationFormType::class, $userRepository);
-
-            $form->handleRequest($request);
-
-            if ($form->isSubmitted() && $form->isValid()) {
-                $id = $form->getData()->getId();
-                $em->flush();
-
-                $this->addFlash('success', "Mise à jour enregistrée");
-
-                return $this->redirectToRoute('app_main', ['id' => $id]);
-            }
-
-            return $this->render('user/edit.html.twig', [
-                'edit_form' => $form,
-                'user' => $userConnected,
-            ]);
         }
+
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($user);
+            $em->flush();
+            $this->addFlash('success', "Mise à jour enregistrée");
+            return $this->redirectToRoute('event_list');
+        }
+
+        return $this->render('user/edit.html.twig', [
+            'edit_form' => $form->createView(),
+            'user' => $user,
+            'id' => $id
+        ]);
     }
+
 
 }

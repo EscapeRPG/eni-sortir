@@ -40,7 +40,9 @@
                                     </div>
                                     <div class="participants">
                                         <img src="{{ asset('uploads/users/' ~ event.organizer.name) }}"
-                                             class="event-organizer">
+                                             class="event-organizer"
+                                             alt="{{ event.organizer.name }}"
+                                        >
                                         <p>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
                                     </div>
                                 </div>

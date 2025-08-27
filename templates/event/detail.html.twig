@@ -19,6 +19,11 @@
     {% set addressGoogle = address|replace({' ': '+'}) %}
 
     <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&output=embed"></iframe>
+
+    {%  if app.user and event.organizer.id == app.user.id %}
+    <a href="{{ path('event_edit', { id: event.id}) }}"> Éditez votre sortie </a>
+        <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}" onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')"> Supprimez votre sortie </a>
+    {% endif %}
 {% endblock %}
 
 

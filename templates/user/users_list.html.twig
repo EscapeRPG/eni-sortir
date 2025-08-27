@@ -11,6 +11,11 @@
 
             <li><a href="">{{ user.name }} {{ user.firstName }} </a>
                 <a href="{{ path('app_users_delete', {id: user.id, _token : csrf_token('delete'~user.id)}) }}" onclick="return confirm('Etes vous sûr?')" >Supprimer</a>
+                {% if user.isActive == true %}
+                    <a href="{{ path('app_users_disable', {id: user.id}) }}" onclick="return confirm('Etes vous sûr?')">Désactiver</a>
+                {% else %}
+                    <a href="{{ path('app_users_disable', {id: user.id}) }}" onclick="return confirm('Etes vous sûr?')">Activer</a>
+                {% endif %}
             </li>
 
 

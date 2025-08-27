@@ -18,7 +18,7 @@
     {% set address = event.place.street ~ ', ' ~ event.place.postalCode ~ ' ' ~ event.place.city %}
     {% set addressGoogle = address|replace({' ': '+'}) %}
 
-    <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&output=embed"></iframe>
+    <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&amp;output=embed"></iframe>
 {% endblock %}
 
 

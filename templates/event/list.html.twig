@@ -7,59 +7,78 @@
 {% block title %}{{ parent() }} - Liste des Sorties{% endblock %}
 
 {% block main %}
-    <div class="events-container">
-        {% for event in events %}
-            <div class="event">
-                <div class="event-poster">
-                    <a href="{{ path('event_detail', {id: event.id}) }}">
-                        <img src="{{ asset('uploads/events/' ~ event.posterFile) }}" alt="{{ event.name }}" title="{{ event.name }}">
-                    </a>
+<div class="events-container">
+    {% if events|length != 0 %}
+        {% for date in eventsDates %}
+            <div class="event-date-container">
+                <div class="event-date">
+                    {{ date }}
                 </div>
 
-                <div class="event-info">
-                    <div class="event-body">
-                        <div class="event-description">
-                            <h2><a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a></h2>
-                            <p>{{ event.startingDateHour | date('d/m/Y H:i:s') }}
-                                - {{ event.endDateHour | date('d/m/Y H:i:s') }}</p>
-                            <p>({{ duration }})</p>
-                            <p>{{ event.place.street }} {{ event.place.postalCode }} {{ event.place.city }}</p>
-                        </div>
-                        <div class="participants">
-                            <img src="{{ asset('uploads/users/' ~ event.organizer.name) }}" class="event-organizer">
-                            <p>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
-                        </div>
-                    </div>
+                {% for event in events %}
+                    {% if event.startingDateHour | date('d/m/Y') == date %}
 
-                    <div class="event-state {{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
-                        {{ event.state.label }}
-                    </div>
-                </div>
+                        <div class="event">
+                            <div class="event-poster">
+                                <a href="{{ path('event_detail', {id: event.id}) }}">
+                                    <img src="{{ asset('uploads/events/' ~ event.posterFile) }}"
+                                         alt="{{ event.name }}"
+                                         title="{{ event.name }}">
+                                </a>
+                            </div>
+
+                            <div class="event-info">
+                                <div class="event-body">
+                                    <div class="event-description">
+                                        <h2>
+                                            <a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a>
+                                        </h2>
+                                        <p>{{ event.startingDateHour | date('H:i:s') ~ ' (' ~ event.duration | duration }})</p>
+                                        <p>{{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}</p>
+                                    </div>
+                                    <div class="participants">
+                                        <img src="{{ asset('uploads/users/' ~ event.organizer.name) }}"
+                                             class="event-organizer">
+                                        <p>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="event-state {{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
+                                    {{ event.state.label }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
             </div>
         {% endfor %}
-    </div>
+    {% else %}
+        <div class="event-date-container">
+            <p>Aucun événement ne correspond à votre recherche.</p>
+        </div>
+    {% endif %}
 
-    {% if pages != 1 %}
+    {% if pages != 0 and pages != 1 %}
         <div class="pagination">
             {% if page == 1 %}
                 <div></div>
                 <div></div>
-                <div><a href="{{ path('_list', {page: page}) }}">{{ page }}</a></div>
-                <div><a href="{{ path('_list', {page: page + 1}) }}">Next ></a></div>
-                <div><a href="{{ path('_list', {page: pages}) }}">Last >></a></div>
+                <div><a href="{{ path('event_list', {page: page}) }}">{{ page }}</a></div>
+                <div><a href="{{ path('event_list', {page: page + 1}) }}">Next ></a></div>
+                <div><a href="{{ path('event_list', {page: pages}) }}">Last >></a></div>
             {% elseif page < pages %}
-                <div><a href="{{ path('_list', {page: 1}) }}"><< First</a></div>
-                <div><a href="{{ path('_list', {page: page - 1}) }}">< Prev</a></div>
-                <div><a href="{{ path('_list', {page: page}) }}">{{ page }}</a></div>
-                <div><a href="{{ path('_list', {page: page + 1}) }}">Next ></a></div>
-                <div><a href="{{ path('_list', {page: pages}) }}">Last >></a></div>
+                <div><a href="{{ path('event_list', {page: 1}) }}"><< First</a></div>
+                <div><a href="{{ path('event_list', {page: page - 1}) }}">< Prev</a></div>
+                <div><a href="{{ path('event_list', {page: page}) }}">{{ page }}</a></div>
+                <div><a href="{{ path('event_list', {page: page + 1}) }}">Next ></a></div>
+                <div><a href="{{ path('event_list', {page: pages}) }}">Last >></a></div>
             {% else %}
-                <div><a href="{{ path('_list', {page: 1}) }}"><< First</a></div>
-                <div><a href="{{ path('_list', {page: page - 1}) }}">< Prev</a></div>
-                <div><a href="{{ path('_list', {page: page}) }}">{{ page }}</a></div>
+                <div><a href="{{ path('event_list', {page: 1}) }}"><< First</a></div>
+                <div><a href="{{ path('event_list', {page: page - 1}) }}">< Prev</a></div>
+                <div><a href="{{ path('event_list', {page: page}) }}">{{ page }}</a></div>
                 <div></div>
                 <div></div>
             {% endif %}
         </div>
     {% endif %}
-{% endblock %}
+    {% endblock %}

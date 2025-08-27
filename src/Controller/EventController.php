@@ -89,19 +89,23 @@ final class EventController extends AbstractController
         $limit = $bag->get('event')['nb_max'];
         $offset = ($page - 1) * $limit;
         $campus = $user->getCampus()->getId();
-
-        // $events = $sortieRepository->findAll();
         $events = $sortieRepository->findAllEvents($limit, $offset, $campus);
-
         $pages = ceil($events->count() / $limit);
+        $dates = $sortieRepository->findEventsDates($limit, $offset, $campus);
 
-        foreach ($events as $eniEvent) {
-            $duration = $eniEvent->getStartingDateHour()->diff($eniEvent->getEndDateHour())->format('%d jours %H heures %i minutes %s secondes');
+        $uniqueDates = [];
+
+        foreach ($dates as $date) {
+            $formattedDate = $date['startingDateHour']->format('d/m/Y');
+            $uniqueDates[$formattedDate] = $formattedDate;
         }
 
+        $uniqueDates = array_unique($uniqueDates);
+        $uniqueDates = array_values($uniqueDates);
+
         return $this->render('event/list.html.twig', [
+            'eventsDates' => $uniqueDates,
             'events' => $events,
-            'duration' => $duration,
             'page' => $page,
             'pages' => $pages
         ]);

@@ -17,10 +17,20 @@ class SortieRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
-    public function findAllEvents(int $limit, int $offset): Paginator
+    public function findAllEvents(int $limit, int $offset, string $campus): Paginator
     {
         $events = $this->createQueryBuilder('e')
             ->orderBy('e.startingDateHour', 'ASC')
+            ->leftJoin('e.place', 'place')
+            ->addSelect('place')
+            ->leftJoin('e.organizer', 'organizer')
+            ->addSelect('organizer')
+            ->leftJoin('e.state', 'state')
+            ->addSelect('state')
+            ->leftJoin('e.participants', 'participants')
+            ->addSelect('participants')
+            ->andWhere('e.campus = :campus')
+            ->setParameter(':campus', $campus)
             ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery();

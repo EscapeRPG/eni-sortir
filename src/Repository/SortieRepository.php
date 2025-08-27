@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Event;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,6 +19,19 @@ class SortieRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
+    /**
+     * @throws Exception
+     */
+    public function findParticipantsByEvent(int $id) : array {
+
+        $sql = <<<SQL
+SELECT u.first_name, u.name FROM USER u JOIN user_event ue ON u.ID = ue.user_id WHERE ue.event_id =:id              
+SQL;
+        $stmt = $this->getEntityManager()->getConnection();
+        return $stmt->prepare($sql)
+            ->executeQuery(['id' => $id])
+        ->fetchAllAssociative();
+    }
     public function findAllEvents(int $limit, int $offset, string $campus): Paginator
     {
         $events = $this->createQueryBuilder('e')
@@ -27,8 +42,8 @@ class SortieRepository extends ServiceEntityRepository
             ->addSelect('organizer')
             ->leftJoin('e.state', 'state')
             ->addSelect('state')
-            ->leftJoin('e.participants', 'participants')
-            ->addSelect('participants')
+//            ->leftJoin('e.participants', 'participants')
+//            ->addSelect('participants')
             ->andWhere('e.campus = :campus')
             ->setParameter(':campus', $campus)
             ->setFirstResult($offset)

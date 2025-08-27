@@ -7,6 +7,8 @@ use App\Entity\State;
 use App\Entity\User;
 use App\Form\EventType;
 use App\Helper\FileUploader;
+use App\Repository\StateRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -50,6 +52,7 @@ final class EventController extends AbstractController
 
 
             $user = $this->getUser();
+            $event->addUser($user);
             $event->setOrganizer($user);
             $event->setCampus($user->getCampus());
 
@@ -139,18 +142,70 @@ final class EventController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
     public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response
     {
         $event = $sortieRepository->find($id);
-
-        if (!$event){
-            throw $this->createNotFoundException('Cet évènement n\'existe pas');
-        }
+        $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
 
         return $this->render('event/detail.html.twig', [
             'id' => $id,
-            'event' =>$event
+            'event' =>$event,
+            'participants' => $listParticipants,
+        ]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    #[Route('/close/{id}', name: '_close', requirements: ['id' => '\d+'])]
+    public function close(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response
+    {
+        $event = $sortieRepository->find($id);
+        $listParticpants = $sortieRepository->findParticipantsByEvent($event->getId());
+
+        $nbParticipants = count($listParticpants);
+        $nbmaxParticipants = $event->getNbInscriptionsMax();
+
+        if ($nbmaxParticipants == $nbParticipants) {
+            $closureState = $stateRepository->find(3);
+            $event->setState($closureState);
+            $entityManager->persist($event);
+            $entityManager->flush();
+        }
+
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    #[Route('/join/{id}', name: '_join', requirements: ['id' => '\d+'])]
+    public function join(SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response {
+
+        $event = $sortieRepository->find($id);
+        $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
+
+        if ($event->getState()->getId() !== 2 ) {
+            throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet évènement");
+        }
+
+        $nbParticipants = count($listParticipants);
+        $nbmaxParticipants = $event->getNbInscriptionsMax();
+
+        if ($nbmaxParticipants >= $nbParticipants){
+            $event->addUser($userConnected);
+            $entityManager->persist($event);
+            $entityManager->flush();
+
+        }
+
+        return $this->redirectToRoute('event_list', [
+            'participants' => $listParticipants,
+            'event' => $event
         ]);
     }
 

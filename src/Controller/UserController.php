@@ -105,4 +105,30 @@ class UserController extends AbstractController
         return $this->redirectToRoute('app_users_list');
     }
 
+    #[Route('users/disable/{id}', name: 'app_users_disable', requirements: ['id' => '\d+'])]
+    public function disableUser(Request $request, User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+
+    if($user->isActive() === true) {
+        $user->setIsActive(false);
+        $em->flush();
+        $em->persist($user);
+
+        $this->addFlash('success', "L'utilisateur a été désactivé");
+
+    }else{
+        $user->setIsActive(true);
+        $em->flush();
+        $em->persist($user);
+
+        $this->addFlash('success', "L'utilisateur a été activé");
+    }
+
+    return $this->redirectToRoute('app_users_list');
+    }
+
 }

@@ -35,7 +35,7 @@ class SortieRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery();
 
-            return new Paginator($events);
+        return new Paginator($events);
     }
 
     //    /**

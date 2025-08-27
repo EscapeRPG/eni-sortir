@@ -7,24 +7,27 @@
 
     {{ form_start(event_form) }}
 
+    <div>
+        <p>Créé par {{ app.user.firstName }}</p>
+        <p>Sur le campus de {{ app.user.campus.name }}</p>
+    </div>
+
     {{ form_row(event_form.name) }}
     {{ form_row(event_form.startingDateHour) }}
     {{ form_row(event_form.endDateHour) }}
     {{ form_row(event_form.nbInscriptionsMax) }}
     {{ form_row(event_form.eventInfo) }}
-    {{ form_row(event_form.state) }}
-    {{ form_row(event_form.campus) }}
     {{ form_row(event_form.place) }}
-
     <div class="button-place">
         <a href="{{ path('place_create') }}" class="btn">
-             Ou créez un lieu
+            Ou créez un lieu
         </a>
-
     </div>
-
     {{ form_row(event_form.poster_file) }}
-    <button class="btn btn-primary"> Enregistrer </button>
+
+    {{ form_row(event_form.saveDraft) }}
+    <p>ou</p>
+    {{ form_row(event_form.publish) }}
 
     {{ form_end(event_form) }}
 

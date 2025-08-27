@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\State;
 use App\Entity\User;
 use App\Form\EventType;
 use App\Helper\FileUploader;
@@ -26,7 +27,6 @@ final class EventController extends AbstractController
     {
         $event = new Event();
 
-
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
@@ -47,11 +47,18 @@ final class EventController extends AbstractController
 
             $user = $this->getUser();
             $event->setOrganizer($user);
-
+            $event->setCampus($user->getCampus());
 
             $place = $form->get('place')->getData();
             $event->setPlace($place);
 
+            if ($form->get('saveDraft')->isClicked()) {
+                $state = $em->getRepository(State::class)->find(1);
+            } elseif ($form->get('publish')->isClicked()) {
+                $state = $em->getRepository(State::class)->find(2);
+            }
+
+            $event->setState($state);
 
             $em->persist($event);
             $em->flush();

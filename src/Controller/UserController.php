@@ -106,7 +106,7 @@ class UserController extends AbstractController
     }
 
     #[Route('users/disable/{id}', name: 'app_users_disable', requirements: ['id' => '\d+'])]
-    public function disableUser(Request $request, User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    public function disableUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
     {
         if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
             $this->addFlash('success', 'Cette page est réservée aux administrateurs');
@@ -130,5 +130,32 @@ class UserController extends AbstractController
 
     return $this->redirectToRoute('app_users_list');
     }
+
+    #[Route('users/promote/{id}', name: 'app_users_promote', requirements: ['id' => '\d+'])]
+    public function promoteUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+        $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+        return $this->redirectToRoute('app_main');
+        }
+
+        if($user->isAdmin() === false) {
+            $user->setIsAdmin(true);
+            $em->flush();
+            $em->persist($user);
+
+            $this->addFlash('success', "L'utilisateur est maintenant administrateur");
+
+        }else{
+            $user->setIsAdmin(false);
+            $em->flush();
+            $em->persist($user);
+
+            $this->addFlash('success', "L'utilisateur n'est plus administrateur");
+        }
+
+        return $this->redirectToRoute('app_users_list');
+    }
+
 
 }

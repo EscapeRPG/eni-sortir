@@ -26,7 +26,7 @@ final class EventController extends AbstractController
 {
 
     #[Route('/create', name: '_create')]
-    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
+    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, Security $security): Response
     {
         $event = new Event();
 
@@ -48,9 +48,6 @@ final class EventController extends AbstractController
             $interval = $start->diff($end);
             $minutes = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i;
             $event->setDuration($minutes);
-
-
-            $user = $this->getUser();
             $event->addUser($user);
             $event->setOrganizer($user);
             $event->setCampus($user->getCampus());
@@ -172,8 +169,8 @@ final class EventController extends AbstractController
     /**
      * @throws Exception
      */
-    #[Route('/close/{id}', name: '_close', requirements: ['id' => '\d+'])]
-    public function close(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response
+
+    public function close(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
     {
         $event = $sortieRepository->find($id);
         $listParticpants = $sortieRepository->findParticipantsByEvent($event->getId());
@@ -187,7 +184,6 @@ final class EventController extends AbstractController
             $entityManager->persist($event);
             $entityManager->flush();
         }
-
     }
 
 
@@ -195,10 +191,11 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/join/{id}', name: '_join', requirements: ['id' => '\d+'])]
-    public function join(SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response {
+    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response {
 
         $event = $sortieRepository->find($id);
         $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
+
 
         if ($event->getState()->getId() !== 2 ) {
             throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet évènement");
@@ -211,6 +208,9 @@ final class EventController extends AbstractController
             $event->addUser($userConnected);
             $entityManager->persist($event);
             $entityManager->flush();
+
+            $this->close($stateRepository, $sortieRepository, $event->getId(), $bag, $entityManager);
+            $this->redirectToRoute('event_list', ['id' => $event->getId()]);
 
         }
 

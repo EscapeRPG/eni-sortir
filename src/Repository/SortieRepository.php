@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Event;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,7 +25,9 @@ class SortieRepository extends ServiceEntityRepository
     {
 
         $sql = <<<SQL
-SELECT u.first_name, u.name FROM USER u JOIN user_event ue ON u.ID = ue.user_id WHERE ue.event_id =:id              
+
+SELECT u.profil_picture, u.id, u.first_name FROM USER u JOIN user_event ue ON u.ID = ue.user_id WHERE ue.event_id =:id              
+
 SQL;
         $stmt = $this->getEntityManager()->getConnection();
         return $stmt->prepare($sql)
@@ -36,7 +37,7 @@ SQL;
 
     public function findAllEvents(int $limit, int $offset, string $campus): Paginator
     {
-        $events = $this->createQueryBuilder('e')
+         $events=$this->createQueryBuilder('e')
             ->orderBy('e.startingDateHour', 'ASC')
             ->leftJoin('e.place', 'place')
             ->addSelect('place')
@@ -57,13 +58,68 @@ SQL;
         return new Paginator($events);
     }
 
+    /**
+     * @throws Exception
+     */
+    public function removeParticipant(int $eventId, int $userId): void
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'DELETE FROM user_event WHERE event_id = :eventId AND user_id = :userId';
+
+        $stmt = $conn->prepare($sql);
+        $stmt->executeStatement([
+            'eventId' => $eventId,
+            'userId' => $userId,
+        ]);
+    }
     public function findEventsToClose(\DateTime $today): array
     {
         return $this->createQueryBuilder('e')
+            ->join('e.state', 's')
             ->where('e.registrationDeadline <= :today')
-            ->andWhere('e.state != :closed')
-            ->setParameter('today', $today->setTime(0, 0))
-            ->setParameter('closed', 3)
+            ->andWhere('s.id != :closedId')
+            ->setParameter('today', $today)
+            ->setParameter('closedId', 3)
+            ->getQuery()
+            ->getResult();
+    }
+
+
+    public function findEventsToArchive(\DateTime $today): array
+    {
+        $archiveDate = (clone $today)->modify('-1 month');
+
+        return $this->createQueryBuilder('e')
+            ->join('e.state', 's')
+            ->where('e.endDateHour <= :archiveDate')
+            ->andWhere('s.id != :archivedId')
+            ->setParameter('archiveDate', $archiveDate)
+            ->setParameter('archivedId', 7)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findEventsToOpen(\DateTime $today): array
+    {
+        return $this->createQueryBuilder('e')
+            ->join('e.state', 's')
+            ->where('e.startingDateHour <= :today')
+            ->andWhere('s.id != :currentId')
+            ->setParameter('today', $today)
+            ->setParameter('currentId', 4)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findEventsToEnd(\DateTime $today): array
+    {
+        return $this->createQueryBuilder('e')
+            ->join('e.state', 's')
+            ->where('e.endDateHour <= :today')
+            ->andWhere('s.id != :endedId')
+            ->setParameter('today', $today)
+            ->setParameter('endedId', 5)
             ->getQuery()
             ->getResult();
     }

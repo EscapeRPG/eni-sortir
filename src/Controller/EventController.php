@@ -46,7 +46,8 @@ final class EventController extends AbstractController
 
             $file = $form->get('poster_file')->getData();
             if ($file instanceof UploadedFile) {
-                $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_file']);
+
+                 $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_dir']);
                 $event->setPosterFile($name);
             }
 
@@ -71,7 +72,7 @@ final class EventController extends AbstractController
             $em->persist($event);
             $em->flush();
 
-            $this->addFlash('success', 'Event created!');
+            $this->addFlash('success', 'Évènement crée !');
             return $this->redirectToRoute('app_main');
         }
         return $this->render('event/create.html.twig', [
@@ -89,23 +90,16 @@ final class EventController extends AbstractController
 
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /*$file = $form->get('poster_file')->getData();
+            $file = $form->get('poster_file')->getData();
 
             if($file instanceof UploadedFile){
-                $dir = $parameterBag->get('event')['poster_dir'];
-                $name = $fileUploader->upload($file, $event->getName(), $dir);
-
+                $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_dir']);
                 $event->setPosterFile($name);
-
-                if ($event->getPosterFile() && file_exists($dir . '/' . $event->getPosterFile()){
-                    unlink($dir . '/' . $event->getPosterFile());
-                    }
-                    $event->setPosterFile($name);
             }
-            $event->setPosterFile($name);*/
+            //$event->setPosterFile($name);
 
             $em->flush();
-            $this->addFlash('success', 'Event edited!');
+            $this->addFlash('success', 'Évènement édité!');
             return $this->redirectToRoute('event_list', ['id' => $event->getId()]);
         }
         return $this->render('event/create.html.twig', [
@@ -225,21 +219,22 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
-    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response
+    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, #[CurrentUser] ?User   $userConnected): Response
     {
         $event = $sortieRepository->find($id);
-
+        $userConnectedId = $userConnected->getId();
 
         if (!$event) {
             throw $this->createNotFoundException('Cet évènement n\'existe pas');
         }
 
-        $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
+        $participants = $sortieRepository->findParticipantsByEvent($event->getId());
 
         return $this->render('event/detail.html.twig', [
             'id' => $id,
             'event' => $event,
-            'participants' => $listParticipants,
+            'participants' => $participants,
+            'userConnectedId' => $userConnectedId,
         ]);
     }
 
@@ -250,9 +245,9 @@ final class EventController extends AbstractController
     public function closeIfFullParticipants(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
     {
         $event = $sortieRepository->find($id);
-        $listParticpants = $sortieRepository->findParticipantsByEvent($event->getId());
+        $participants = $sortieRepository->findParticipantsByEvent($event->getId());
 
-        $nbParticipants = count($listParticpants);
+        $nbParticipants = count($participants);
         $nbmaxParticipants = $event->getNbInscriptionsMax();
 
         if ($nbmaxParticipants == $nbParticipants) {
@@ -285,14 +280,14 @@ final class EventController extends AbstractController
     {
 
         $event = $sortieRepository->find($id);
-        $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
+        $participants = $sortieRepository->findParticipantsByEvent($event->getId());
 
 
         if ($event->getState()->getId() !== 2) {
             throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet évènement");
         }
 
-        $nbParticipants = count($listParticipants);
+        $nbParticipants = count($participants);
         $nbmaxParticipants = $event->getNbInscriptionsMax();
 
         if ($nbmaxParticipants >= $nbParticipants) {
@@ -306,10 +301,53 @@ final class EventController extends AbstractController
         }
 
         return $this->redirectToRoute('event_list', [
-            'participants' => $listParticipants,
+            'participants' => $participants,
             'event' => $event
         ]);
     }
+
+    /**
+     * @throws Exception
+     */
+    #[Route('/withdraw/{id}', name: '_withdraw', requirements: ['id' => '\d+'])]
+    public function withdraw(
+        SortieRepository       $sortieRepository,
+        EntityManagerInterface $entityManager,
+        #[CurrentUser] ?User   $userConnected,
+        int                    $id
+    ): Response
+    {
+        $event = $sortieRepository->find($id);
+        if (!$event) {
+            $this->addFlash('danger', "Événement introuvable.");
+            return $this->redirectToRoute('event_list');
+        }
+
+        $participants = $sortieRepository->findParticipantsByEvent($event->getId());
+
+        $found = false;
+        foreach ($participants as $Idparticipant) {
+
+            if ($Idparticipant['id'] === $userConnected->getId()) {
+
+                $sortieRepository->removeParticipant($event->getId(), $userConnected->getId());
+
+                $entityManager->persist($event);
+                $entityManager->flush();
+
+                $this->addFlash('success', "Désistement réussi");
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            $this->addFlash('danger', "Tu n'es pas inscrit à cet évènement");
+        }
+
+        return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+    }
+
 
     #[Route ('/cancel/{id}', name: '_cancel', requirements: ['id' => '\d+'])]
     public function cancel(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository, Request $request): Response
@@ -341,30 +379,29 @@ final class EventController extends AbstractController
     public function reactivate(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
     {
         $this->checkStatusUser($event, $security);
-
-        $reac = $stateRepository->findOneBy(['label' => 'Créée']);
-        if (!$reac) {
-            throw $this->createNotFoundException('statut introuvable !');
-        }
-        $event->setState($reac);
-        $em->flush();
-        $this->addFlash('success', 'Event réactivé !');
+      
+            $reac = $stateRepository->findOneBy(['label' => 'Ouverte']);
+            if (!$reac) {
+                throw $this->createNotFoundException('statut introuvable !');
+            }
+            $event->setState($reac);
+            $em->flush();
+            $this->addFlash('success','Event réactivé !');
 
         return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
-
-
     }
 
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
     public function delete(Event $event, Request $request, EntityManagerInterface $em, Security $security): Response
     {
-        $this->checkStatusUser($event, $security);
 
-        if ($this->isCsrfTokenValid('delete' . $event->getId(), $request->get('token'))) {
+        $this->checkStatusUser($event, $security);
+        if($this->isCsrfTokenValid('delete'.$event->getId(), $request->get('token'))) {
+
             $em->remove($event);
             $em->flush();
 
-            $this->addFlash('success', 'Event deleted!');
+            $this->addFlash('success', 'Évènement supprimé !');
         } else {
             $this->addFlash('danger', 'Suppression impossible !');
 

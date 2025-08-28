@@ -22,15 +22,29 @@ class SortieRepository extends ServiceEntityRepository
     /**
      * @throws Exception
      */
-    public function findParticipantsByEvent(int $id) : array {
+    public function findNamesParticipantsByEvent(int $id) : array {
 
         $sql = <<<SQL
-SELECT u.first_name, u.name FROM USER u JOIN user_event ue ON u.ID = ue.user_id WHERE ue.event_id =:id              
+SELECT u.first_name, u.name  FROM USER u JOIN user_event ue ON u.ID = ue.user_id WHERE ue.event_id =:id              
 SQL;
         $stmt = $this->getEntityManager()->getConnection();
         return $stmt->prepare($sql)
             ->executeQuery(['id' => $id])
         ->fetchAllAssociative();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function findIdParticipantsByEvent(int $id) : array {
+
+        $sql = <<<SQL
+SELECT u.id  FROM USER u JOIN user_event ue ON u.ID = ue.user_id WHERE ue.event_id =:id              
+SQL;
+        $stmt = $this->getEntityManager()->getConnection();
+        return $stmt->prepare($sql)
+            ->executeQuery(['id' => $id])
+            ->fetchAllAssociative();
     }
     public function findAllEvents(int $limit, int $offset, string $campus): Paginator
     {
@@ -69,6 +83,23 @@ SQL;
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @throws Exception
+     */
+    public function removeParticipant(int $eventId, int $userId): void
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = 'DELETE FROM user_event WHERE event_id = :eventId AND user_id = :userId';
+
+        $stmt = $conn->prepare($sql);
+        $stmt->executeStatement([
+            'eventId' => $eventId,
+            'userId' => $userId,
+        ]);
+    }
+
 
     //    /**
     //     * @return Event[] Returns an array of Event objects

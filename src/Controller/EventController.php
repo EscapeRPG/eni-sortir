@@ -145,21 +145,24 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
-    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response
+    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, #[CurrentUser] ?User   $userConnected): Response
     {
         $event = $sortieRepository->find($id);
-
+        $userConnectedId = $userConnected->getId();
 
         if (!$event) {
             throw $this->createNotFoundException('Cet évènement n\'existe pas');
         }
 
-        $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
+        $listNamesParticipants = $sortieRepository->findNamesParticipantsByEvent($event->getId());
+        $listIdParticipants = $sortieRepository->findIdParticipantsByEvent($event->getId());
 
         return $this->render('event/detail.html.twig', [
             'id' => $id,
-            'event' =>$event,
-            'participants' => $listParticipants,
+            'event' => $event,
+            'listIdParticipants' => $listIdParticipants,
+            'listNamesParticipants' => $listNamesParticipants,
+            'userConnectedId' => $userConnectedId,
         ]);
     }
 
@@ -170,7 +173,7 @@ final class EventController extends AbstractController
     public function closeIfFullParticipants(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
     {
         $event = $sortieRepository->find($id);
-        $listParticpants = $sortieRepository->findParticipantsByEvent($event->getId());
+        $listParticpants = $sortieRepository->findNamesParticipantsByEvent($event->getId());
 
         $nbParticipants = count($listParticpants);
         $nbmaxParticipants = $event->getNbInscriptionsMax();
@@ -183,13 +186,14 @@ final class EventController extends AbstractController
         }
     }
 
-    public function closeIfOutDate(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void {
+    public function closeIfOutDate(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
+    {
         $event = $sortieRepository->find($id);
         $today = new \DateTime();
         $closureDate = $event->getRegistrationDeadline();
         $closureState = $stateRepository->find(3);
 
-        if($closureDate == $today){
+        if ($closureDate == $today) {
             $event->setState($closureState);
             $entityManager->persist($event);
             $entityManager->flush();
@@ -200,20 +204,21 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/join/{id}', name: '_join', requirements: ['id' => '\d+'])]
-    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response {
+    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response
+    {
 
         $event = $sortieRepository->find($id);
-        $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
+        $listParticipants = $sortieRepository->findNamesParticipantsByEvent($event->getId());
 
 
-        if ($event->getState()->getId() !== 2 ) {
+        if ($event->getState()->getId() !== 2) {
             throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet évènement");
         }
 
         $nbParticipants = count($listParticipants);
         $nbmaxParticipants = $event->getNbInscriptionsMax();
 
-        if ($nbmaxParticipants >= $nbParticipants){
+        if ($nbmaxParticipants >= $nbParticipants) {
             $event->addUser($userConnected);
             $entityManager->persist($event);
             $entityManager->flush();
@@ -228,6 +233,49 @@ final class EventController extends AbstractController
             'event' => $event
         ]);
     }
+
+    /**
+     * @throws Exception
+     */
+    #[Route('/withdraw/{id}', name: '_withdraw', requirements: ['id' => '\d+'])]
+    public function withdraw(
+        SortieRepository       $sortieRepository,
+        EntityManagerInterface $entityManager,
+        #[CurrentUser] ?User   $userConnected,
+        int                    $id
+    ): Response
+    {
+        $event = $sortieRepository->find($id);
+        if (!$event) {
+            $this->addFlash('danger', "Événement introuvable.");
+            return $this->redirectToRoute('event_list');
+        }
+
+        $listIdParticipants = $sortieRepository->findIdParticipantsByEvent($event->getId());
+
+        $found = false;
+        foreach ($listIdParticipants as $Idparticipant) {
+
+            if ($Idparticipant['id'] === $userConnected->getId()) {
+
+                $sortieRepository->removeParticipant($event->getId(), $userConnected->getId());
+
+                $entityManager->persist($event);
+                $entityManager->flush();
+
+                $this->addFlash('success', "Désistement réussi");
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            $this->addFlash('danger', "Tu n'es pas inscrit à cet évènement");
+        }
+
+        return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+    }
+
 
     #[Route ('/cancel/{id}', name: '_cancel', requirements: ['id' => '\d+'])]
     public function cancel(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
@@ -246,39 +294,39 @@ final class EventController extends AbstractController
         $this->addFlash('success', 'Event annulé !');
 
         return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+    }
+
+    #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
+    public function reactivate(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
+    {
+        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
         }
-
-        #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
-        public function reactivate(Event $event, EntityManagerInterface $em, Security $security,StateRepository $stateRepository): Response
-        {
-            if ($event->getOrganizer() !== $security->getUser()&& !$security->isGranted('ROLE_ADMIN')) {
-                throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
-            }
-            $reac = $stateRepository->findOneBy(['label' => 'Créée']);
-            if (!$reac) {
-                throw $this->createNotFoundException('statut introuvable !');
-            }
-            $event->setState($reac);
-            $em->flush();
-            $this->addFlash('success','Event réactivé !');
-
-            return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
-
-
+        $reac = $stateRepository->findOneBy(['label' => 'Créée']);
+        if (!$reac) {
+            throw $this->createNotFoundException('statut introuvable !');
         }
+        $event->setState($reac);
+        $em->flush();
+        $this->addFlash('success', 'Event réactivé !');
+
+        return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+
+
+    }
 
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
     public function delete(Event $event, Request $request, EntityManagerInterface $em, Security $security): Response
     {
-        if($event->getOrganizer() !== $security->getUser()&& !$security->isGranted('ROLE_ADMIN')){
+        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
         }
-        if($this->isCsrfTokenValid('delete'.$event->getId(), $request->get('token'))) {
+        if ($this->isCsrfTokenValid('delete' . $event->getId(), $request->get('token'))) {
             $em->remove($event);
             $em->flush();
 
             $this->addFlash('success', 'Event deleted!');
-        }else{
+        } else {
             $this->addFlash('danger', 'Suppression impossible !');
 
         }

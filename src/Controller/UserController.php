@@ -51,8 +51,10 @@ class UserController extends AbstractController
         $user = $userRepository->findUserById($id);
 
         if ($userConnected === $user || in_array('ROLE_ADMIN', $userConnected->getRoles(), true)) {
+            $isSelfEdit = $this->getUser() === $user;
             $form = $this->createForm(EditType::class, $user, [
                 'is_admin' => $this->isGranted('ROLE_ADMIN'),
+                'is_self_edit' => $isSelfEdit,
             ]);
             $form->handleRequest($request);
 

@@ -121,6 +121,8 @@ class ResetPasswordController extends AbstractController
             $this->cleanSessionAfterReset();
 
             $this->addFlash('success', 'Votre mot de passe a été réinitialisé');
+
+            if (userConnected)
             return $this->redirectToRoute('app_login');
         }
 

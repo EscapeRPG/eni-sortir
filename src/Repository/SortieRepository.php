@@ -94,4 +94,15 @@ SQL;
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function findEventsToClose(\DateTime $today): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.registrationDeadline <= :today')
+            ->andWhere('e.state != :closed')
+            ->setParameter('today', $today->setTime(0, 0))
+            ->setParameter('closed', 3)
+            ->getQuery()
+            ->getResult();
+    }
+
 }

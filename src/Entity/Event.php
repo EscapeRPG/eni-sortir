@@ -58,6 +58,9 @@ class Event
     #[ORM\Column(length: 300, nullable: true)]
     private ?string $posterFile = null;
 
+    #[ORM\Column]
+    private ?\DateTime $registrationDeadline = null;
+
     public function __construct()
     {
         $this->participants = new ArrayCollection();
@@ -224,6 +227,18 @@ class Event
     public function setDuration(int $duration): static
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getRegistrationDeadline(): ?\DateTime
+    {
+        return $this->registrationDeadline;
+    }
+
+    public function setRegistrationDeadline(\DateTime $registrationDeadline): static
+    {
+        $this->registrationDeadline = $registrationDeadline;
 
         return $this;
     }

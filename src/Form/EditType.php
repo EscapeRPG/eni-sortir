@@ -68,6 +68,7 @@ class EditType extends AbstractType
                     ]),
                 ]
             ]);
+      
         if ($options['is_self_edit']) {
             $builder
                 ->add('plainPassword', RepeatedType::class, [
@@ -113,7 +114,6 @@ class EditType extends AbstractType
             ->add('submit', SubmitType::class, [
             'label' => 'Enregistrer',
             ]);
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void

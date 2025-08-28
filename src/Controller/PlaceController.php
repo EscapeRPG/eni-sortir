@@ -38,7 +38,7 @@ final class PlaceController extends AbstractController
             $em->persist($place);
             $em->flush();
 
-            $this->addFlash('success', 'Place created!');
+            $this->addFlash('success', 'Lieu crée !');
             return $this->redirectToRoute('event_create');
         }
         return $this->render('place/place.html.twig', [
@@ -88,8 +88,8 @@ final class PlaceController extends AbstractController
 
     if($form->isSubmitted() && $form->isValid()){
     $em->flush();
-    $this->addFlash('success', 'Place updated!');
-    return $this->redirectToRoute('event_list', ['id' => $place->getId()]);
+    $this->addFlash('success', 'Lieu mis à jour !');
+    return $this->redirectToRoute('place_list', ['id' => $place->getId()]);
 
     }
     return $this->render('place/place.html.twig', [
@@ -97,5 +97,25 @@ final class PlaceController extends AbstractController
         'place' => $place,
     ]);
     }
+
+    #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
+    #[ISGranted('ROLE_ADMIN')]
+public function delete(Place $place, Request $request, EntityManagerInterface $em, Security $security): Response
+    {
+        if($this->isCsrfTokenValid('delete'.$place->getId(), $request->get('token'))){
+        $this->addFlash('danger', 'impossible de supprimer');
+        return $this->redirectToRoute('place_list');
+        }
+
+        if(count($place->getEvents())>0){
+            $this-> addFlash('danger','suppression impossible, ce lieu est lié à un évènement');
+            return $this->redirectToRoute('place_list');
+        }
+        $em->remove($place);
+        $em->flush();
+        $this->addFlash('success', 'lieu supprimé');
+        return $this->redirectToRoute('place_list');
+    }
+
 
 }

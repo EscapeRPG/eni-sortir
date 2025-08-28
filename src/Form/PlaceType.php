@@ -24,10 +24,12 @@ class PlaceType extends AbstractType
             ->add('city', TextType::class, [
                 'label' => 'Ville'])
             ->add('latitude', IntegerType::class, [
-                'label' => 'Latitude'
+                'label' => 'Latitude',
+                'required' => false
             ])
             ->add('longitude', IntegerType::class, [
-                'label' => 'Longitude'
+                'label' => 'Longitude',
+                'required' => false
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Enregistrer'

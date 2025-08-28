@@ -147,14 +147,13 @@ final class EventController extends AbstractController
             throw $this->createNotFoundException('Cet évènement n\'existe pas');
         }
 
-        $listNamesParticipants = $sortieRepository->findNamesParticipantsByEvent($event->getId());
-        $listIdParticipants = $sortieRepository->findIdParticipantsByEvent($event->getId());
+        $participants = $sortieRepository->findParticipantsByEvent($event->getId());
 
         return $this->render('event/detail.html.twig', [
             'id' => $id,
             'event' => $event,
-            'listIdParticipants' => $listIdParticipants,
-            'listNamesParticipants' => $listNamesParticipants,
+            'participants' => $participants,
+
             'userConnectedId' => $userConnectedId,
         ]);
     }
@@ -166,9 +165,9 @@ final class EventController extends AbstractController
     public function closeIfFullParticipants(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
     {
         $event = $sortieRepository->find($id);
-        $listParticpants = $sortieRepository->findNamesParticipantsByEvent($event->getId());
+        $participants = $sortieRepository->findParticipantsByEvent($event->getId());
 
-        $nbParticipants = count($listParticpants);
+        $nbParticipants = count($participants);
         $nbmaxParticipants = $event->getNbInscriptionsMax();
 
         if ($nbmaxParticipants == $nbParticipants) {
@@ -201,14 +200,14 @@ final class EventController extends AbstractController
     {
 
         $event = $sortieRepository->find($id);
-        $listParticipants = $sortieRepository->findNamesParticipantsByEvent($event->getId());
+        $participants = $sortieRepository->findParticipantsByEvent($event->getId());
 
 
         if ($event->getState()->getId() !== 2) {
             throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet évènement");
         }
 
-        $nbParticipants = count($listParticipants);
+        $nbParticipants = count($participants);
         $nbmaxParticipants = $event->getNbInscriptionsMax();
 
         if ($nbmaxParticipants >= $nbParticipants) {
@@ -222,7 +221,7 @@ final class EventController extends AbstractController
         }
 
         return $this->redirectToRoute('event_list', [
-            'participants' => $listParticipants,
+            'participants' => $participants,
             'event' => $event
         ]);
     }
@@ -244,10 +243,10 @@ final class EventController extends AbstractController
             return $this->redirectToRoute('event_list');
         }
 
-        $listIdParticipants = $sortieRepository->findIdParticipantsByEvent($event->getId());
+        $participants = $sortieRepository->findParticipantsByEvent($event->getId());
 
         $found = false;
-        foreach ($listIdParticipants as $Idparticipant) {
+        foreach ($participants as $Idparticipant) {
 
             if ($Idparticipant['id'] === $userConnected->getId()) {
 

@@ -18,7 +18,7 @@
 
     {% set found = false %}
 
-    {% for Idparticipant in listIdParticipants %}
+    {% for Idparticipant in participants %}
         {% if Idparticipant.id == userConnectedId %}
             {% set found = true %}
         {% endif %}
@@ -64,7 +64,6 @@
 
     {% for participant in participants %}
         <a href="{{ path('app_profile', {id: participant.id}) }}"><img src="{{ asset('uploads/users/' ~ participant.profil_picture) }}" alt="Image de {{ participant.first_name }}"></a>
-
 
     {% endfor %}
 

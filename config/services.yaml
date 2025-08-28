@@ -5,10 +5,10 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
   event:
-    nb_max: 12
+    nb_max: 10
     poster_dir: 'uploads/events'
-    user:
-      profil_picture: 'uploads/users'
+  user:
+    profil_picture: 'uploads/users'
   place:
     nb_max: 12
 

@@ -2,16 +2,20 @@
 
 namespace App\Controller;
 
+use App\Entity\Campus;
 use App\Entity\Event;
 use App\Entity\State;
 use App\Entity\User;
 use App\Form\CancellationReasonType;
 use App\Form\EventType;
+use App\Form\FiltersType;
 use App\Helper\FileUploader;
 use App\Repository\StateRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SortieRepository;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -109,36 +113,113 @@ final class EventController extends AbstractController
         ]);
     }
 
-    #[Route('/list{page}',
-        name: '_list',
-        requirements: ['page' => '\d+'],
-        defaults: ['page' => 1])]
-    public function index(SortieRepository $sortieRepository, ParameterBagInterface $bag, int $page, #[CurrentUser] ?User $user): Response
+    /**
+     * @throws ORMException
+     * @throws \Exception
+     */
+    #[Route('/list/{page}', name: '_list', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
+    public function list(
+        SortieRepository       $sortieRepository,
+        ParameterBagInterface  $bag,
+        int                    $page,
+        #[CurrentUser] ?User   $user,
+        Request                $request,
+        EntityManagerInterface $entityManager
+    ): Response
     {
         $limit = $bag->get('event')['nb_max'];
         $offset = ($page - 1) * $limit;
-        $campus = $user->getCampus()->getId();
-        $events = $sortieRepository->findAllEvents($limit, $offset, $campus);
-        $pages = ceil($events->count() / $limit);
-        $dates = $sortieRepository->findEventsDates($limit, $offset, $campus);
 
+        $form = $this->createForm(FiltersType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $filters = $form->getData();
+            $events = [
+                'page' => 1,
+            ];
+
+            if ($filters['campus']) {
+                $events['campus'] = $filters['campus']->getId();
+            }
+            if (!empty($filters['name'])) {
+                $events['name'] = $filters['name'];
+            }
+            if ($filters['startingDay']) {
+                $events['startingDay'] = $filters['startingDay']->format('Y-m-d');
+            }
+            if ($filters['endingDay']) {
+                $events['endingDay'] = $filters['endingDay']->format('Y-m-d');
+            }
+            if (!empty($filters['organizer'])) {
+                $events['organizer'] = $user?->getId();
+            }
+            if (!empty($filters['subscribed'])) {
+                $events['subscribed'] = $user?->getId();
+            }
+            if (!empty($filters['notSubscribed'])) {
+                $events['notSubscribed'] = $user?->getId();
+            }
+            if (!empty($filters['passedEvents'])) {
+                $events['passedEvents'] = true;
+            }
+
+            return $this->redirectToRoute('event_list', $events);
+        }
+
+        $campusId = $request->query->get('campus') ? $request->query->get('campus') : $user->getCampus()->getId();
+        $name = $request->query->get('name');
+        $startingDay = $request->query->get('startingDay') ? new \DateTime($request->query->get('startingDay')) : null;
+        $endingDay = $request->query->get('endingDay') ? new \DateTime($request->query->get('endingDay')) : null;
+        $organizer = $request->query->get('organizer');
+        $subscribed = $request->query->get('subscribed');
+        $notSubscribed = $request->query->get('notSubscribed');
+        $passedEvents = $request->query->get('passedEvents');
+
+        $form = $this->createForm(FiltersType::class, [
+            'campus' => $campusId ? $entityManager->getReference(Campus::class, $campusId) : $user->getCampus(),
+            'name' => $name,
+            'startingDay' => $startingDay,
+            'endingDay' => $endingDay,
+            'organizer' => (bool)$organizer,
+            'subscribed' => (bool)$subscribed,
+            'notSubscribed' => (bool)$notSubscribed,
+            'passedEvents' => (bool)$passedEvents,
+        ], ['method' => 'POST']);
+
+        $events = $sortieRepository->findEventsByFilters(
+            $campusId,
+            $name,
+            $startingDay,
+            $endingDay,
+            $organizer,
+            $subscribed,
+            $notSubscribed,
+            $passedEvents,
+            $limit,
+            $offset
+        );
+
+        $totalItems = count($events);
+        $pages = ceil($totalItems / $limit);
         $uniqueDates = [];
 
-        foreach ($dates as $date) {
-            $formattedDate = $date['startingDateHour']->format('d/m/Y');
+        foreach ($events as $event) {
+            $formattedDate = $event->getStartingDateHour()->format('d/m/Y');
             $uniqueDates[$formattedDate] = $formattedDate;
         }
 
-        $uniqueDates = array_unique($uniqueDates);
-        $uniqueDates = array_values($uniqueDates);
+        $uniqueDates = array_values(array_unique($uniqueDates));
 
         return $this->render('event/list.html.twig', [
             'eventsDates' => $uniqueDates,
             'events' => $events,
             'page' => $page,
-            'pages' => $pages
+            'pages' => $pages,
+            'filters' => $form->createView()
         ]);
     }
+
 
     /**
      * @throws Exception
@@ -157,7 +238,7 @@ final class EventController extends AbstractController
 
         return $this->render('event/detail.html.twig', [
             'id' => $id,
-            'event' =>$event,
+            'event' => $event,
             'participants' => $listParticipants,
         ]);
     }
@@ -182,13 +263,14 @@ final class EventController extends AbstractController
         }
     }
 
-    public function closeIfOutDate(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void {
+    public function closeIfOutDate(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
+    {
         $event = $sortieRepository->find($id);
         $today = new \DateTime();
         $closureDate = $event->getRegistrationDeadline();
         $closureState = $stateRepository->find(3);
 
-        if($closureDate == $today){
+        if ($closureDate == $today) {
             $event->setState($closureState);
             $entityManager->persist($event);
             $entityManager->flush();
@@ -199,20 +281,21 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/join/{id}', name: '_join', requirements: ['id' => '\d+'])]
-    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response {
+    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response
+    {
 
         $event = $sortieRepository->find($id);
         $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
 
 
-        if ($event->getState()->getId() !== 2 ) {
+        if ($event->getState()->getId() !== 2) {
             throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet évènement");
         }
 
         $nbParticipants = count($listParticipants);
         $nbmaxParticipants = $event->getNbInscriptionsMax();
 
-        if ($nbmaxParticipants >= $nbParticipants){
+        if ($nbmaxParticipants >= $nbParticipants) {
             $event->addUser($userConnected);
             $entityManager->persist($event);
             $entityManager->flush();
@@ -242,57 +325,59 @@ final class EventController extends AbstractController
                 throw $this->createNotFoundException('statut introuvable !');
             }
 
-        $event->setState($cancel);
-        $em->flush();
-        $this->addFlash('success', 'Event annulé !');
+            $event->setState($cancel);
+            $em->flush();
+            $this->addFlash('success', 'Event annulé !');
 
-        return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+            return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
         }
         return $this->render('event/cancel.html.twig', [
             'cancel_form' => $form->createView(),
             'event' => $event,
         ]);
     }
-        #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
-        public function reactivate(Event $event, EntityManagerInterface $em, Security $security,StateRepository $stateRepository): Response
-        {
-            $this->checkStatusUser($event, $security);
 
-            $reac = $stateRepository->findOneBy(['label' => 'Créée']);
-            if (!$reac) {
-                throw $this->createNotFoundException('statut introuvable !');
-            }
-            $event->setState($reac);
-            $em->flush();
-            $this->addFlash('success','Event réactivé !');
+    #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
+    public function reactivate(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
+    {
+        $this->checkStatusUser($event, $security);
 
-            return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
-
-
+        $reac = $stateRepository->findOneBy(['label' => 'Créée']);
+        if (!$reac) {
+            throw $this->createNotFoundException('statut introuvable !');
         }
+        $event->setState($reac);
+        $em->flush();
+        $this->addFlash('success', 'Event réactivé !');
+
+        return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+
+
+    }
 
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
     public function delete(Event $event, Request $request, EntityManagerInterface $em, Security $security): Response
     {
         $this->checkStatusUser($event, $security);
 
-        if($this->isCsrfTokenValid('delete'.$event->getId(), $request->get('token'))) {
+        if ($this->isCsrfTokenValid('delete' . $event->getId(), $request->get('token'))) {
             $em->remove($event);
             $em->flush();
 
             $this->addFlash('success', 'Event deleted!');
-        }else{
+        } else {
             $this->addFlash('danger', 'Suppression impossible !');
 
         }
         return $this->redirectToRoute('event_list');
     }
 
-    private function checkStatusUser(Event $event, Security $security): void {
+    private function checkStatusUser(Event $event, Security $security): void
+    {
 
-        if($event->getOrganizer() !== $security->getUser()&& !$security->isGranted('ROLE_ADMIN')){
+        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
-    }
+        }
 
 
     }

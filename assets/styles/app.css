@@ -98,11 +98,13 @@ body {
 
                         &::before {
                             transform: rotate(45deg);
+                            background-color: red;
                             top: 0;
                         }
 
                         &::after {
                             transform: rotate(-45deg);
+                            background-color: red;
                             top: 0;
                         }
                     }

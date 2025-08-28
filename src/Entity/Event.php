@@ -55,11 +55,11 @@ class Event
     #[ORM\Column]
     private ?int $duration = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $nb_participants = null;
-
     #[ORM\Column(length: 300, nullable: true)]
     private ?string $posterFile = null;
+
+    #[ORM\Column]
+    private ?\DateTime $registrationDeadline = null;
 
     public function __construct()
     {
@@ -231,15 +231,14 @@ class Event
         return $this;
     }
 
-
-    public function getNbParticipants(): ?int
+    public function getRegistrationDeadline(): ?\DateTime
     {
-        return $this->nb_participants;
+        return $this->registrationDeadline;
     }
 
-    public function setNbParticipants(?int $nb_participants): static
+    public function setRegistrationDeadline(\DateTime $registrationDeadline): static
     {
-        $this->nb_participants = $nb_participants;
+        $this->registrationDeadline = $registrationDeadline;
 
         return $this;
     }

@@ -7,6 +7,8 @@ use App\Entity\State;
 use App\Entity\User;
 use App\Form\EventType;
 use App\Helper\FileUploader;
+use App\Repository\StateRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +26,7 @@ final class EventController extends AbstractController
 {
 
     #[Route('/create', name: '_create')]
-    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
+    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, Security $security): Response
     {
         $event = new Event();
 
@@ -37,7 +39,6 @@ final class EventController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
 
-
             $file = $form->get('poster_file')->getData();
             if ($file instanceof UploadedFile) {
                 $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_file']);
@@ -47,9 +48,7 @@ final class EventController extends AbstractController
             $interval = $start->diff($end);
             $minutes = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i;
             $event->setDuration($minutes);
-
-
-            $user = $this->getUser();
+            $event->addUser($user);
             $event->setOrganizer($user);
             $event->setCampus($user->getCampus());
 
@@ -78,13 +77,12 @@ final class EventController extends AbstractController
     #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
     public function edit(Event $event, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
-        if($event->getOrganizer() !== $security->getUser()){
+        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
         }
 
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
-
 
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -143,41 +141,136 @@ final class EventController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
     public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag): Response
     {
         $event = $sortieRepository->find($id);
 
-        if (!$event){
+
+        if (!$event) {
             throw $this->createNotFoundException('Cet évènement n\'existe pas');
         }
 
+        $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
+
         return $this->render('event/detail.html.twig', [
             'id' => $id,
-            'event' =>$event
+            'event' =>$event,
+            'participants' => $listParticipants,
+        ]);
+    }
+
+    /**
+     * @throws Exception
+     */
+
+    public function closeIfFullParticipants(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
+    {
+        $event = $sortieRepository->find($id);
+        $listParticpants = $sortieRepository->findParticipantsByEvent($event->getId());
+
+        $nbParticipants = count($listParticpants);
+        $nbmaxParticipants = $event->getNbInscriptionsMax();
+
+        if ($nbmaxParticipants == $nbParticipants) {
+            $closureState = $stateRepository->find(3);
+            $event->setState($closureState);
+            $entityManager->persist($event);
+            $entityManager->flush();
+        }
+    }
+
+    public function closeIfOutDate(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void {
+        $event = $sortieRepository->find($id);
+        $today = new \DateTime();
+        $closureDate = $event->getRegistrationDeadline();
+        $closureState = $stateRepository->find(3);
+
+        if($closureDate == $today){
+            $event->setState($closureState);
+            $entityManager->persist($event);
+            $entityManager->flush();
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    #[Route('/join/{id}', name: '_join', requirements: ['id' => '\d+'])]
+    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response {
+
+        $event = $sortieRepository->find($id);
+        $listParticipants = $sortieRepository->findParticipantsByEvent($event->getId());
+
+
+        if ($event->getState()->getId() !== 2 ) {
+            throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet évènement");
+        }
+
+        $nbParticipants = count($listParticipants);
+        $nbmaxParticipants = $event->getNbInscriptionsMax();
+
+        if ($nbmaxParticipants >= $nbParticipants){
+            $event->addUser($userConnected);
+            $entityManager->persist($event);
+            $entityManager->flush();
+
+            $this->closeIfFullParticipants($stateRepository, $sortieRepository, $event->getId(), $bag, $entityManager);
+            $this->redirectToRoute('event_list', ['id' => $event->getId()]);
+
+        }
+
+        return $this->redirectToRoute('event_list', [
+            'participants' => $listParticipants,
+            'event' => $event
         ]);
     }
 
     #[Route ('/cancel/{id}', name: '_cancel', requirements: ['id' => '\d+'])]
-    public function cancel( Event $event, EntityManagerInterface $em, Security $security, SortieRepository $sortieRepository ):Response
+    public function cancel(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
     {
-        if($event->getOrganizer() !== $security->getUser()){
-            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
+        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement (ou admin)");
         }
 
-        $cancel = $sortieRepository->findBy(['name' => 'Annulée']);
-        if(!$cancel){
+        $cancel = $stateRepository->findOneBy(['label' => 'Annulée']);
+        if (!$cancel) {
             throw $this->createNotFoundException('statut introuvable !');
         }
 
         $event->setState($cancel);
+        $em->flush();
+        $this->addFlash('success', 'Event annulé !');
 
-    }
+        return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+        }
+
+        #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
+        public function reactivate(Event $event, EntityManagerInterface $em, Security $security,StateRepository $stateRepository): Response
+        {
+            if ($event->getOrganizer() !== $security->getUser()&& !$security->isGranted('ROLE_ADMIN')) {
+                throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
+            }
+            $reac = $stateRepository->findOneBy(['label' => 'Créée']);
+            if (!$reac) {
+                throw $this->createNotFoundException('statut introuvable !');
+            }
+            $event->setState($reac);
+            $em->flush();
+            $this->addFlash('success','Event réactivé !');
+
+            return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+
+
+        }
 
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
     public function delete(Event $event, Request $request, EntityManagerInterface $em, Security $security): Response
     {
-        if($event->getOrganizer() !== $security->getUser()){
+        if($event->getOrganizer() !== $security->getUser()&& !$security->isGranted('ROLE_ADMIN')){
             throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
         }
         if($this->isCsrfTokenValid('delete'.$event->getId(), $request->get('token'))) {

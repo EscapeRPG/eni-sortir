@@ -8,17 +8,30 @@
 
     {{ form_errors(edit_form) }}
 
-    {{ form_start(edit_form) }}
-    {{ form_row(edit_form.name) }}
-    {{ form_row(edit_form.firstName) }}
-    {{ form_row(edit_form.campus) }}
-    {{ form_row(edit_form.phoneNumber) }}
-    {{ form_row(edit_form.email) }}
-    {{ form_row(edit_form.plainPassword) }}
+    {{ form(edit_form) }}
 
-    {{ form_widget(edit_form) }}
-    <button type="submit">Enregistrer</button>
-    {{ form_end(edit_form) }}
-    <a href="{{ path('app_main') }}">Retour</a>
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('app_users_delete', {id: user.id, _token : csrf_token('delete'~user.id)}) }}"
+           onclick="return confirm('Etes vous sûr?')">Supprimer</a>
+        {% if user.isActive == true %}
+            <a href="{{ path('app_users_disable', {id: user.id}) }}"
+               onclick="return confirm('Etes vous sûr?')">Désactiver</a>
+        {% else %}
+            <a href="{{ path('app_users_disable', {id: user.id}) }}" onclick="return confirm('Etes vous sûr?')">Activer</a>
+        {% endif %}
+
+        {% if user.isAdmin == false %}
+            <a href="{{ path('app_users_promote', {id: user.id}) }}">Promouvoir </a>
+        {% else %}
+            <a href="{{ path('app_users_promote', {id: user.id}) }}">Retrograder </a>
+        {% endif %}
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('app_users_list') }}">Retour</a>
+    {% else %}
+        <a href="{{ path('app_main') }}">Retour</a>
+    {% endif %}
+
 {% endblock %}
 

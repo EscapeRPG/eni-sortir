@@ -16,7 +16,7 @@
 <body>
 <header>
     <div class="logo-nav">
-        <a href="{{ path('app_main') }}"><img></a>
+        <a href="{{ path('app_main') }}"><img src="" alt="logo"></a>
         <a href="{{ path('app_main') }}"><h1>ENI SORTIR</h1></a>
         <a href="{{ path('event_list') }}">Événements</a>
     </div>
@@ -29,12 +29,14 @@
         <div id="responsive" data-burger-target="menu">
             {% if is_granted('IS_AUTHENTICATED') %}
                 <ul>
-                    <li><a href="{{ path('app_profile', {id:app.user.id}) }}">Profil</a></li>
+                    <li><a href="{{ path('app_update', {id:app.user.id}) }}">Profil</a></li>
                     <li><a href="{{ path('app_logout') }}">Préférences</a></li>
                     <li><a href="{{ path('app_logout') }}">Se déconnecter</a></li>
                 </ul>
                 <ul>
+                    <li><a href="{{ path('event_list') }}">Liste des sorties</a></li>
                     <li><a href="{{ path('event_create') }}">Créer un évènement</a></li>
+                    <li><a href="{{ path('place_create') }}">Créer un lieu de sortie</a></li>
                 </ul>
             {% else %}
                 <ul>
@@ -66,8 +68,6 @@
         <p>Salut !</p>
     {% endblock %}
 </main>
-<footer>
-    Test
-</footer>
+<footer></footer>
 </body>
 </html>

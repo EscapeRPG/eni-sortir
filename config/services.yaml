@@ -9,6 +9,8 @@ parameters:
     poster_dir: 'uploads/events'
     user:
       profil_picture: 'uploads/users'
+  place:
+    nb_max: 12
 
 services:
     # default configuration for services in *this* file

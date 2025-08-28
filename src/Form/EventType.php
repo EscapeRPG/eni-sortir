@@ -50,13 +50,19 @@ class EventType extends AbstractType
                 'required' => true,
             ])
 
+            ->add('registrationDeadline', DateTimeType::class, [
+                'label'=>'Clôture des inscriptions',
+                'widget' => 'single_text',
+                'required' => true,
+            ])
+
             ->add('nbInscriptionsMax', IntegerType::class, [
-                'label'=>'Nombre d\'inscriptions',
+                'label'=>'Nombre maximum de participants',
                 'required' => true,
             ])
 
             ->add('eventInfo', TextareaType::class, [
-                'label' => 'Informations',
+                'label' => 'Infos pratiques',
                 'required' => false,
             ])
 

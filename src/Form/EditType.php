@@ -40,7 +40,7 @@ class EditType extends AbstractType
                             'image/png',
                             'image/jpg'
                         ],
-                        'mimeTypesMessage' => 'Les formats acceptés sont jpg, png ou jpeg !',
+                        'mimeTypesMessage' => 'Les formats acceptés sont jpg, jpeg ou png !',
                     ])
                 ]
             ])

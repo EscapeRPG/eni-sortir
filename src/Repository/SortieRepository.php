@@ -45,9 +45,7 @@ SQL;
             ->addSelect('organizer')
             ->leftJoin('e.state', 'state')
             ->addSelect('state')
-
-           ->leftJoin('e.participants', 'participants')
-
+            ->leftJoin('e.participants', 'participants')
             ->addSelect('participants')
             ->andWhere('e.campus = :campus')
             ->setParameter(':campus', $campus)
@@ -58,21 +56,6 @@ SQL;
             ->getQuery();
 
         return new Paginator($events);
-    }
-
-    public function findEventsDates(int $limit, int $offset, string $campus): array
-    {
-        return $this->createQueryBuilder('e')
-            ->select('e.startingDateHour')
-            ->orderBy('e.startingDateHour', 'ASC')
-            ->where('e.campus = :campus')
-            ->setParameter(':campus', $campus)
-            ->andWhere('e.state != 1')
-            ->andWhere('e.state != 7')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
     }
 
     /**
@@ -141,31 +124,62 @@ SQL;
             ->getResult();
     }
 
+    public function findEventsByFilters($campus, $name, $startingDay, $endingDay, $organizer, $subscribed, $notSubscribed, $passedEvents, $limit, $offset): Paginator
+    {
+        $req = $this->createQueryBuilder('e')
+            ->orderBy('e.startingDateHour', 'ASC');
 
-    //    /**
-    //     * @return Event[] Returns an array of Event objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('s.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+        if (!empty($campus)) {
+            $req->andWhere('e.campus = :campus')
+                ->setParameter(':campus', $campus);
+        }
 
-    //    public function findOneBySomeField($value): ?Event
-    //    {
-    //        return $this->createQueryBuilder('s')
-    //            ->andWhere('s.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if (!empty($name)) {
+            $req->andWhere('e.name LIKE :name')
+                ->setParameter(':name', '%' . $name . '%');
+        }
 
+        if ($startingDay !== null) {
+            $req->andWhere('e.startingDateHour >= :startingDay')
+                ->setParameter(':startingDay', $startingDay);
+        }
 
+        if ($endingDay !== null) {
+            $req->andWhere('e.endDateHour <= :endingDay')
+                ->setParameter(':endingDay', $endingDay);
+        }
+
+        if ($organizer !== null) {
+            $req->andWhere('e.organizer = :organizer')
+                ->setParameter(':organizer', $organizer);
+        }
+
+        if ($passedEvents !== null) {
+            $req->andWhere('e.state = 5');
+        }
+
+        if ($subscribed !== null) {
+            $req->join('e.participants', 'participants')
+                ->andWhere('participants = :subscribed')
+                ->setParameter(':subscribed', $subscribed);
+        }
+
+        if ($notSubscribed !== null) {
+            $subQuery = $this->createQueryBuilder('e2')
+                ->select('e2.id')
+                ->join('e2.participants', 'not_subscribed')
+                ->where('not_subscribed = :notSubscribed')
+                ->getDQL();
+
+            $req->andWhere($req->expr()->notIn('e.id', $subQuery))
+                ->setParameter(':notSubscribed', $notSubscribed);
+        }
+
+        $req->setFirstResult($offset)
+            ->setMaxResults($limit);
+
+        $query = $req->getQuery();
+
+        return new Paginator($query);
+    }
 }

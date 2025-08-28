@@ -3,7 +3,7 @@
     flex-direction: column;
     gap: 1em;
     width: 60%;
-    margin: auto;
+    margin: 20px auto;
 
     .event-date-container {
         width: calc(100% - 40px);

@@ -15,6 +15,7 @@
     <p>informations pratiques : {{ event.eventInfo }}</p>
     <p>On se retrouve ici : {{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>
 
+
     {% set found = false %}
 
     {% for Idparticipant in listIdParticipants %}
@@ -33,19 +34,21 @@
         {% if found %}
             <a href="{{ path('event_withdraw', { id: event.id }) }}">Se désister</a>
         {% endif %}
+
+    {% if event.state.label == 'Annulée' %}
+        <p> Raison d'annulation : {{ event.cancellationReason }}</p>
     {% endif %}
+    
+    
+    {%  if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
 
+    <a href="{{ path('event_edit', { id: event.id}) }}"> Éditez votre sortie </a>
+        <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}" 
+        onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')"> Supprimez votre sortie </a>
+    {% if event.state.label != 'Annulée' %}
+        <a href ="{{ path('event_cancel', {id:event.id}) }}"> Annulez votre event </a>
 
-    {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
-
-        <a href="{{ path('event_edit', { id: event.id}) }}"> Éditez votre sortie </a>
-        <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}"
-           onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')"> Supprimez votre sortie </a>
-        {% if event.state.label != 'Annulée' %}
-            <a href="{{ path('event_cancel', {id:event.id}) }}"
-               onclick="return confirm('êtes vous sûr de vouloir annuler votre event ?')"> Annulez votre event </a>
-        {% endif %}
-
+    {% endif %}
 
         {% if event.state.label == 'Annulée' %}
             <a href="{{ path('event_reactivate', {id:event.id}) }}"> Réactivez votre sortie </a>
@@ -58,9 +61,11 @@
     <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&amp;output=embed"></iframe>
 
     <h3>Liste des participants</h3>
+
     {% for participant in listNamesParticipants %}
         {% for value in participant %}
             {{ value }}
+
         {% endfor %}
 
     {% endfor %}

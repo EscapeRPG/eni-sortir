@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Entity\State;
 use App\Entity\User;
+use App\Form\CancellationReasonType;
 use App\Form\EventType;
 use App\Helper\FileUploader;
 use App\Repository\StateRepository;
@@ -77,9 +78,7 @@ final class EventController extends AbstractController
     #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
     public function edit(Event $event, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
-        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
-        }
+        $this->checkStatusUser($event, $security);
 
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
@@ -278,37 +277,43 @@ final class EventController extends AbstractController
 
 
     #[Route ('/cancel/{id}', name: '_cancel', requirements: ['id' => '\d+'])]
-    public function cancel(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
+    public function cancel(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository, Request $request): Response
     {
-        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement (ou admin)");
-        }
+        $this->checkStatusUser($event, $security);
 
-        $cancel = $stateRepository->findOneBy(['label' => 'Annulée']);
-        if (!$cancel) {
-            throw $this->createNotFoundException('statut introuvable !');
-        }
+        $form = $this->createForm(CancellationReasonType::class, $event);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $cancel = $stateRepository->findOneBy(['label' => 'Annulée']);
+            if (!$cancel) {
+                throw $this->createNotFoundException('statut introuvable !');
+            }
 
         $event->setState($cancel);
         $em->flush();
         $this->addFlash('success', 'Event annulé !');
 
         return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
-    }
 
-    #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
-    public function reactivate(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
-    {
-        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
         }
-        $reac = $stateRepository->findOneBy(['label' => 'Créée']);
-        if (!$reac) {
-            throw $this->createNotFoundException('statut introuvable !');
-        }
-        $event->setState($reac);
-        $em->flush();
-        $this->addFlash('success', 'Event réactivé !');
+        return $this->render('event/cancel.html.twig', [
+            'cancel_form' => $form->createView(),
+            'event' => $event,
+        ]);
+    }
+        #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
+        public function reactivate(Event $event, EntityManagerInterface $em, Security $security,StateRepository $stateRepository): Response
+        {
+            $this->checkStatusUser($event, $security);
+
+            $reac = $stateRepository->findOneBy(['label' => 'Créée']);
+            if (!$reac) {
+                throw $this->createNotFoundException('statut introuvable !');
+            }
+            $event->setState($reac);
+            $em->flush();
+            $this->addFlash('success','Event réactivé !');
 
         return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
 
@@ -318,10 +323,11 @@ final class EventController extends AbstractController
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
     public function delete(Event $event, Request $request, EntityManagerInterface $em, Security $security): Response
     {
-        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
-        }
-        if ($this->isCsrfTokenValid('delete' . $event->getId(), $request->get('token'))) {
+
+        $this->checkStatusUser($event, $security);
+
+        if($this->isCsrfTokenValid('delete'.$event->getId(), $request->get('token'))) {
+
             $em->remove($event);
             $em->flush();
 
@@ -332,5 +338,15 @@ final class EventController extends AbstractController
         }
         return $this->redirectToRoute('event_list');
     }
+
+    private function checkStatusUser(Event $event, Security $security): void {
+
+        if($event->getOrganizer() !== $security->getUser()&& !$security->isGranted('ROLE_ADMIN')){
+            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
+    }
+
+
+    }
+
 
 }

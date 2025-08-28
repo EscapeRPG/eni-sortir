@@ -50,7 +50,7 @@ SQL;
 
     public function findAllEvents(int $limit, int $offset, string $campus): Paginator
     {
-        $events = $this->createQueryBuilder('e')
+         $events=$this->createQueryBuilder('e')
             ->orderBy('e.startingDateHour', 'ASC')
             ->leftJoin('e.place', 'place')
             ->addSelect('place')
@@ -58,7 +58,9 @@ SQL;
             ->addSelect('organizer')
             ->leftJoin('e.state', 'state')
             ->addSelect('state')
-            ->leftJoin('e.participants', 'participants')
+
+           ->leftJoin('e.participants', 'participants')
+
             ->addSelect('participants')
             ->andWhere('e.campus = :campus')
             ->setParameter(':campus', $campus)

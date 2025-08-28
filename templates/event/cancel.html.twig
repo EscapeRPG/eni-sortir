@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un super event{% endblock %}
+
+{% block main %}
+    <h1> Votre motif d'annulation snif snif </h1>
+
+    {{ form_start(cancel_form) }}
+
+    {{ form_row(cancel_form.cancellationReason) }}
+
+    {{ form_row(cancel_form.submit) }}
+
+    <a href="{{ path('event_detail',{id: event.id} ) }}"> <button>Annuler l'annulation oui</button> </a>
+    {{ form_end(cancel_form) }}
+
+
+{% endblock %}

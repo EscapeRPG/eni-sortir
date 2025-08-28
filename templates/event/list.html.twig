@@ -8,15 +8,6 @@
 
 {% block main %}
 
-
-    <a href="{{ path('place_list') }}">Liste des lieux de sortie !</a>
-    <div class="events-container">
-        {% for event in events %}
-            <div class="event">
-                <div class="event-poster">
-                    <a href="{{ path('event_detail', {id: event.id}) }}">
-
-
 <div class="events-container">
     {% if events|length != 0 %}
         {% for date in eventsDates %}

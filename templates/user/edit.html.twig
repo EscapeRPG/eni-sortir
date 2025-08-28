@@ -8,6 +8,8 @@
 
     {{ form_errors(edit_form) }}
 
+    <img src="{{ asset('uploads/users/' ~ user.profilPicture) }}" alt="photo de profil de {{ user.firstName }}">
+
     {{ form(edit_form) }}
 
     {% if is_granted('ROLE_ADMIN') %}

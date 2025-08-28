@@ -25,7 +25,7 @@ class SortieRepository extends ServiceEntityRepository
     public function findParticipantsByEvent(int $id) : array {
 
         $sql = <<<SQL
-SELECT u.first_name, u.name FROM USER u JOIN user_event ue ON u.ID = ue.user_id WHERE ue.event_id =:id              
+SELECT u.profil_picture, u.id, u.first_name FROM USER u JOIN user_event ue ON u.ID = ue.user_id WHERE ue.event_id =:id              
 SQL;
         $stmt = $this->getEntityManager()->getConnection();
         return $stmt->prepare($sql)

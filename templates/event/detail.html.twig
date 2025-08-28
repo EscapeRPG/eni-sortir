@@ -45,9 +45,7 @@
 
     <h3>Liste des participants</h3>
     {% for participant in participants %}
-        {%  for value in participant %}
-            {{value}}
-        {% endfor %}
+        <a href="{{ path('app_profile', {id: participant.id}) }}"><img src="{{ asset('uploads/users/' ~ participant.profil_picture) }}" alt="Image de {{ participant.first_name }}"></a>
 
     {% endfor %}
 

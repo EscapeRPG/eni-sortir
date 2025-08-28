@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} - Participant{% endblock %}
+
+{% block main %}
+    <h2>{{ participant.name | upper }} {{ participant.firstName }}</h2>
+
+    <img src="{{ asset('uploads/users/' ~ participant.profilPicture) }}" alt="photo de profil de {{ participant.firstName }}">
+
+
+    <p>Prénom : {{ participant.firstName }}</p>
+    <p>Nom : {{ participant.name }}</p>
+    <p>Email : {{ participant.email }}</p>
+    <p>Téléphone : {{ participant.phoneNumber }}</p>
+    <p>Campus : {{ participant.campus.name }}</p>
+    <p>Evenements organisés :</p>
+    <div class="events-container">
+        {% for event in events %}
+            {% if participant.id == event.organizer.id %}
+                <div class="event">
+                    <div class="event-poster">
+                        <a href="{{ path('event_detail', {id: event.id}) }}">
+                            <img src="{{ asset('uploads/events/' ~ event.posterFile) }}"
+                                 alt="{{ event.name }}"
+                                 title="{{ event.name }}">
+                        </a>
+                    </div>
+
+                    <div class="event-info">
+                        <div class="event-body">
+                            <div class="event-description">
+                                <h2>
+                                    <a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a>
+                                </h2>
+                                <p>{{ event.startingDateHour | date('H:i:s') ~ ' (' ~ event.duration | duration }})</p>
+                                <p>{{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}</p>
+                            </div>
+                            <div class="participants">
+                                <img src="{{ asset('uploads/users/' ~ event.organizer.profilPicture) }}"
+                                     class="event-organizer"
+                                     alt="{{ event.organizer.name }}"
+                                >
+                                <p>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
+                            </div>
+                        </div>
+
+                        <div class="event-state {{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
+                            {{ event.state.label }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <a href="{{ path('event_list') }}">Retour</a>
+
+{% endblock %}

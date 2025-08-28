@@ -7,8 +7,8 @@ parameters:
   event:
     nb_max: 12
     poster_dir: 'uploads/events'
-    user:
-      profil_picture: 'uploads/users'
+  user:
+    profil_picture: 'uploads/users'
   place:
     nb_max: 12
 

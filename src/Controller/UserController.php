@@ -6,9 +6,12 @@ use App\Entity\Campus;
 use App\Entity\User;
 use App\Form\EditType;
 use App\Form\RegistrationFormType;
+use App\Helper\FileUploader;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -45,7 +48,9 @@ class UserController extends AbstractController
         int                    $id,
         Request                $request,
         EntityManagerInterface $em,
-        #[CurrentUser] ?User   $userConnected
+        #[CurrentUser] ?User   $userConnected,
+        ParameterBagInterface   $parameterBag,
+        FileUploader           $fileUploader,
     ): Response
     {
         $user = $userRepository->findUserById($id);
@@ -59,6 +64,17 @@ class UserController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
+                $file = $form->get('profilPicture')->getData();
+
+                if ($file instanceof UploadedFile) {
+                    $name = $fileUploader->upload(
+                        $file,
+                        $user->getName(),
+                        $parameterBag->get('user')['profil_picture']
+                    );
+
+                    $user->setProfilPicture($name);
+                }
                 $em->flush();
 
                 $this->addFlash('success', "Mise à jour enregistrée");
@@ -167,6 +183,19 @@ class UserController extends AbstractController
 
         return $this->redirectToRoute('app_update', ['id' => $user->getId()]);
     }
+
+    #[Route('profile/{id}', name: 'app_profile', requirements: ['id' => '\d+'])]
+    public function profile(int $id, UserRepository $userRepository): Response{
+        $participant = $userRepository->find($id);
+        $events = $participant->getEvents();
+        $organizer = $participant->getMyEvents();
+        return $this->render('user/profile.html.twig', [
+            'participant' => $participant,
+            'events' => $events,
+            'organizer' => $organizer,
+        ]);
+    }
+
 
 
 }

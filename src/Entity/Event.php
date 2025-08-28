@@ -5,7 +5,9 @@ namespace App\Entity;
 use App\Repository\SortieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SortieRepository::class)]
 class Event
@@ -22,6 +24,7 @@ class Event
     private ?\DateTime $startingDateHour = null;
 
     #[ORM\Column]
+    #[Assert\GreaterThan(propertyPath: 'startingDateHour', message : "la date de fin doit être postérieure à la date de début")]
     private ?\DateTime $endDateHour = null;
 
     #[ORM\Column]
@@ -59,7 +62,12 @@ class Event
     private ?string $posterFile = null;
 
     #[ORM\Column]
+    #[Assert\LessThan(propertyPath: 'startingDateHour', message : "la date d'inscription doit être antérieure à la date de début")]
+    #[Assert\LessThan(propertyPath: 'endDateHour', message :"La date d'inscription doit être antérieure à la date de fin" )]
     private ?\DateTime $registrationDeadline = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $cancellationReason = null;
 
     public function __construct()
     {
@@ -239,6 +247,18 @@ class Event
     public function setRegistrationDeadline(\DateTime $registrationDeadline): static
     {
         $this->registrationDeadline = $registrationDeadline;
+
+        return $this;
+    }
+
+    public function getCancellationReason(): ?string
+    {
+        return $this->cancellationReason;
+    }
+
+    public function setCancellationReason(?string $cancellationReason): static
+    {
+        $this->cancellationReason = $cancellationReason;
 
         return $this;
     }

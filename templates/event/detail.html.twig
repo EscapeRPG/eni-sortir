@@ -15,6 +15,10 @@
     <p>informations pratiques :  {{ event.eventInfo }}</p>
     <p>On se retrouve ici : {{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>
 
+    {% if event.state.label == 'Annulée' %}
+        <p> Raison d'annulation : {{ event.cancellationReason }}</p>
+    {% endif %}
+
 
     {% if event.state.label == 'Ouverte' %}
         <a href="{{ path('event_join', { id: event.id}) }}">S'inscrire</a>
@@ -25,7 +29,7 @@
     <a href="{{ path('event_edit', { id: event.id}) }}"> Éditez votre sortie </a>
         <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}" onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')"> Supprimez votre sortie </a>
     {% if event.state.label != 'Annulée' %}
-        <a href ="{{ path('event_cancel', {id:event.id}) }}" onclick="return confirm('êtes vous sûr de vouloir annuler votre event ?')"> Annulez votre event </a>
+        <a href ="{{ path('event_cancel', {id:event.id}) }}"> Annulez votre event </a>
     {% endif %}
 
 

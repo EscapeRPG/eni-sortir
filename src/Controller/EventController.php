@@ -42,7 +42,8 @@ final class EventController extends AbstractController
 
             $file = $form->get('poster_file')->getData();
             if ($file instanceof UploadedFile) {
-                $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_file']);
+
+                 $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_dir']);
                 $event->setPosterFile($name);
             }
 
@@ -67,7 +68,7 @@ final class EventController extends AbstractController
             $em->persist($event);
             $em->flush();
 
-            $this->addFlash('success', 'Event created!');
+            $this->addFlash('success', 'Évènement crée !');
             return $this->redirectToRoute('app_main');
         }
         return $this->render('event/create.html.twig', [
@@ -85,23 +86,16 @@ final class EventController extends AbstractController
 
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /*$file = $form->get('poster_file')->getData();
+            $file = $form->get('poster_file')->getData();
 
             if($file instanceof UploadedFile){
-                $dir = $parameterBag->get('event')['poster_dir'];
-                $name = $fileUploader->upload($file, $event->getName(), $dir);
-
+                $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_dir']);
                 $event->setPosterFile($name);
-
-                if ($event->getPosterFile() && file_exists($dir . '/' . $event->getPosterFile()){
-                    unlink($dir . '/' . $event->getPosterFile());
-                    }
-                    $event->setPosterFile($name);
             }
-            $event->setPosterFile($name);*/
+            //$event->setPosterFile($name);
 
             $em->flush();
-            $this->addFlash('success', 'Event edited!');
+            $this->addFlash('success', 'Évènement édité!');
             return $this->redirectToRoute('event_list', ['id' => $event->getId()]);
         }
         return $this->render('event/create.html.twig', [
@@ -307,7 +301,7 @@ final class EventController extends AbstractController
         {
             $this->checkStatusUser($event, $security);
 
-            $reac = $stateRepository->findOneBy(['label' => 'Créée']);
+            $reac = $stateRepository->findOneBy(['label' => 'Ouverte']);
             if (!$reac) {
                 throw $this->createNotFoundException('statut introuvable !');
             }
@@ -331,7 +325,7 @@ final class EventController extends AbstractController
             $em->remove($event);
             $em->flush();
 
-            $this->addFlash('success', 'Event deleted!');
+            $this->addFlash('success', 'Évènement supprimé !');
         } else {
             $this->addFlash('danger', 'Suppression impossible !');
 

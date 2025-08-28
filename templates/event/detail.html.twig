@@ -34,7 +34,7 @@
         {% if found %}
             <a href="{{ path('event_withdraw', { id: event.id }) }}">Se désister</a>
         {% endif %}
-
+    {% endif %}
     {% if event.state.label == 'Annulée' %}
         <p> Raison d'annulation : {{ event.cancellationReason }}</p>
     {% endif %}

@@ -1,8 +1,9 @@
 :root {
+    --header-bg-color: #ff8e8e;
     --bg-main-color: #fff8f3;
     --txt-main-color: black;
     --event-bg-color: #ffffff;
-    --a-color: orange;
+    --a-color: #ffffff;
     --a-color-hover: #a54b0c;
     --event-shadow: rgba(20, 115, 168, 0.6);
     --events-dates-container-bg-color: #ffc59b;
@@ -13,4 +14,155 @@ body {
     background-color: var(--bg-main-color);
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
+
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: calc(100% - 80px);
+        background-color: var(--header-bg-color);
+        padding: 15px 40px;
+        position: fixed;
+        top: 0;
+        left: 0;
+
+        .logo-nav {
+            display: flex;
+            align-items: baseline;
+            gap: 20px;
+
+            h1 {
+                margin: 0;
+            }
+
+            a {
+                color: var(--a-color);
+                text-decoration: none;
+                font-weight: bold;
+
+                &:hover {
+                    color: var(--a-color-hover);
+                    text-decoration: underline;
+                }
+            }
+        }
+
+        nav {
+            .burger-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                width: 30px;
+                height: 30px;
+                background-color: transparent;
+                border: 2px solid white;
+                transform: rotate(45deg);
+
+                .burgerBtn {
+                    width: 20px;
+                    height: 20px;
+                    transform: rotate(-45deg);
+                }
+
+                #burger {
+                    width: 20px;
+                    height: 2px;
+                    background-color: white;
+                    display: inline-block;
+                    position: absolute;
+                    top: 50%;
+
+                    &::before, &::after {
+                        content: '';
+                        width: 20px;
+                        height: 2px;
+                        background-color: white;
+                        display: inline-block;
+                        position: absolute;
+                        transform-origin: center;
+                        transition: all 0.5s ease;
+                    }
+
+                    &::before {
+                        top: -7px;
+                    }
+
+                    &::after {
+                        top: 7px;
+                    }
+
+                    &.open {
+                        background: transparent;
+
+                        &::before {
+                            transform: rotate(45deg);
+                            background-color: red;
+                            top: 0;
+                        }
+
+                        &::after {
+                            transform: rotate(-45deg);
+                            background-color: red;
+                            top: 0;
+                        }
+                    }
+                }
+            }
+
+            #responsive {
+                position: absolute;
+                top: 67px;
+                height: calc(100vh - 67px);
+                right: 0;
+                transform: translateX(100%);
+                transition: transform .4s ease;
+                background-color: var(--header-bg-color);
+                margin: 0;
+
+                &.open {
+                    transform: translateX(0);
+                    white-space: nowrap;
+                }
+
+                ul {
+                    margin: 0 auto;
+                    padding: 20px;
+                    list-style-type: none;
+                    border-bottom: 1px solid var(--bg-main-color);
+
+                    li {
+                        margin: 5px auto;
+                    }
+                }
+
+                a {
+                    color: var(--a-color);
+                    text-decoration: none;
+
+                    &:hover {
+                        color: var(--a-color-hover);
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
+
+    main {
+        width: 100%;
+        margin-top: 100px;
+    }
+
+    footer {
+        text-align: center;
+        padding: 10px;
+        position: absolute;
+        width: 40%;
+        left: 30%;
+        bottom: 0;
+        border-radius: 20px 20px 0 0;
+        border-bottom: none;
+    }
 }

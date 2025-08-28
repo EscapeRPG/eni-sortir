@@ -14,7 +14,6 @@
             <div class="event-date-container">
                 <div class="event-date">
                     {{ date }}
-
                 </div>
 
                 {% for event in events %}
@@ -39,7 +38,7 @@
                                         <p>{{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}</p>
                                     </div>
                                     <div class="participants">
-                                        <img src="{{ asset('uploads/users/' ~ event.organizer.name) }}"
+                                        <img src="{{ asset('uploads/users/' ~ event.organizer.profilPicture) }}"
                                              class="event-organizer"
                                              alt="{{ event.organizer.name }}"
                                         >

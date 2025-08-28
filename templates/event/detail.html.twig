@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-{{ parent() }} - Détails
+    {{ parent() }} - Détails
 {% endblock %}
 
 {% block main %}
@@ -12,30 +12,47 @@
 
     <p>participants : {{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
     <p>date : {{ event.startingDateHour | date('d/m/Y H:i:s') }}</p>
-    <p>informations pratiques :  {{ event.eventInfo }}</p>
+    <p>informations pratiques : {{ event.eventInfo }}</p>
     <p>On se retrouve ici : {{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>
+
+
+    {% set found = false %}
+
+    {% for Idparticipant in listIdParticipants %}
+        {% if Idparticipant.id == userConnectedId %}
+            {% set found = true %}
+        {% endif %}
+    {% endfor %}
+
+    {% if event.state.label == 'Ouverte' %}
+        {% if not found %}
+            <a href="{{ path('event_join', { id: event.id }) }}">S'inscrire</a>
+        {% endif %}
+    {% endif %}
+
+    {% if event.state.label in ['Ouverte', 'Cloturée'] %}
+        {% if found %}
+            <a href="{{ path('event_withdraw', { id: event.id }) }}">Se désister</a>
+        {% endif %}
 
     {% if event.state.label == 'Annulée' %}
         <p> Raison d'annulation : {{ event.cancellationReason }}</p>
     {% endif %}
-
-
-    {% if event.state.label == 'Ouverte' %}
-        <a href="{{ path('event_join', { id: event.id}) }}">S'inscrire</a>
-    {% endif %}
-
+    
+    
     {%  if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
 
     <a href="{{ path('event_edit', { id: event.id}) }}"> Éditez votre sortie </a>
-        <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}" onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')"> Supprimez votre sortie </a>
+        <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}" 
+        onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')"> Supprimez votre sortie </a>
     {% if event.state.label != 'Annulée' %}
         <a href ="{{ path('event_cancel', {id:event.id}) }}"> Annulez votre event </a>
+
     {% endif %}
 
-
         {% if event.state.label == 'Annulée' %}
-                <a href="{{ path('event_reactivate', {id:event.id}) }}"> Réactivez votre sortie </a>
-            {% endif %}
+            <a href="{{ path('event_reactivate', {id:event.id}) }}"> Réactivez votre sortie </a>
+        {% endif %}
 
     {% endif %}
 
@@ -44,9 +61,11 @@
     <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&amp;output=embed"></iframe>
 
     <h3>Liste des participants</h3>
-    {% for participant in participants %}
-        {%  for value in participant %}
-            {{value}}
+
+    {% for participant in listNamesParticipants %}
+        {% for value in participant %}
+            {{ value }}
+
         {% endfor %}
 
     {% endfor %}

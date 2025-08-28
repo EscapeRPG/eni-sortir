@@ -1,5 +1,4 @@
 <?php
-// src/EventSubscriber/CheckEventClosureSubscriber.php
 
 namespace App\EventSubscriber;
 
@@ -13,9 +12,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class EventListener implements EventSubscriberInterface
 {
     public function __construct(
-        private SortieRepository $sortieRepository,
-        private StateRepository $stateRepository,
-        private EntityManagerInterface $entityManager
+        private readonly SortieRepository $sortieRepository,
+        private readonly StateRepository  $stateRepository,
+        private readonly EntityManagerInterface $entityManager
     ) {}
 
     public static function getSubscribedEvents(): array
@@ -27,26 +26,62 @@ class EventListener implements EventSubscriberInterface
 
     public function onKernelRequest(RequestEvent $event): void
     {
-
         $request = $event->getRequest();
         $route = $request->attributes->get('_route');
 
-        if (in_array($route, ['app_login', 'app_logout', 'app_register', 'app_verify_email', 'app_forgot_password_request', 'app_check_email', 'app_reset_password'])) {
+        if (in_array($route, ['app_login', 'app_logout'])) {
             return;
         }
 
         $today = new \DateTime();
-        $events = $this->sortieRepository->findEventsToClose($today);
+        $today->setTime((int) $today->format('H'), (int) $today->format('i'), 0);
 
-        $closureState = $this->stateRepository->find(3);
+        $states = [
+            'closed'   => $this->stateRepository->find(3),
+            'current'  => $this->stateRepository->find(4),
+            'ended'    => $this->stateRepository->find(5),
+            'archived' => $this->stateRepository->find(7),
+        ];
 
-        foreach ($events as $eventToClose) {
-            $eventToClose->setState($closureState);
-            $this->entityManager->persist($eventToClose);
+        // Etat Cloturée
+        $eventsToClose = $this->sortieRepository->findEventsToClose($today);
+        foreach ($eventsToClose as $eventToClose) {
+            if ($eventToClose->getState()->getId() !== $states['closed']->getId()) {
+                $eventToClose->setState($states['closed']);
+                $this->entityManager->persist($eventToClose);
+                $this->entityManager->flush();
+            }
         }
 
-        if (count($events) > 0) {
-            $this->entityManager->flush();
+        // Etat En cours
+        $eventsToOpen = $this->sortieRepository->findEventsToOpen($today);
+        foreach ($eventsToOpen as $eventToOpen) {
+            if ($eventToOpen->getState()->getId() !== $states['current']->getId()) {
+                $eventToOpen->setState($states['current']);
+                $this->entityManager->persist($eventToOpen);
+                $this->entityManager->flush();
+            }
         }
+
+        // Etat Passée
+        $eventsToEnd = $this->sortieRepository->findEventsToEnd($today);
+        foreach ($eventsToEnd as $eventToEnd) {
+            if ($eventToEnd->getState()->getId() !== $states['ended']->getId()) {
+                $eventToEnd->setState($states['ended']);
+                $this->entityManager->persist($eventToEnd);
+                $this->entityManager->flush();
+            }
+        }
+
+        // Etat Archivée
+        $eventsToArchive = $this->sortieRepository->findEventsToArchive($today);
+        foreach ($eventsToArchive as $eventToArchive) {
+            if ($eventToArchive->getState()->getId() !== $states['archived']->getId()) {
+                $eventToArchive->setState($states['archived']);
+                $this->entityManager->persist($eventToArchive);
+                $this->entityManager->flush();
+            }
+        }
+
     }
 }

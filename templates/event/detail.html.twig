@@ -16,9 +16,9 @@
     <p>On se retrouve ici : {{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>
 
 
-{#    {% if app.user !== event.organizer.id %}#}
+    {% if event.state.label == 'Ouverte' %}
         <a href="{{ path('event_join', { id: event.id}) }}">S'inscrire</a>
-{#    {% endif %}#}
+    {% endif %}
 
     {%  if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
 

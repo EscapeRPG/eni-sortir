@@ -7,7 +7,13 @@
 {% block main %}
     <img src="{{ event.posterFile }}" alt="image de l'évènement">
     <h1>Détail de l'évènement : {{ event.name }}</h1>
-    <p>crée par {{ event.organizer.firstName }} {{ event.organizer.name }}</p>
+
+    {% if event.organizer %}
+        <p>crée par {{ event.organizer.firstName }} {{ event.organizer.name }}</p>
+    {% else %}
+        <p>Organisateur supprimé</p>
+    {% endif %}
+
     <p>Campus de {{ event.campus.name }}</p>
 
     <p>participants : {{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>

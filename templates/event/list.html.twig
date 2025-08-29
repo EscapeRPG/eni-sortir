@@ -38,10 +38,14 @@
                                         <p>{{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}</p>
                                     </div>
                                     <div class="participants">
+                                        {% if event.organizer %}
                                         <img src="{{ asset('uploads/users/' ~ event.organizer.profilPicture) }}"
                                              class="event-organizer"
                                              alt="{{ event.organizer.name }}"
-                                        >
+                                             {% else %}
+                                                 <img src="" alt="Organisateur supprimé">
+                                             {% endif %}
+
                                         <p>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
                                     </div>
                                 </div>

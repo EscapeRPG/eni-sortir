@@ -219,7 +219,6 @@ final class EventController extends AbstractController
             $this->redirectToRoute('event_list', ['id' => $event->getId()]);
 
         }
-
         return $this->redirectToRoute('event_list', [
             'participants' => $participants,
             'event' => $event

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Campus;
+use App\Entity\State;
 use App\Entity\User;
 use App\Form\EditType;
 use App\Form\RegistrationFormType;
@@ -121,6 +122,16 @@ class UserController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->get('_token'))) {
+            $cancelState = $em->getRepository(State::class)->findOneBy(['label'=>'Annulée']);
+
+            foreach ($user->getMyEvents() as $event) {
+                $event->setState($cancelState);
+                $event->setCancellationReason('Le profil de l\'utilisateur à été supprimé');
+                $event->setOrganizer(null);//pour enlever la dépendance à un event sinon ca ne veut pas
+                $em->persist($event);
+            }
+            $em->flush();
+
             $em->remove($user);
             $em->flush();
 
@@ -140,8 +151,17 @@ class UserController extends AbstractController
             return $this->redirectToRoute('app_main');
         }
 
-    if($user->isActive() === true) {
-        $user->setIsActive(false);
+        //partie ajoutée pour supprimer les event si l'uti est desac
+        if($user->isActive() === true) {
+            $user->setIsActive(false);
+
+            $cancelState = $em->getRepository(State::class)->findOneBy(['label'=>'Annulée']);
+                foreach ($user->getMyEvents() as $event) {
+                    $event->setState($cancelState);
+                    $event->setCancellationReason('Le profil de l\'utilisateur à été désactivé');
+                    $em->persist($event);
+                    }
+
         $em->flush();
         $em->persist($user);
 
@@ -149,6 +169,13 @@ class UserController extends AbstractController
 
     }else{
         $user->setIsActive(true);
+
+        $activeState=$em->getRepository(State::class)->findOneBy(['label'=>'Ouverte']);
+            foreach ($user->getMyEvents() as $event) {
+                $event->setState($activeState);
+                $em->persist($event);
+            }
+
         $em->flush();
         $em->persist($user);
 

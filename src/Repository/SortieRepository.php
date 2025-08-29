@@ -133,9 +133,7 @@ SQL;
             ->leftJoin('e.organizer', 'organizer')
             ->addSelect('organizer')
             ->leftJoin('e.state', 'state')
-            ->addSelect('state')
-            ->leftJoin('e.participants', 'participants')
-            ->addSelect('participants');
+            ->addSelect('state');
 
         if (!empty($campus)) {
             $req->andWhere('e.campus = :campus')

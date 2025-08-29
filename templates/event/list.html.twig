@@ -8,25 +8,28 @@
 
 {% block main %}
 
-<div class="events-container">
-    {% if events|length != 0 %}
-        {% for date in eventsDates %}
-            <div class="event-date-container">
-                <div class="event-date">
-                    {{ date }}
-                </div>
+    {{ form_start(filters) }}
+    {{ form_end(filters) }}
 
-                {% for event in events %}
-                    {% if event.startingDateHour | date('d/m/Y') == date %}
+    <div class="events-container">
+        {% if events|length != 0 %}
+            {% for date in eventsDates %}
+                <div class="event-date-container">
+                    <div class="event-date">
+                        {{ date }}
+                    </div>
 
-                        <div class="event">
-                            <div class="event-poster">
-                                <a href="{{ path('event_detail', {id: event.id}) }}">
-                                    <img src="{{ asset('uploads/events/' ~ event.posterFile) }}"
-                                         alt="{{ event.name }}"
-                                         title="{{ event.name }}">
-                                </a>
-                            </div>
+                    {% for event in events %}
+                        {% if event.startingDateHour | date('d/m/Y') == date %}
+
+                            <div class="event">
+                                <div class="event-poster">
+                                    <a href="{{ path('event_detail', {id: event.id}) }}">
+                                        <img src="{{ asset('uploads/events/' ~ event.posterFile) }}"
+                                             alt="{{ event.name }}"
+                                             title="{{ event.name }}">
+                                    </a>
+                                </div>
 
                             <div class="event-info">
                                 <div class="event-body">

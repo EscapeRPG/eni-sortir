@@ -12,7 +12,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class LoginController extends AbstractController
 {
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils, #[CurrentUser] ?User $userConnected, User $user): Response
+    public function login(AuthenticationUtils $authenticationUtils, #[CurrentUser] ?User $userConnected): Response
     {
         if ($userConnected) {
             $this->addFlash('success', 'Vous êtes déjà connecté');

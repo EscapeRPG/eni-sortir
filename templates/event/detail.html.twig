@@ -56,8 +56,13 @@
 
         {% endif %}
 
-        {% if event.state.label == 'Annulée' %}
-            <a href="{{ path('event_reactivate', {id:event.id}) }}"> Réactivez votre sortie </a>
+
+        {% if event.organizer %}
+            {% if event.state.label == 'Annulée' %}
+                <a href="{{ path('event_reactivate', {id:event.id}) }}"> Réactivez votre sortie </a>
+                {% else %}
+                <a href=""></a>
+            {% endif %}
         {% endif %}
 
     {% endif %}

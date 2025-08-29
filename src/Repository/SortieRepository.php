@@ -127,7 +127,15 @@ SQL;
     public function findEventsByFilters($campus, $name, $startingDay, $endingDay, $organizer, $subscribed, $notSubscribed, $passedEvents, $limit, $offset): Paginator
     {
         $req = $this->createQueryBuilder('e')
-            ->orderBy('e.startingDateHour', 'ASC');
+            ->orderBy('e.startingDateHour', 'ASC')
+            ->leftJoin('e.place', 'place')
+            ->addSelect('place')
+            ->leftJoin('e.organizer', 'organizer')
+            ->addSelect('organizer')
+            ->leftJoin('e.state', 'state')
+            ->addSelect('state')
+            ->leftJoin('e.participants', 'participants')
+            ->addSelect('participants');
 
         if (!empty($campus)) {
             $req->andWhere('e.campus = :campus')

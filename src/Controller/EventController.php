@@ -162,13 +162,13 @@ final class EventController extends AbstractController
         }
 
         $campusId = $request->query->get('campus') ? $request->query->get('campus') : $user->getCampus()->getId();
-        $name = $request->query->get('name');
+        $name = $request->query->get('name') ? $request->query->get('name') : null;
         $startingDay = $request->query->get('startingDay') ? new \DateTime($request->query->get('startingDay')) : null;
         $endingDay = $request->query->get('endingDay') ? new \DateTime($request->query->get('endingDay')) : null;
-        $organizer = $request->query->get('organizer');
-        $subscribed = $request->query->get('subscribed');
-        $notSubscribed = $request->query->get('notSubscribed');
-        $passedEvents = $request->query->get('passedEvents');
+        $organizer = $request->query->get('organizer') ? $request->query->get('organizer') : null;
+        $subscribed = $request->query->get('subscribed') ? $request->query->get('subscribed') : null;
+        $notSubscribed = $request->query->get('notSubscribed') ? $request->query->get('notSubscribed') : null;
+        $passedEvents = $request->query->get('passedEvents') ? $request->query->get('passedEvents') : null;
 
         $form = $this->createForm(FiltersType::class, [
             'campus' => $campusId ? $entityManager->getReference(Campus::class, $campusId) : $user->getCampus(),

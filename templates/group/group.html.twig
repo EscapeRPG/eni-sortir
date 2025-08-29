@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un groupe{% endblock %}
+
+{% block main %}
+    <h1>Créez un groupe privé pour vos sorties</h1>
+
+        {{ form_start(form) }}
+        {{ form_row(form.name) }}
+        {{ form_row(form.userList) }}
+        <button>Créer</button>
+        {{ form_end(form) }}
+
+{% endblock %}

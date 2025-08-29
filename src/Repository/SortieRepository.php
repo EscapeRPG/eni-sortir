@@ -35,29 +35,6 @@ SQL;
             ->fetchAllAssociative();
     }
 
-    public function findAllEvents(int $limit, int $offset, string $campus): Paginator
-    {
-         $events=$this->createQueryBuilder('e')
-            ->orderBy('e.startingDateHour', 'ASC')
-            ->leftJoin('e.place', 'place')
-            ->addSelect('place')
-            ->leftJoin('e.organizer', 'organizer')
-            ->addSelect('organizer')
-            ->leftJoin('e.state', 'state')
-            ->addSelect('state')
-            ->leftJoin('e.participants', 'participants')
-            ->addSelect('participants')
-            ->andWhere('e.campus = :campus')
-            ->setParameter(':campus', $campus)
-            ->andWhere('e.state != 1')
-            ->andWhere('e.state != 7')
-            ->setFirstResult($offset)
-            ->setMaxResults($limit)
-            ->getQuery();
-
-        return new Paginator($events);
-    }
-
     /**
      * @throws Exception
      */
@@ -73,18 +50,19 @@ SQL;
             'userId' => $userId,
         ]);
     }
+
     public function findEventsToClose(\DateTime $today): array
     {
         return $this->createQueryBuilder('e')
             ->join('e.state', 's')
+            ->addSelect('s')
             ->where('e.registrationDeadline <= :today')
-            ->andWhere('s.id != :closedId')
+            ->andWhere('s.id != :closedId AND s.id < :closedId')
             ->setParameter('today', $today)
             ->setParameter('closedId', 3)
             ->getQuery()
             ->getResult();
     }
-
 
     public function findEventsToArchive(\DateTime $today): array
     {
@@ -92,8 +70,9 @@ SQL;
 
         return $this->createQueryBuilder('e')
             ->join('e.state', 's')
+            ->addSelect('s')
             ->where('e.endDateHour <= :archiveDate')
-            ->andWhere('s.id != :archivedId')
+            ->andWhere('s.id != :archivedId AND s.id < :archivedId')
             ->setParameter('archiveDate', $archiveDate)
             ->setParameter('archivedId', 7)
             ->getQuery()
@@ -104,8 +83,9 @@ SQL;
     {
         return $this->createQueryBuilder('e')
             ->join('e.state', 's')
+            ->addSelect('s')
             ->where('e.startingDateHour <= :today')
-            ->andWhere('s.id != :currentId')
+            ->andWhere('s.id != :currentId AND s.id < :currentId')
             ->setParameter('today', $today)
             ->setParameter('currentId', 4)
             ->getQuery()
@@ -116,8 +96,9 @@ SQL;
     {
         return $this->createQueryBuilder('e')
             ->join('e.state', 's')
+            ->addSelect('s')
             ->where('e.endDateHour <= :today')
-            ->andWhere('s.id != :endedId')
+            ->andWhere('s.id != :endedId AND s.id < :endedId')
             ->setParameter('today', $today)
             ->setParameter('endedId', 5)
             ->getQuery()
@@ -133,9 +114,7 @@ SQL;
             ->leftJoin('e.organizer', 'organizer')
             ->addSelect('organizer')
             ->leftJoin('e.state', 'state')
-            ->addSelect('state')
-            ->leftJoin('e.participants', 'participants')
-            ->addSelect('participants');
+            ->addSelect('state');
 
         if (!empty($campus)) {
             $req->andWhere('e.campus = :campus')

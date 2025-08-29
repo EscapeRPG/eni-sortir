@@ -1,0 +1,97 @@
+form {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: 0 auto 20px auto;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--other-bg-color);
+    border-radius: 20px;
+
+    div {
+        width: 60%;
+        margin: 10px auto;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+
+        p {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+    input:not([type=checkbox]), select, textarea {
+        border: none;
+        border-radius: 5px;
+        width: calc(100% - 20px);
+        min-height: 3em;
+        padding: 0 10px;
+    }
+
+    select {
+        width: 100%;
+    }
+
+    button {
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        background-color: var(--header-bg-color);
+        cursor: pointer;
+        font-weight: bold;
+
+        &:hover {
+            background-color: var(--bg-main-color);
+        }
+    }
+}
+
+.form-btn-link {
+    width: 60%;
+    display: flex;
+    justify-content: center;
+
+    .a-btn {
+        background-color: var(--events-a-color);
+        width: 100%;
+        height: 100%;
+        margin: auto;
+        color: var(--a-color);
+        font-weight: bold;
+        text-align: center;
+        border-radius: 5px;
+        text-decoration: none;
+        padding: 10px 0;
+
+        &:hover {
+            background-color: var(--a-color);
+            color: var(--events-a-color);
+            text-decoration: underline;
+        }
+    }
+}
+
+.save-btn {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+
+    .save-draft, .publish {
+        color: var(--a-color);
+    }
+
+    .save-draft:hover, .publish:hover {
+        background-color: var(--a-color);
+        color: var(--events-a-color);
+    }
+
+    .save-draft {
+        background-color: var(--red);
+    }
+
+    .publish {
+        background-color: var(--green);
+    }
+}

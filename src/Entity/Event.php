@@ -40,7 +40,7 @@ class Event
     private Collection $participants;
 
     #[ORM\ManyToOne(inversedBy: 'myEvents')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $organizer = null;
 
     #[ORM\ManyToOne(inversedBy: 'events')]

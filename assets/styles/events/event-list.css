@@ -1,3 +1,36 @@
+.events-filters {
+    background-color: var(--other-bg-color);
+    padding: 20px;
+
+    form {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        width: 100%;
+
+        div {
+            align-items: flex-start;
+            width: fit-content;
+        }
+    }
+
+    .filters-checkboxes {
+        align-items: flex-start;
+
+        h3 {
+            font-size: 1em;
+            margin: 0;
+        }
+
+        div {
+            flex-direction: row;
+            width: 100%;
+            margin: 0;
+            justify-content: flex-start;
+        }
+    }
+}
+
 .events-container {
     display: flex;
     flex-direction: column;
@@ -9,7 +42,7 @@
         width: calc(100% - 40px);
         padding: 20px;
         box-shadow: 5px 5px 5px var(--event-shadow);
-        border-radius: 10px;
+        border-radius: 20px;
         background-color: var(--events-dates-container-bg-color);
 
         .event-date {
@@ -27,10 +60,11 @@
         display: flex;
         width: 100%;
         border: none;
-        border-radius: 20px;
+        border-radius: 10px;
         overflow: hidden;
         margin-top: 20px;
         background-color: var(--event-bg-color);
+        transition: transform .3s ease;
 
         &:hover {
             transform: scale(1.02);
@@ -68,11 +102,11 @@
                         a {
                             text-decoration: none;
                             font-weight: bold;
-                            color: var(--a-color);
+                            color: var(--events-a-color);
 
                             &:hover {
                                 text-decoration: underline;
-                                color: var(--a-color-hover);
+                                color: var(--events-a-color-hover);
                             }
                         }
                     }
@@ -105,19 +139,27 @@
             }
 
             .event-state {
-                text-align: right;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 1em;
                 font-weight: bold;
                 padding: 5px 20px;
+                border-top: 1px solid var(--events-dates-container-bg-color);
+            }
+
+            .event-green, .event-red {
+                width: 1em;
+                height: 1em;
+                border-radius: 100%;
             }
 
             .event-green {
-                background-color: #b3ffb3;
-                color: #04d804;
+                background-color: var(--green);
             }
 
             .event-red {
-                background-color: #ffb2b2;
-                color: red;
+                background-color: var(--red);
             }
         }
     }

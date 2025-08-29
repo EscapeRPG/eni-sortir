@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\State;
 use App\Repository\SortieRepository;
 use App\Repository\StateRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,10 +13,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class EventListener implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly SortieRepository $sortieRepository,
-        private readonly StateRepository  $stateRepository,
+        private readonly SortieRepository       $sortieRepository,
+        private readonly StateRepository        $stateRepository,
         private readonly EntityManagerInterface $entityManager
-    ) {}
+    )
+    {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -24,17 +27,20 @@ class EventListener implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @throws \Exception
+     */
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
         $route = $request->attributes->get('_route');
 
-        if (in_array($route, ['app_login', 'app_logout'])) {
+        if (in_array($route, ['app_main', 'app_login', 'app_logout'])) {
             return;
         }
 
         $today = new \DateTime();
-        $today->setTime((int) $today->format('H'), (int) $today->format('i'), 0);
+        $today->setTime((int)$today->format('H'), (int)$today->format('i'), 0);
 
         $states = [
             'closed'   => $this->stateRepository->find(3),
@@ -49,7 +55,7 @@ class EventListener implements EventSubscriberInterface
             if ($eventToClose->getState()->getId() !== $states['closed']->getId()) {
                 $eventToClose->setState($states['closed']);
                 $this->entityManager->persist($eventToClose);
-                $this->entityManager->flush();
+
             }
         }
 
@@ -59,7 +65,7 @@ class EventListener implements EventSubscriberInterface
             if ($eventToOpen->getState()->getId() !== $states['current']->getId()) {
                 $eventToOpen->setState($states['current']);
                 $this->entityManager->persist($eventToOpen);
-                $this->entityManager->flush();
+
             }
         }
 
@@ -69,7 +75,7 @@ class EventListener implements EventSubscriberInterface
             if ($eventToEnd->getState()->getId() !== $states['ended']->getId()) {
                 $eventToEnd->setState($states['ended']);
                 $this->entityManager->persist($eventToEnd);
-                $this->entityManager->flush();
+
             }
         }
 
@@ -79,9 +85,8 @@ class EventListener implements EventSubscriberInterface
             if ($eventToArchive->getState()->getId() !== $states['archived']->getId()) {
                 $eventToArchive->setState($states['archived']);
                 $this->entityManager->persist($eventToArchive);
-                $this->entityManager->flush();
-            }
+                 }
         }
-
+        $this->entityManager->flush();
     }
 }

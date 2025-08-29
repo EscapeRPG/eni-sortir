@@ -1,13 +1,18 @@
 :root {
     --header-bg-color: #ff8e8e;
+    --other-bg-color: #ffc3c3;
     --bg-main-color: #fff8f3;
     --txt-main-color: black;
     --event-bg-color: #ffffff;
     --a-color: #ffffff;
     --a-color-hover: #a54b0c;
     --event-shadow: rgba(20, 115, 168, 0.6);
-    --events-dates-container-bg-color: #ffc59b;
-    --events-dates-bg-color: #ff9346;
+    --events-dates-container-bg-color: #ffc3c3;
+    --events-dates-bg-color: #ff8e8e;
+    --events-a-color: #ff8e8e;
+    --events-a-color-hover: #ff5f5f;
+    --green: #89df45;
+    --red: #f64949;
 }
 
 body {
@@ -152,13 +157,13 @@ body {
 
     main {
         width: 100%;
-        margin-top: 100px;
+        margin-top: 67px;
     }
 
     footer {
         text-align: center;
         padding: 10px;
-        position: absolute;
+        position: fixed;
         width: 40%;
         left: 30%;
         bottom: 0;

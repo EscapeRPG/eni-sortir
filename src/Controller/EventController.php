@@ -47,7 +47,7 @@ final class EventController extends AbstractController
             $file = $form->get('poster_file')->getData();
             if ($file instanceof UploadedFile) {
 
-                 $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_dir']);
+                $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_dir']);
                 $event->setPosterFile($name);
             }
 
@@ -92,7 +92,7 @@ final class EventController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $file = $form->get('poster_file')->getData();
 
-            if($file instanceof UploadedFile){
+            if ($file instanceof UploadedFile) {
                 $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_dir']);
                 $event->setPosterFile($name);
             }
@@ -124,7 +124,26 @@ final class EventController extends AbstractController
         $limit = $bag->get('event')['nb_max'];
         $offset = ($page - 1) * $limit;
 
-        $form = $this->createForm(FiltersType::class);
+        $campusId = $request->query->get('campus') ? $request->query->get('campus') : $user->getCampus()->getId();
+        $name = $request->query->get('name') ? $request->query->get('name') : null;
+        $startingDay = $request->query->get('startingDay') ? new \DateTime($request->query->get('startingDay')) : null;
+        $endingDay = $request->query->get('endingDay') ? new \DateTime($request->query->get('endingDay')) : null;
+        $organizer = $request->query->get('organizer') ? $request->query->get('organizer') : null;
+        $subscribed = $request->query->get('subscribed') ? $request->query->get('subscribed') : null;
+        $notSubscribed = $request->query->get('notSubscribed') ? $request->query->get('notSubscribed') : null;
+        $passedEvents = $request->query->get('passedEvents') ? $request->query->get('passedEvents') : null;
+
+        $form = $this->createForm(FiltersType::class, [
+            'campus' => $campusId ? $entityManager->getReference(Campus::class, $campusId) : $user->getCampus(),
+            'name' => $name,
+            'startingDay' => $startingDay,
+            'endingDay' => $endingDay,
+            'organizer' => (bool)$organizer,
+            'subscribed' => (bool)$subscribed,
+            'notSubscribed' => (bool)$notSubscribed,
+            'passedEvents' => (bool)$passedEvents,
+        ], ['method' => 'POST']);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -161,26 +180,6 @@ final class EventController extends AbstractController
             return $this->redirectToRoute('event_list', $events);
         }
 
-        $campusId = $request->query->get('campus') ? $request->query->get('campus') : $user->getCampus()->getId();
-        $name = $request->query->get('name') ? $request->query->get('name') : null;
-        $startingDay = $request->query->get('startingDay') ? new \DateTime($request->query->get('startingDay')) : null;
-        $endingDay = $request->query->get('endingDay') ? new \DateTime($request->query->get('endingDay')) : null;
-        $organizer = $request->query->get('organizer') ? $request->query->get('organizer') : null;
-        $subscribed = $request->query->get('subscribed') ? $request->query->get('subscribed') : null;
-        $notSubscribed = $request->query->get('notSubscribed') ? $request->query->get('notSubscribed') : null;
-        $passedEvents = $request->query->get('passedEvents') ? $request->query->get('passedEvents') : null;
-
-        $form = $this->createForm(FiltersType::class, [
-            'campus' => $campusId ? $entityManager->getReference(Campus::class, $campusId) : $user->getCampus(),
-            'name' => $name,
-            'startingDay' => $startingDay,
-            'endingDay' => $endingDay,
-            'organizer' => (bool)$organizer,
-            'subscribed' => (bool)$subscribed,
-            'notSubscribed' => (bool)$notSubscribed,
-            'passedEvents' => (bool)$passedEvents,
-        ], ['method' => 'POST']);
-
         $events = $sortieRepository->findEventsByFilters(
             $campusId,
             $name,
@@ -193,16 +192,14 @@ final class EventController extends AbstractController
             $limit,
             $offset
         );
-
         $totalItems = count($events);
         $pages = ceil($totalItems / $limit);
-        $uniqueDates = [];
 
+        $uniqueDates = [];
         foreach ($events as $event) {
             $formattedDate = $event->getStartingDateHour()->format('d/m/Y');
             $uniqueDates[$formattedDate] = $formattedDate;
         }
-
         $uniqueDates = array_values(array_unique($uniqueDates));
 
         return $this->render('event/list.html.twig', [
@@ -210,7 +207,7 @@ final class EventController extends AbstractController
             'events' => $events,
             'page' => $page,
             'pages' => $pages,
-            'filters' => $form->createView()
+            'filters' => $form
         ]);
     }
 
@@ -219,7 +216,7 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
-    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, #[CurrentUser] ?User   $userConnected): Response
+    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, #[CurrentUser] ?User $userConnected): Response
     {
         $event = $sortieRepository->find($id);
         $userConnectedId = $userConnected->getId();
@@ -379,14 +376,14 @@ final class EventController extends AbstractController
     public function reactivate(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
     {
         $this->checkStatusUser($event, $security);
-      
-            $reac = $stateRepository->findOneBy(['label' => 'Ouverte']);
-            if (!$reac) {
-                throw $this->createNotFoundException('statut introuvable !');
-            }
-            $event->setState($reac);
-            $em->flush();
-            $this->addFlash('success','Event réactivé !');
+
+        $reac = $stateRepository->findOneBy(['label' => 'Ouverte']);
+        if (!$reac) {
+            throw $this->createNotFoundException('statut introuvable !');
+        }
+        $event->setState($reac);
+        $em->flush();
+        $this->addFlash('success', 'Event réactivé !');
 
         return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
     }
@@ -396,7 +393,7 @@ final class EventController extends AbstractController
     {
 
         $this->checkStatusUser($event, $security);
-        if($this->isCsrfTokenValid('delete'.$event->getId(), $request->get('token'))) {
+        if ($this->isCsrfTokenValid('delete' . $event->getId(), $request->get('token'))) {
 
             $em->remove($event);
             $em->flush();

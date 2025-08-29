@@ -6,12 +6,13 @@
     <h1> Créez une super teuf ouais les jeunes </h1>
 
     {{ form_start(event_form) }}
-
     <div>
-        <p>Créé par {{ app.user.firstName }}</p>
-        <p>Sur le campus de {{ app.user.campus.name }}</p>
+        <p>
+            Créé par {{ app.user.firstName }}
+            <br>
+            Sur le campus de {{ app.user.campus.name }}
+        </p>
     </div>
-
     {{ form_row(event_form.name) }}
     {{ form_row(event_form.startingDateHour) }}
     {{ form_row(event_form.endDateHour) }}
@@ -19,18 +20,15 @@
     {{ form_row(event_form.registrationDeadline) }}
     {{ form_row(event_form.eventInfo) }}
     {{ form_row(event_form.place) }}
-    <div class="button-place">
-        <a href="{{ path('place_create') }}" class="btn">
+    <div class="form-btn-link">
+        <a href="{{ path('place_create') }}" class="a-btn">
             Ou créez un lieu
         </a>
     </div>
     {{ form_row(event_form.poster_file) }}
-
-    {{ form_row(event_form.saveDraft) }}
-    <p>ou</p>
-    {{ form_row(event_form.publish) }}
-
+    <div class="save-btn">
+        {{ form_widget(event_form.saveDraft) }}
+        {{ form_widget(event_form.publish) }}
+    </div>
     {{ form_end(event_form) }}
-
-
 {% endblock %}

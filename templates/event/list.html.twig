@@ -53,21 +53,21 @@
                                     </div>
                                 </div>
 
-                                <div class="event-state {{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
-                                    {{ event.state.label }}
+                                    <div class="event-state {{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
+                                        {{ event.state.label }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="event-date-container">
+                <p>Aucun événement ne correspond à votre recherche.</p>
             </div>
-        {% endfor %}
-    {% else %}
-        <div class="event-date-container">
-            <p>Aucun événement ne correspond à votre recherche.</p>
-        </div>
-    {% endif %}
-</div>
+        {% endif %}
+    </div>
 
     {% if pages != 0 and pages != 1 %}
         <div class="pagination">
@@ -92,4 +92,4 @@
             {% endif %}
         </div>
     {% endif %}
-    {% endblock %}
+{% endblock %}

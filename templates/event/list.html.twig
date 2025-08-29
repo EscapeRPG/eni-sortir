@@ -8,7 +8,8 @@
 
 {% block main %}
 
-    {{ form(filters) }}
+    {{ form_start(filters) }}
+    {{ form_end(filters) }}
 
     <div class="events-container">
         {% if events|length != 0 %}

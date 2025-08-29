@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Place;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -23,19 +24,17 @@ class PlaceType extends AbstractType
                 'label' => 'Code postal'])
             ->add('city', TextType::class, [
                 'label' => 'Ville'])
-            ->add('latitude', IntegerType::class, [
+            ->add('latitude', NumberType::class, [
                 'label' => 'Latitude',
-                'required' => false
+                'scale' => 6,
             ])
-            ->add('longitude', IntegerType::class, [
+            ->add('longitude', NumberType::class, [
                 'label' => 'Longitude',
-                'required' => false
+                'scale' => 6,
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Enregistrer'
             ]);
-
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void

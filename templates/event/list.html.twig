@@ -55,24 +55,27 @@
                                     </a>
                                 </div>
 
-                                <div class="event-info">
-                                    <div class="event-body">
-                                        <div class="event-description">
-                                            <h2>
-                                                <a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a>
-                                            </h2>
-                                            <p>{{ event.startingDateHour | date('H:i:s') ~ ' (' ~ event.duration | duration }}
-                                                )</p>
-                                            <p>{{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}</p>
-                                        </div>
-                                        <div class="participants">
-                                            <img src="{{ asset('uploads/users/' ~ event.organizer.profilPicture) }}"
-                                                 class="event-organizer"
-                                                 alt="{{ event.organizer.name }}"
-                                            >
-                                            <p>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
-                                        </div>
+                            <div class="event-info">
+                                <div class="event-body">
+                                    <div class="event-description">
+                                        <h2>
+                                            <a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a>
+                                        </h2>
+                                        <p>{{ event.startingDateHour | date('H:i:s') ~ ' (' ~ event.duration | duration }})</p>
+                                        <p>{{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}</p>
                                     </div>
+                                    <div class="participants">
+                                        {% if event.organizer %}
+                                        <img src="{{ asset('uploads/users/' ~ event.organizer.profilPicture) }}"
+                                             class="event-organizer"
+                                             alt="{{ event.organizer.name }}"
+                                             {% else %}
+                                                 <img src="" alt="Organisateur supprimé">
+                                             {% endif %}
+
+                                        <p>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
+                                    </div>
+                                </div>
 
                                     <div class="event-state">
                                         {{ event.state.label }}

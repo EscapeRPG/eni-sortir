@@ -6,6 +6,8 @@ use App\Repository\PlaceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: PlaceRepository::class)]
 class Place
@@ -15,22 +17,22 @@ class Place
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 100, nullable: true)]
     private ?string $street = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, nullable: true)]
     private ?string $postalCode = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 100, nullable: true)]
     private ?string $city = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?float $latitude = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?float $longitude = null;
 
     /**
@@ -153,5 +155,19 @@ class Place
         }
 
         return $this;
+    }
+
+    /**
+     * @Assert\Callback
+     */
+    public function validateAdresseOuGPS(ExecutionContextInterface $context): void
+    {
+        $hasAdresse = $this->street && $this->postalCode && $this->city;
+        $hasGPS = $this->latitude !== null && $this->longitude !== null;
+
+        if (!$hasAdresse && !$hasGPS) {
+            $context->buildViolation('Vous devez renseigner une adresse ou des coordonnées GPS.')
+                ->addViolation();
+        }
     }
 }

@@ -38,17 +38,17 @@
     {% if event.state.label == 'Annulée' %}
         <p> Raison d'annulation : {{ event.cancellationReason }}</p>
     {% endif %}
-    
-    
-    {%  if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
 
-    <a href="{{ path('event_edit', { id: event.id}) }}"> Éditez votre sortie </a>
-        <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}" 
-        onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')"> Supprimez votre sortie </a>
-    {% if event.state.label != 'Annulée' %}
-        <a href ="{{ path('event_cancel', {id:event.id}) }}"> Annulez votre event </a>
 
-    {% endif %}
+    {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
+
+        <a href="{{ path('event_edit', { id: event.id}) }}"> Éditez votre sortie </a>
+        <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}"
+           onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')"> Supprimez votre sortie </a>
+        {% if event.state.label != 'Annulée' %}
+            <a href="{{ path('event_cancel', {id:event.id}) }}"> Annulez votre event </a>
+
+        {% endif %}
 
         {% if event.state.label == 'Annulée' %}
             <a href="{{ path('event_reactivate', {id:event.id}) }}"> Réactivez votre sortie </a>
@@ -56,14 +56,31 @@
 
     {% endif %}
 
-    {% set address = event.place.street ~ ', ' ~ event.place.postalCode ~ ' ' ~ event.place.city %}
-    {% set addressGoogle = address|replace({' ': '+'}) %}
-    <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&amp;output=embed"></iframe>
+    {# si on a une adresse #}
+    {% if event.place.street and event.place.postalCode and event.place.city %}
+        {% set address = event.place.street ~ ', ' ~ event.place.postalCode ~ ' ' ~ event.place.city %}
+        {% set addressGoogle = address|replace({' ': '+'}) %}
+
+        <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&amp;output=embed"
+                allowfullscreen loading="lazy">
+        </iframe>
+    {% endif %}
+
+    {# si on a des coordonnées GPS #}
+    {% if event.place.latitude is not null and event.place.longitude is not null %}
+
+        <iframe src="https://maps.google.com/maps?q={{ event.place.latitude }},{{ event.place.longitude }}&amp;output=embed"
+                allowfullscreen loading="lazy">
+        </iframe>
+    {% endif %}
+
 
     <h3>Liste des participants</h3>
 
     {% for participant in participants %}
-        <a href="{{ path('app_profile', {id: participant.id}) }}"><img src="{{ asset('uploads/users/' ~ participant.profil_picture) }}" alt="Image de {{ participant.first_name }}"></a>
+        <a href="{{ path('app_profile', {id: participant.id}) }}"><img
+                    src="{{ asset('uploads/users/' ~ participant.profil_picture) }}"
+                    alt="Image de {{ participant.first_name }}"></a>
 
     {% endfor %}
 

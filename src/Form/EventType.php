@@ -106,7 +106,7 @@ class EventType extends AbstractType
                             'image/png',
                             'image/jpg'
                         ],
-                        'mimeTypesMessage' => 'Les formats de fichiers accéptés sont JPEG, JPG et PNG',
+                        'mimeTypesMessage' => 'Les formats de fichiers acceptés sont JPEG, JPG et PNG',
                     ])
                 ]
             ])

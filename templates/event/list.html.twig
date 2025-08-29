@@ -8,25 +8,18 @@
 
 {% block main %}
 
-<div class="events-container">
-    {% if events|length != 0 %}
-        {% for date in eventsDates %}
-            <div class="event-date-container">
-                <div class="event-date">
-                    {{ date }}
-                </div>
+    {{ form(filters) }}
 
-                {% for event in events %}
-                    {% if event.startingDateHour | date('d/m/Y') == date %}
+    <div class="events-container">
+        {% if events|length != 0 %}
+            {% for date in eventsDates %}
+                <div class="event-date-container">
+                    <div class="event-date">
+                        {{ date }}
+                    </div>
 
-                        <div class="event">
-                            <div class="event-poster">
-                                <a href="{{ path('event_detail', {id: event.id}) }}">
-                                    <img src="{{ asset('uploads/events/' ~ event.posterFile) }}"
-                                         alt="{{ event.name }}"
-                                         title="{{ event.name }}">
-                                </a>
-                            </div>
+                    {% for event in events %}
+                        {% if event.startingDateHour | date('d/m/Y') == date %}
 
                             <div class="event-info">
                                 <div class="event-body">
@@ -48,23 +41,43 @@
 
                                         <p>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
                                     </div>
+
                                 </div>
 
-                                <div class="event-state {{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
-                                    {{ event.state.label }}
+                                <div class="event-info">
+                                    <div class="event-body">
+                                        <div class="event-description">
+                                            <h2>
+                                                <a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a>
+                                            </h2>
+                                            <p>{{ event.startingDateHour | date('H:i:s') ~ ' (' ~ event.duration | duration }}
+                                                )</p>
+                                            <p>{{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}</p>
+                                        </div>
+                                        <div class="participants">
+                                            <img src="{{ asset('uploads/users/' ~ event.organizer.profilPicture) }}"
+                                                 class="event-organizer"
+                                                 alt="{{ event.organizer.name }}"
+                                            >
+                                            <p>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="event-state {{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
+                                        {{ event.state.label }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="event-date-container">
+                <p>Aucun événement ne correspond à votre recherche.</p>
             </div>
-        {% endfor %}
-    {% else %}
-        <div class="event-date-container">
-            <p>Aucun événement ne correspond à votre recherche.</p>
-        </div>
-    {% endif %}
-</div>
+        {% endif %}
+    </div>
 
     {% if pages != 0 and pages != 1 %}
         <div class="pagination">
@@ -89,4 +102,4 @@
             {% endif %}
         </div>
     {% endif %}
-    {% endblock %}
+{% endblock %}

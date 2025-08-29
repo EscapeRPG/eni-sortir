@@ -83,7 +83,7 @@ class UserController extends AbstractController
                 if ($user->isAdmin() === true){
                     return $this->redirectToRoute('app_users_list');
                 }else{
-                    return $this->redirectToRoute('event_list');
+                    return $this->redirectToRoute('app_update', ['id' => $id]);
                 }
             }
 

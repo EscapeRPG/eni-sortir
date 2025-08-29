@@ -7,9 +7,33 @@
 {% block title %}{{ parent() }} - Liste des Sorties{% endblock %}
 
 {% block main %}
-
-    {{ form_start(filters) }}
-    {{ form_end(filters) }}
+    <div class="events-filters">
+        {{ form_start(filters) }}
+        {{ form_row(filters.campus) }}
+        {{ form_row(filters.name) }}
+        {{ form_row(filters.startingDay) }}
+        {{ form_row(filters.endingDay) }}
+        <div class="filters-checkboxes">
+            <h3>Les événements :</h3>
+            <div>
+                {{ form_widget(filters.organizer) }}
+                {{ form_label(filters.organizer) }}
+            </div>
+            <div>
+                {{ form_widget(filters.subscribed) }}
+                {{ form_label(filters.subscribed) }}
+            </div>
+            <div>
+                {{ form_widget(filters.notSubscribed) }}
+                {{ form_label(filters.notSubscribed) }}
+            </div>
+            <div>
+                {{ form_widget(filters.passedEvents) }}
+                {{ form_label(filters.passedEvents) }}
+            </div>
+        </div>
+        {{ form_end(filters) }}
+    </div>
 
     <div class="events-container">
         {% if events|length != 0 %}
@@ -53,8 +77,10 @@
                                     </div>
                                 </div>
 
-                                    <div class="event-state {{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
+                                    <div class="event-state">
                                         {{ event.state.label }}
+                                        <div class="{{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
+                                        </div>
                                     </div>
                                 </div>
                             </div>

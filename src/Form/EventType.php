@@ -43,29 +43,27 @@ class EventType extends AbstractType
                     'placeholder' => date('d/m/y H:i'),
                 ]*/
             ])
-
             ->add('endDateHour', DateTimeType::class, [
                 'label'=>'Date de fin',
                 'widget' => 'single_text',
                 'required' => true,
             ])
-
             ->add('registrationDeadline', DateTimeType::class, [
                 'label'=>'Clôture des inscriptions',
                 'widget' => 'single_text',
                 'required' => true,
             ])
-
             ->add('nbInscriptionsMax', IntegerType::class, [
                 'label'=>'Nombre maximum de participants',
                 'required' => true,
             ])
-
             ->add('eventInfo', TextareaType::class, [
                 'label' => 'Infos pratiques',
                 'required' => false,
+                'attr' => [
+                    'rows' => 10,
+                ]
             ])
-
             /*la personne qui crée l'évènement est l'oganisateur, à ajouter*/
 
 //            ->add('state', EntityType::class, [
@@ -83,16 +81,12 @@ class EventType extends AbstractType
 //                    return sprintf('%s (%s)', $campus->getName(), count($campus->getEvents()));
 //                }
 //            ])
-
             ->add('place', EntityType::class, [
                 'class' => Place::class,
                 'label'=>'Choisissez un lieu',
                 'required' => true,
                 'choice_label' => 'name',
             ])
-
-
-
             ->add('poster_file', FileType::class, [
                 'label' => 'Image',
                 'mapped' => false,
@@ -110,12 +104,17 @@ class EventType extends AbstractType
                     ])
                 ]
             ])
-
             ->add('saveDraft', SubmitType::class, [
                 'label' => 'Enregistrer pour plus tard',
+                'attr' => [
+                    'class' => 'save-draft'
+                ]
             ])
             ->add('publish', SubmitType::class, [
                 'label' => 'Ouvrir aux inscriptions',
+                'attr' => [
+                    'class' => 'publish'
+                ]
             ]);
         ;
     }

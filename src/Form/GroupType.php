@@ -9,7 +9,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use function Sodium\add;
 
 class GroupType extends AbstractType
 {
@@ -20,6 +19,9 @@ class GroupType extends AbstractType
                 'label' => 'Nom du groupe'
             ])
             ->add('userList', EntityType::class, [
+                'attr' => [
+                    'class' => 'select2'
+                ],
                 'class' => User::class,
                 'label' => 'Membres du groupe',
                 'choice_label' => function(User $user) {
@@ -28,6 +30,7 @@ class GroupType extends AbstractType
                 'multiple' => true,
                 'expanded' => false,
                 'required' => true,
+
             ]);
     }
 

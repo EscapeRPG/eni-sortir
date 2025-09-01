@@ -31,6 +31,7 @@ final class GroupController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Groupe créé avec succès !');
+
             return $this->redirectToRoute('group_list');
         }
 

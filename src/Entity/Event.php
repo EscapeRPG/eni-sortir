@@ -69,6 +69,9 @@ class Event
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $cancellationReason = null;
 
+    #[ORM\ManyToOne(targetEntity: Group::class, inversedBy: 'events')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Group $group = null;
     public function __construct()
     {
         $this->participants = new ArrayCollection();
@@ -259,6 +262,19 @@ class Event
     public function setCancellationReason(?string $cancellationReason): static
     {
         $this->cancellationReason = $cancellationReason;
+
+        return $this;
+    }
+
+
+    public function getGroup(): ?Group
+    {
+        return $this->group;
+    }
+
+    public function setGroup(?Group $group): static
+    {
+        $this->group = $group;
 
         return $this;
     }

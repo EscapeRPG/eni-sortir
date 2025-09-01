@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un super event{% endblock %}
+
+{% block main %}
+
+    <h2>Liste de mes groupes privés</h2>
+    <ul>
+        {% for group in groups %}
+            <li>
+                <a href="{{ path('group_detail', {id:group.id }) }}">
+                    {{ group.name }} </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

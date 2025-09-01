@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Campus;
 use App\Entity\Event;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -18,12 +19,16 @@ class AppFixtures extends Fixture
             $event->setName($faker->realText(30))
                 ->setStartingDateHour($faker->dateTimeBetween('+1 day', '+3 month'))
                 ->setEndDateHour($faker->dateTimeBetween($event->getStartingDateHour(), '+3 day'))
+                ->setDuration($event->getEndDateHour()-$event->getStartingDateHour())
                 ->setNbInscriptionsMax($faker->numberBetween(3,100))
-                ->setEventInfo($faker->paragraph(2));
+                ->setEventInfo($faker->paragraph(2))
+                ->setCampus($this->getReference(CampusFixtures::CAMPUS, Campus::class))
+
+            ;
 
         }
-        // $product = new Product();
-        // $manager->persist($product);
+
+        $manager->persist($event);
 
         $manager->flush();
     }

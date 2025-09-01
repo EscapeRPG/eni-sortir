@@ -1,0 +1,12 @@
+<h3>Bonjour {{ user.firstName }},</h3>
+
+<p>Un nouvel événement "{{ event.name }}" a été créé dans un groupe privé auquel vous avez rattaché.</p>
+
+<p>
+    Début : {{ event.startingDateHour|date('d/m/Y H:i') }}<br>
+    Fin : {{ event.endDateHour|date('d/m/Y H:i') }}
+</p>
+
+<p>Consultez-le sur le site pour plus de détails.</p>
+
+<p>À bientôt !</p>

@@ -10,6 +10,7 @@ use App\Form\CancellationReasonType;
 use App\Form\EventType;
 use App\Form\FiltersType;
 use App\Helper\FileUploader;
+use App\Repository\GroupRepository;
 use App\Repository\StateRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -24,17 +25,23 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+use Symfony\Component\Mime\Email;
 #[Route('/event', name: 'event')]
 final class EventController extends AbstractController
 {
 
+    /**
+     * @throws Exception
+     * @throws TransportExceptionInterface
+     */
     #[Route('/create', name: '_create')]
-    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, Security $security): Response
+    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, Security $security, GroupRepository $groupRepository, MailerInterface $mailer): Response
     {
         $event = new Event();
 
@@ -61,6 +68,14 @@ final class EventController extends AbstractController
             $event->setOrganizer($user);
             $event->setCampus($user->getCampus());
 
+            if ($event->getGroup() != null) {
+                $group = $groupRepository->find($event->getGroup());
+                $id = $group->getId();
+                $listUsers = $groupRepository->findGroupUsers($id);
+                $nbParticipantsgroup = count($listUsers);
+                $event->setNbInscriptionsMax($nbParticipantsgroup);
+            }
+
             $place = $form->get('place')->getData();
             $event->setPlace($place);
 
@@ -74,6 +89,28 @@ final class EventController extends AbstractController
 
             $em->persist($event);
             $em->flush();
+
+            if ($event->getGroup() !== null) {
+                $group = $event->getGroup();
+                $users = $group->getUserList();
+
+                foreach ($users as $member) {
+                    if ($member->getId() === $user->getId()) {
+                        continue;
+                    }
+
+                    $email = (new Email())
+                        ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
+                        ->to($member->getEmail())
+                        ->subject('Invitation à un nouvel évènement : '.$event->getName())
+                        ->html($this->renderView('email/invitation.html.twig', [
+                            'event' => $event,
+                            'user' => $member,
+                        ]));
+
+                    $mailer->send($email);
+                }
+            }
 
             $this->addFlash('success', 'Évènement crée !');
             return $this->redirectToRoute('app_main');

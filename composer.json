@@ -99,6 +99,8 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^4.1",
+        "fakerphp/faker": "*",
         "phpunit/phpunit": "^12.3",
         "symfony/browser-kit": "6.4.*",
         "symfony/css-selector": "6.4.*",

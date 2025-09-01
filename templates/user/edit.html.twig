@@ -19,12 +19,15 @@
     {{ form_row(edit_form.firstName) }}
     {{ form_row(edit_form.name) }}
     {{ form_row(edit_form.phoneNumber) }}
-    {{ form_row(edit_form.plainPassword) }}
-    {{ form_row(edit_form.campus) }}
+    {% if app.user.id == id %}
+        {{ form_row(edit_form.plainPassword) }}
+    {% endif %}
+    {% if user.id == id %}
+        {{ form_row(edit_form.campus) }}
+    {% endif %}
     <div class="save-btn">
         {{ form_widget(edit_form.submit) }}
     </div>
-
     <div class="save-btn separator">
         {% if is_granted('ROLE_ADMIN') %}
             <a href="{{ path('app_users_delete', {id: user.id, _token : csrf_token('delete'~user.id)}) }}"

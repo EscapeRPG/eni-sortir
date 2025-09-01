@@ -16,12 +16,15 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SortieRepository;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -273,7 +276,7 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/join/{id}', name: '_join', requirements: ['id' => '\d+'])]
-    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response
+    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager, MailerInterface $mailer, LoggerInterface $logger): Response
     {
 
         $event = $sortieRepository->find($id);
@@ -291,6 +294,34 @@ final class EventController extends AbstractController
             $event->addUser($userConnected);
             $entityManager->persist($event);
             $entityManager->flush();
+
+
+            //insérer l'envoi de mail
+
+            if(!$userConnected->getEmail()) { //si l'adresse n'existe pas ?
+                $this->addFlash('danger', 'Impossible d\'envoyer un mail, adresse invalide');
+                return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+            }
+
+            $email = (new TemplatedEmail())
+                ->from('no-reply@eni-sortir.fr')
+                ->to($userConnected->getEmail())
+                ->subject('Confirmation d\'inscription à l\'évènement ' . $event->getName())
+                ->htmlTemplate('email/join.html.twig')
+                ->context([
+                    'user' => $userConnected,
+                    'event' => $event,
+                ]);
+            try{ //pour ne pas bloquer si l'envoi ne fonctionne pas
+                $mailer->send($email);
+            } catch (\Throwable $e) {
+                $this->addFlash('danger', 'Ton inscription est validée mais le mail n\'a pas pu être envoyé');
+                $this->$logger->error('mail error : ' .$e->getMessage()); //logger : stock messages dans des fichiers (log)
+            }
+
+
+            $this->addFlash('success', 'Vous êtes inscrit à l\'évènement ! Un mail de conformation va vous être envoyé');
+
 
             $this->closeIfFullParticipants($stateRepository, $sortieRepository, $event->getId(), $bag, $entityManager);
             $this->redirectToRoute('event_list', ['id' => $event->getId()]);
@@ -310,7 +341,8 @@ final class EventController extends AbstractController
         SortieRepository       $sortieRepository,
         EntityManagerInterface $entityManager,
         #[CurrentUser] ?User   $userConnected,
-        int                    $id
+        int                    $id,
+        MailerInterface       $mailer
     ): Response
     {
         $event = $sortieRepository->find($id);
@@ -331,7 +363,22 @@ final class EventController extends AbstractController
                 $entityManager->persist($event);
                 $entityManager->flush();
 
-                $this->addFlash('success', "Désistement réussi");
+
+                //mail de désistement
+
+                $email = (new TemplatedEmail())
+                    ->from('no-reply@eni-sortir.fr')
+                    ->to($userConnected->getEmail())
+                    ->subject('Confirmation de désinscription à l\'évènement ' . $event->getName())
+                    ->htmlTemplate('email/withdraw.html.twig')
+                    ->context([
+                        'user' => $userConnected,
+                        'event' => $event,
+                    ]);
+                $mailer->send($email);
+
+                $this->addFlash('success', 'Vous vous êtes désinscrit de l\'évènement. Un mail de conformation va vous être envoyé');
+
                 $found = true;
                 break;
             }

@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+{{ parent() }} - Détails du groupe
+{% endblock %}
+
+{% block main %}
+
+    <h1>Détail du groupe : {{ groupDetails[0].group_name }}</h1>
+
+    <h2>Événement associé :</h2>
+    {% if groupDetails[0].event_name is not null %}
+        <p>{{ groupDetails[0].event_name }}</p>
+    {% else %}
+        <p><em>Pas d’événement associé pour l’instant.</em></p>
+    {% endif %}
+
+    <h2>Membres du groupe :</h2>
+    <ul>
+        {% for member in groupDetails %}
+            <li>{{ member.first_name }} {{ member.last_name }}</li>
+        {% endfor %}
+    </ul>
+
+
+{% endblock %}
+
+

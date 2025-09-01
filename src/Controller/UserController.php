@@ -94,9 +94,9 @@ class UserController extends AbstractController
             ]);
 
         } else {
-            throw $this->createAccessDeniedException('Accès refusé');
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
         }
-
+        return $this->redirectToRoute('app_main');
     }
 
     #[Route('/users/list', name: 'app_users_list')]

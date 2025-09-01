@@ -50,15 +50,6 @@ class EditType extends AbstractType
             ->add('firstName', TextType::class, [
                 'label' => 'Prénom '
             ])
-            ->add('email', EmailType::class, [
-                'label' => 'Email ',
-                'constraints' => [
-                    new Regex([
-                        'pattern' => '/^[^@]+@campus-eni\.fr$/',
-                        'message' => "L'adresse email doit appartenir au domaine @campus-eni.fr"
-                    ])
-                ]
-            ])
             ->add('phoneNumber', TextType::class, [
                 'label' => 'Numéro de téléphone ',
                 'constraints' => [
@@ -68,7 +59,7 @@ class EditType extends AbstractType
                     ]),
                 ]
             ]);
-      
+
         if ($options['is_self_edit']) {
             $builder
                 ->add('plainPassword', RepeatedType::class, [
@@ -93,7 +84,7 @@ class EditType extends AbstractType
                         'required' => false,
                     ],
                     'second_options' => [
-                        'label' => 'Répéter votre mot de passe ',
+                        'label' => 'Répétez votre mot de passe ',
                     ],
                     'invalid_message' => 'Le mot de passe est différent.',
                     // Instead of being set onto the object directly,
@@ -112,7 +103,7 @@ class EditType extends AbstractType
         }
         $builder
             ->add('submit', SubmitType::class, [
-            'label' => 'Enregistrer',
+                'label' => 'Enregistrer',
             ]);
     }
 

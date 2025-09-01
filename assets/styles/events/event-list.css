@@ -1,36 +1,3 @@
-.events-filters {
-    background-color: var(--other-bg-color);
-    padding: 20px;
-
-    form {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        width: 100%;
-
-        div {
-            align-items: flex-start;
-            width: fit-content;
-        }
-    }
-
-    .filters-checkboxes {
-        align-items: flex-start;
-
-        h3 {
-            font-size: 1em;
-            margin: 0;
-        }
-
-        div {
-            flex-direction: row;
-            width: 100%;
-            margin: 0;
-            justify-content: flex-start;
-        }
-    }
-}
-
 .events-container {
     display: flex;
     flex-direction: column;

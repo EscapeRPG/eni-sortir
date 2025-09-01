@@ -181,3 +181,9 @@ form {
         text-align: center;
     }
 }
+
+.error {
+    font-size: 0.8em;
+    font-style: italic;
+    color: red;
+}

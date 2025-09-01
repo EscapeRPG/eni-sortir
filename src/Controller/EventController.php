@@ -10,6 +10,7 @@ use App\Form\CancellationReasonType;
 use App\Form\EventType;
 use App\Form\FiltersType;
 use App\Helper\FileUploader;
+use App\Message\SendMailReminder;
 use App\Repository\StateRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,6 +26,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -276,7 +280,7 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/join/{id}', name: '_join', requirements: ['id' => '\d+'])]
-    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager, MailerInterface $mailer, LoggerInterface $logger): Response
+    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager, MailerInterface $mailer, LoggerInterface $logger, MessageBusInterface $bus): Response
     {
 
         $event = $sortieRepository->find($id);
@@ -325,6 +329,17 @@ final class EventController extends AbstractController
 
             $this->closeIfFullParticipants($stateRepository, $sortieRepository, $event->getId(), $bag, $entityManager);
             $this->redirectToRoute('event_list', ['id' => $event->getId()]);
+
+
+            //pour le mail délai 48h !
+        $eventId= $event->getId();
+        $delay=($event->getStartingDateHour()->getTimestamp()-48*3600 - time()) / 1000;
+        //timestamp renvoie nbr secondes, puis calcul 48h en sec. puis /1000 car messenger att millisecondes
+
+        if ($delay > 0) {
+            $bus->dispatch(new SendMailReminder($eventId), [new DelayStamp($delay)]);
+        }
+        //si -48h alors on programme le message avec un delaystamp
 
         }
         return $this->redirectToRoute('event_list', [

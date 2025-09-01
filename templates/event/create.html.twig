@@ -14,6 +14,11 @@
 
     {{ form_start(event_form) }}
     {{ form_row(event_form.name) }}
+{#    {{ form_row(event_form.groupePrive) }}#}
+        {{ form_row(event_form.group) }}
+
+    <a id="group-create-link" href="{{ path('group_create') }}" target="_blank">ou Créer un groupe privé pour cet évènement</a>
+
     {{ form_row(event_form.startingDateHour) }}
     {{ form_row(event_form.endDateHour) }}
     {{ form_row(event_form.nbInscriptionsMax) }}
@@ -31,4 +36,7 @@
         {{ form_widget(event_form.publish) }}
     </div>
     {{ form_end(event_form) }}
+
 {% endblock %}
+
+

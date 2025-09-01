@@ -3,17 +3,24 @@
 {% block title %}Créer un super event{% endblock %}
 
 {% block main %}
-    <h1> Créez une super teuf ouais les jeunes </h1>
-
-    {{ form_start(event_form) }}
-    <div>
+    <h2> Créez une super teuf ouais les jeunes </h2>
+    <div class="author">
         <p>
             Créé par {{ app.user.firstName }}
             <br>
             Sur le campus de {{ app.user.campus.name }}
         </p>
     </div>
+
+    {{ form_start(event_form) }}
     {{ form_row(event_form.name) }}
+    {% if event_form.name.vars.errors|length > 0 %}
+        <div class="errors">
+            {% for error in event_form.name.vars.errors %}
+                <p class="error">{{ error.message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
     {{ form_row(event_form.startingDateHour) }}
     {{ form_row(event_form.endDateHour) }}
     {{ form_row(event_form.nbInscriptionsMax) }}

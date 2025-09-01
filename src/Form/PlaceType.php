@@ -19,7 +19,7 @@ class PlaceType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => 'Nom'])
             ->add('street', TextType::class, [
-                'label' => 'rue'])
+                'label' => 'Rue'])
             ->add('postalCode', TextType::class, [
                 'label' => 'Code postal'])
             ->add('city', TextType::class, [

@@ -123,7 +123,7 @@ final class EventController extends AbstractController
             }
 
             $this->addFlash('success', 'Évènement crée !');
-            return $this->redirectToRoute('app_main');
+            return $this->redirectToRoute('event_list');
         }
         return $this->render('event/create.html.twig', [
             'event_form' => $form,

@@ -64,10 +64,12 @@
                                             </h2>
                                             <div>
                                                 {{ ux_icon('tabler:clock-hour-7') }}
-                                                {{ event.startingDateHour | date('H:i:s') ~ ' (' ~ event.duration | duration }})
+                                                Heure de rendez-vous :
+                                                {{ event.startingDateHour | date('H:i:s') }}
                                             </div>
                                             <div>
                                                 {{ ux_icon('tabler:map-pin') }}
+                                                Adresse :
                                                 {{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}
                                             </div>
                                         </div>

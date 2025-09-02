@@ -6,15 +6,20 @@
     <title>{% block title %}Eni Sortir{% endblock %}</title>
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="{{ asset('styles/forms/forms.css') }}">
-    <link rel="stylesheet" href="{{ asset('styles/forms/select.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/themes/themes.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/preferences/user-preferences.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/user/user.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/user/list.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/events/event-list.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
     {% block javascripts %}
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        
         {% block importmap %}{{ importmap('app') }}{% endblock %}
         <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
         <script>
@@ -40,7 +45,7 @@
 <body data-controller="themes">
 <header>
     <div class="logo-nav">
-        <a href="{{ path('app_main') }}"><img src="{{ asset('') }}" alt="logo"></a>
+        <a href="{{ path('app_main') }}"><img src="" alt="logo"></a>
         <a href="{{ path('app_main') }}"><h1>ENI SORTIR</h1></a>
         {% if is_granted('IS_AUTHENTICATED') %}
         <a class="nav-responsive" href="{{ path('event_list') }}">Événements</a>
@@ -57,15 +62,15 @@
             {% if is_granted('IS_AUTHENTICATED') %}
                 <ul>
                     <li>
-                        <a href="{{ path('app_update', {id:app.user.id}) }}">
+                        <a href="{{ path('app_profile', {id:app.user.id}) }}">
                             {{ ux_icon('tabler:user') }}
                             Profil
                         </a>
                     </li>
                     <li>
-                        <a href="">
+                        <a href="{{ path('app_preferences', {id:app.user.id}) }}">
                             {{ ux_icon('tabler:settings') }}
-                            Préférences
+                            Paramètres
                         </a>
                     </li>
                     <li>
@@ -85,9 +90,12 @@
 
                 </ul>
                 <ul>
-                    <li><a href="{{ path('group_list') }}">Liste de mes groupes privés</a></li>
                     <li><a id="create-group-link" href="{{ path('group_create') }}">Créer un groupe privé</a></li>
-                 </ul>
+
+                    <li><a href="{{ path('group_list') }}">Liste de mes groupes privés</a></li>
+                    <li><a href="{{ path('group_create') }}">Créer un groupe privé</a></li>
+
+                </ul>
 
             {% else %}
                 <ul>
@@ -126,6 +134,10 @@
 
     {% block main %}
         <h2>Bienvenue sur le site de Sortir.com !</h2>
+    {% endblock %}
+
+    {# pour charger le form de création de gruopes privés #}
+    {#        <div id="form-container"></div> #}
         <p>Connectez-vous ou créez un compte et accédez à vos évènements</p>
         <button data-themes-id-param="dark-mode" data-action="click->themes#setTheme"></button>
         <button data-themes-id-param="pochi-pink" data-action="click->themes#setTheme"></button>
@@ -143,9 +155,7 @@
         </div>
         <div class="swiper-scrollbar"></div>
     </div>
-    
 </main>
-
 <footer></footer>
 
 </body>

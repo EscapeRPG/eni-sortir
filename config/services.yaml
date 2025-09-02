@@ -9,6 +9,7 @@ parameters:
     poster_dir: 'uploads/events'
   user:
     profil_picture: 'uploads/users'
+    nb_max: 15
   place:
     nb_max: 12
 

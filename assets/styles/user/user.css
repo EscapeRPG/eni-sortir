@@ -1,0 +1,32 @@
+.user-info {
+    width: calc(60% - 40px);
+    margin: 20px auto;
+    background-color: var(--other-bg-color);
+    border-radius: 20px;
+    text-align: center;
+    padding: 20px;
+}
+
+.return {
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: var(--other-bg-color);
+    width: 200px;
+    margin: auto;
+    text-align: center;
+    cursor: pointer;
+
+    a {
+        text-decoration: none;
+        color: var(--header-bg-color);
+    }
+
+    &:hover {
+        background-color: var(--header-bg-color);
+
+        a {
+            color: var(--a-color);
+            text-decoration: underline;
+        }
+    }
+}

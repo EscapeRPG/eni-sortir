@@ -1,9 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('styles/events/event-list.css') }}">
-{% endblock %}
-
 {% block title %}{{ parent() }} - Liste des Sorties{% endblock %}
 
 {% block main %}
@@ -37,69 +33,7 @@
 
     <div class="events-container">
         {% if events|length != 0 %}
-            {% for date in eventsDates %}
-                <div class="event-date-container">
-                    <div class="event-date">
-                        {{ date }}
-                        {{ ux_icon('tabler:calendar-month') }}
-                    </div>
-
-                    {% for event in events %}
-                        {% if event.startingDateHour | date('d/m/Y') == date %}
-
-                            <div class="event">
-                                <div class="event-poster">
-                                    <a href="{{ path('event_detail', {id: event.id}) }}">
-                                        <img src="{{ asset('uploads/events/' ~ event.posterFile) }}"
-                                             alt="{{ event.name }}"
-                                             title="{{ event.name }}">
-                                    </a>
-                                </div>
-
-                                <div class="event-info">
-                                    <div class="event-body">
-                                        <div class="event-description">
-                                            <h2>
-                                                <a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a>
-                                            </h2>
-                                            <div class="heure-lieu">
-                                                {{ ux_icon('tabler:clock-hour-7') }}
-                                                <p class="list-event-responsive"> Heure de rendez-vous : </p>
-                                                {{ event.startingDateHour | date('H:i:s') }}
-                                            </div>
-                                            <div class="heure-lieu">
-                                                {{ ux_icon('tabler:map-pin') }}
-                                                <p class="list-event-responsive"> Adresse : </p>
-                                                {{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}
-                                            </div>
-                                        </div>
-                                        <div class="participants">
-                                            {% if event.organizer %}
-                                                <img src="{{ asset('uploads/users/' ~ event.organizer.profilPicture) }}"
-                                                     class="event-organizer"
-                                                     alt="{{ event.organizer.name }}">
-                                            {% else %}
-                                                <img src="" alt="Organisateur supprimé">
-                                            {% endif %}
-
-                                            <div>
-                                                {{ ux_icon('tabler:user') }}
-                                                {{ event.participants|length }} / {{ event.nbInscriptionsMax }}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="event-state">
-                                        {{ event.state.label }}
-                                        <div class="{{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            {% endfor %}
+            {% include 'event/event.html.twig' %}
         {% else %}
             <div class="event-date-container">
                 <p>Aucun événement ne correspond à votre recherche.</p>

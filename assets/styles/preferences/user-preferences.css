@@ -1,0 +1,109 @@
+.preferences-container {
+    position: relative;
+
+    button {
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        background-color: var(--other-bg-color);
+        cursor: pointer;
+        font-weight: bold;
+        margin: 10px;
+        color: var(--a-color);
+
+        &:hover {
+            background-color: var(--bg-main-color);
+            color: var(--header-bg-color);
+        }
+    }
+
+    .menu {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 0;
+        width: 20%;
+        padding: 20px;
+        background-color: var(--other-bg-color);
+        border-radius: 10px;
+        position: fixed;
+        top: 150px;
+        left: 10%;
+
+        button {
+            background-color: var(--header-bg-color);
+            border-bottom: 2px solid transparent;
+        }
+
+        button:hover {
+            background-color: var(--bg-main-color);
+            color: var(--header-bg-color);
+            border-bottom: 2px solid var(--header-bg-color);
+        }
+
+        .active-tag {
+            background-color: var(--bg-main-color);
+            color: var(--header-bg-color);
+            border-bottom: 2px solid var(--header-bg-color);
+        }
+    }
+
+    .preferences {
+        width: calc(60% - 50px);
+        border-radius: 10px;
+        position: absolute;
+        top: calc(150px - var(--margin-top));
+        left: calc(30% + 50px);
+        right: 10%;
+
+        #profile {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #themes {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            gap: 10px;
+
+            button {
+                width: 60%;
+                margin: auto;
+            }
+
+            #default {
+                background-color: lightskyblue;
+                color: white;
+                border-bottom: 2px solid #3d86e1;
+
+                &:hover {
+                    background-color: #3d86e1;
+                    color: white;
+                }
+            }
+
+            #dark-mode {
+                background-color: #606060;
+                color: white;
+                border-bottom: 2px solid #101010;
+
+                &:hover {
+                    background-color: #101010;
+                    color: white;
+                }
+            }
+
+            #pochi-pink {
+                background-color: #ff8e8e;
+                color: white;
+                border-bottom: 2px solid #ff5f5f;
+
+                &:hover {
+                    background-color: #ff5f5f;
+                    color: white;
+                }
+            }
+        }
+    }
+}

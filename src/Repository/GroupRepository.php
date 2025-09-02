@@ -59,6 +59,27 @@ SQL;
 
     }
 
+    /**
+     * @throws Exception
+     */
+    public function findGroupUsers(int $groupId): array
+    {
+        $sql = <<<SQL
+SELECT 
+    u.name AS last_name
+FROM `group` g
+LEFT JOIN group_user gu ON gu.group_id = g.id
+LEFT JOIN user u ON gu.user_id = u.id
+LEFT JOIN event e ON g.id = e.group_id
+WHERE g.id = :group_id
+SQL;
+        $stmt = $this->getEntityManager()->getConnection();
+        return $stmt->prepare($sql)
+            ->executeQuery(['group_id' => $groupId])
+            ->fetchAllAssociative();
+
+    }
+
     //    /**
     //     * @return Group[] Returns an array of Group objects
     //     */

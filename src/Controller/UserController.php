@@ -7,8 +7,10 @@ use App\Entity\State;
 use App\Entity\User;
 use App\Form\EditType;
 use App\Form\RegistrationFormType;
+use App\Form\UserCsvImportType;
 use App\Helper\FileUploader;
 use App\Repository\UserRepository;
+use App\Service\UserCsvImporter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -100,16 +102,42 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/list', name: 'app_users_list')]
-    public function usersList(UserRepository $userRepository, #[CurrentUser] ?User $userConnected): Response
+    public function usersList(UserCsvImporter $userCsvImporter, Request $request,UserRepository $userRepository, #[CurrentUser] ?User $userConnected): Response
     {
         if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
             $this->addFlash('success', 'Cette page est réservée aux administrateurs');
             return $this->redirectToRoute('app_main');
         }
+        $form = $this->createForm(UserCsvImportType::class);
+        $form->handleRequest($request);
+
+        $logs = [];
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file = $form->get('csv_file')->getData();
+
+            if (!$file) {
+                $this->addFlash('error', 'Le formulaire n\'est pas valide');
+            } else {
+                $logs = $userCsvImporter->import($file->getPathname());
+
+                foreach ($logs as $log) {
+                    if (str_contains(strtolower($log), 'ignorée') || str_contains(strtolower($log), 'inconnu') || str_contains(strtolower($log), 'erreur')) {
+                        $this->addFlash('error', $log);
+                    } else {
+                        $this->addFlash('success', $log);
+                    }
+                }
+
+            }
+            return $this->redirectToRoute('app_users_list');
+        }
 
         $users = $userRepository->findUsersByCampus($userConnected->getCampus());
         return $this->render('user/users_list.html.twig', [
             'users' => $users,
+            'import_form' => $form->createView(),
+            'message' => $logs,
         ]);
     }
 
@@ -223,7 +251,6 @@ class UserController extends AbstractController
             'organizer' => $organizer,
         ]);
     }
-
 
     #[Route('/preferences/{id}', name: 'app_preferences', requirements: ['id' => '\d+'])]
     public function preferences(#[CurrentUser] ?User $userConnected): Response

@@ -1,36 +1,15 @@
 <?php
-
-namespace App\Command;
+namespace App\Service;
 
 use App\Entity\Campus;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Csv\Reader;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-#[AsCommand(
-    name: 'app:import-user-csv',
-    description: "Import d'utilisateurs depuis un fichier CSV",
-)]
-class ImportUserCsvCommand extends Command
+class UserCsvImporter
 {
-    public function __construct(
-        private EntityManagerInterface $em,
-        private UserPasswordHasherInterface $passwordHasher,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this
-            ->addArgument('csvFile', InputArgument::REQUIRED, 'Chemin vers le fichier CSV');
-    }
+    public function __construct(private EntityManagerInterface $em, private UserPasswordHasherInterface $passwordHasher,) {}
 
     private function normalizeEmail(string $email): string
     {
@@ -81,13 +60,13 @@ class ImportUserCsvCommand extends Command
         return $user;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function import(string $filePath): array
     {
-        $filePath = $input->getArgument('csvFile');
+    $logs = [];
 
-        if (!file_exists($filePath)) {
-            $output->writeln("<error>Fichier non trouvé : $filePath</error>");
-            return Command::FAILURE;
+        if(!file_exists($filePath)) {
+            $logs[] = "Fichier non trouvé: $filePath";
+            return $logs;
         }
 
         $csv = Reader::createFromPath($filePath, 'r');
@@ -95,11 +74,11 @@ class ImportUserCsvCommand extends Command
 
         $records = $csv->getRecords();
 
-        $count = 0;
-
+        $line = 1;
         foreach ($records as $row) {
+            $line ++;
             if (empty($row['email'])) {
-                $output->writeln("<comment>Ligne ignorée : email manquant</comment>");
+                $logs[] = ("Email manquant : ligne $line ignorée : ");
                 continue;
             }
 
@@ -111,28 +90,28 @@ class ImportUserCsvCommand extends Command
                 $campus = $this->em->getRepository(Campus::class)->findOneBy(['name' => $campusName]);
 
                 if (!$campus) {
-                    $output->writeln("<comment>Campus inconnu : $campusName, ligne ignorée.</comment>");
+                    $logs[] = ("Campus inconnu : $campusName, ligne $line ignorée.");
                     continue;
                 }
             }
 
             $userData = [
-                'name' => trim($row['name'] ?? ''),
-                'firstName' => trim($row['first_name'] ?? ''),
-                'phoneNumber' => trim($row['phone_number'] ?? ''),
+                'name' => trim($row['name'] !== '' ? $row['name'] : null),
+                'firstName' => trim($row['first_name'] !== '' ? $row['first_name'] : null),
+                'phoneNumber' => trim($row['phone_number'] !== '' ? $row['phone_number'] : null),
                 'isAdmin' => isset($row['is_admin']) ? filter_var($row['is_admin'], FILTER_VALIDATE_BOOLEAN) : false,
                 'isActive' => isset($row['is_active']) ? filter_var($row['is_active'], FILTER_VALIDATE_BOOLEAN) : true,
             ];
 
-            $user = $this->getOrCreateUser($email, $userData, $campus);
-            $output->writeln("Utilisateur importé/mis à jour : $email");
-            $count++;
+            $this->getOrCreateUser($email, $userData, $campus);
+            $logs[] = ("Utilisateur importé/mis à jour : $email");
         }
 
         $this->em->flush();
 
-        $output->writeln("<info>Import terminé : $count utilisateurs importés ou mis à jour.</info>");
+        $logs[] = ("Import terminé ");
 
-        return Command::SUCCESS;
+        return $logs;
     }
+
 }

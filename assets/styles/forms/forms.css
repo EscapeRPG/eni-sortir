@@ -104,33 +104,39 @@ form {
     align-items: center;
     justify-content: space-evenly;
     flex-wrap: wrap;
+    gap: 10px;
+
+    button {
+        min-width: 40%;
+    }
 
     .delete, .activate, .deactivate, .return {
+        width: 20%;
         padding: 10px 20px;
         border-radius: 5px;
         text-decoration: none;
         color: var(--a-color);
 
         &:hover {
-            background-color: var(--a-color);
-            color: var(--header-bg-color);
+            background-color: var(--a-color) !important;
+            color: var(--header-bg-color) !important;
         }
     }
 
     .delete {
-        background-color: var(--red);
+        background-color: var(--red) !important;
     }
 
     .activate {
-        background-color: var(--green);
+        background-color: var(--green) !important;
     }
 
     .deactivate {
-        background-color: var(--orange);
+        background-color: var(--orange) !important;
     }
 
     .return {
-        background-color: var(--events-a-color);
+        background-color: var(--events-a-color) !important;
     }
 }
 

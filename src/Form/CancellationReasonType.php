@@ -29,6 +29,9 @@ class CancellationReasonType extends AbstractType
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Enregistrer l\'annulation',
+                'attr' => [
+                    'class' => 'link-btn',
+                ]
             ]);
 
         ;

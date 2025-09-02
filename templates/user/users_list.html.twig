@@ -6,6 +6,11 @@
 
     <h2>Liste des utilisateurs</h2>
 
+    {{ form_start(import_form) }}
+        {{ form_errors(import_form) }}
+        {{ form_widget(import_form) }}
+    {{ form_end(import_form) }}
+
     <ul>
         {% for user in users %}
 

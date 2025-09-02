@@ -9,6 +9,7 @@ use App\Entity\Group;
 use App\Entity\Place;
 use App\Entity\State;
 use App\Entity\User;
+use App\Repository\GroupRepository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -27,12 +28,27 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 
+
 class EventType extends AbstractType
 {
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
+        $user = $options['user'];
+        $userId = $user->getId();
+        $groupRepository = $options['group_repository'];
+
+        $builder->add('group', EntityType::class, [
+            'class' => Group::class,
+            'label' => 'Définir un groupe privé (optionnel)',
+            'required' => false,
+            'choice_label' => 'name',
+            'placeholder' => '-- Garder cet évènement public --',
+            'attr' => ['id' => 'groupSelect'],
+            'query_builder' => fn() => $groupRepository->findGroupsOfUserConnected($userId),
+        ])
+
+
 //@TODO supprimer la case à cocher si JS ne se lance pas
 //
 //            ->add('groupePrive', CheckboxType::class, [
@@ -43,17 +59,6 @@ class EventType extends AbstractType
 //            ])
 
 
-            ->add('group', EntityType::class, [
-                'class' => Group::class,
-                'label' => 'Définir un groupe privé (optionnel)',
-                'required' => false,
-                'choice_label' => 'name',
-                'placeholder' => '-- Garder cet évènement public --',
-                'attr' => ['id' => 'groupSelect'],
-                'query_builder' => function(EntityRepository $er) {
-                    return $er->createQueryBuilder('g')->orderBy('g.name', 'ASC');
-                }
-            ])
 
             ->add('name', TextType::class, [
                 'label' => 'Nom de l\'evènement',
@@ -147,6 +152,12 @@ class EventType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Event::class,
+            'user' => null,
+            'group_repository' => null,
         ]);
+
+        $resolver->setAllowedTypes('group_repository', ['null', 'App\Repository\GroupRepository']);
+        $resolver->setAllowedTypes('user', ['null', 'App\Entity\User']);
     }
+
 }

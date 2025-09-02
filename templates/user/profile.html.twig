@@ -3,7 +3,7 @@
 {% block title %}{{ parent() }} - Profil{% endblock %}
 
 {% block main %}
-    <h2>{{ participant.name | upper }} {{ participant.firstName }}</h2>
+    <h2 class="profile-title">{{ participant.firstName }} {{ participant.name | upper }} </h2>
 
     <div class="profile-pic">
         <img src="{{ asset('uploads/users/' ~ participant.profilPicture) }}"
@@ -19,12 +19,12 @@
     </div>
 
     <div class="events-container">
-        <p><strong>Événements organisés :</strong></p>
+        <p class="events-title"><strong>Mes évènements :</strong></p>
         {% if events|length != 0 %}
             {% include 'event/event.html.twig' %}
         {% else %}
             <div class="event-date-container">
-                <p>Cette personne n'est inscrite à aucun événement actuellement actif.</p>
+                <p>Vous n'avez aucun évènement en cours</p>
             </div>
         {% endif %}
     </div>

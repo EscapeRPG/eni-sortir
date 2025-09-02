@@ -20,4 +20,9 @@
             </div>
         {% endfor %}
     </div>
+
+    {{ form_start(import_form) }}
+    {{ form_errors(import_form) }}
+    {{ form_widget(import_form) }}
+    {{ form_end(import_form) }}
 {% endblock %}

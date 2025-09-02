@@ -15,15 +15,10 @@
 
         {{ form_start(event_form) }}
         {{ form_row(event_form.name) }}
-
-
-
-        {# @TODO à voir si on supprime #}
+{#        @TODO à voir si on supprime#}
         {#    {{ form_row(event_form.groupePrive) }}#}
         {{ form_row(event_form.group) }}
-        <a id="group-create-link" href="{{ path('group_create') }}" target="_blank">ou Créer un groupe privé pour cet évènement</a>
-
-
+        <a id="group-create-link" href="{{ path('group_create') }}">ou Créer un groupe privé pour cet évènement</a>
         {{ form_row(event_form.startingDateHour) }}
         {{ form_row(event_form.endDateHour) }}
         {{ form_row(event_form.nbInscriptionsMax) }}

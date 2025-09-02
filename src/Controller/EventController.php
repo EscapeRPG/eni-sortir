@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Campus;
 use App\Entity\Event;
+use App\Entity\Place;
 use App\Entity\State;
 use App\Entity\User;
 use App\Form\CancellationReasonType;
 use App\Form\EventType;
 use App\Form\FiltersType;
+use App\Form\PlaceType;
 use App\Helper\FileUploader;
 use App\Repository\GroupRepository;
 use App\Repository\StateRepository;
@@ -16,7 +18,6 @@ use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SortieRepository;
 use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,7 +30,6 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use Symfony\Component\Mime\Email;
 #[Route('/event', name: 'event')]
@@ -44,8 +44,10 @@ final class EventController extends AbstractController
     public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, Security $security, GroupRepository $groupRepository, MailerInterface $mailer): Response
     {
         $event = new Event();
+        $place = new Place();
 
         $form = $this->createForm(EventType::class, $event);
+        $placeForm = $this->createForm(PlaceType::class, $place);
         $form->handleRequest($request);
 
         $start = $event->getStartingDateHour();
@@ -117,6 +119,7 @@ final class EventController extends AbstractController
         }
         return $this->render('event/create.html.twig', [
             'event_form' => $form,
+            'place_form' => $placeForm->createView(),
         ]);
     }
 

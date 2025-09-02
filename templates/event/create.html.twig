@@ -3,40 +3,82 @@
 {% block title %}Créer un super event{% endblock %}
 
 {% block main %}
-    <h2> Créez une super teuf ouais les jeunes </h2>
-    <div class="author">
-        <p>
-            Créé par {{ app.user.firstName }}
-            <br>
-            Sur le campus de {{ app.user.campus.name }}
-        </p>
+    <div data-controller="modals">
+        <h2> Créez une super teuf ouais les jeunes </h2>
+        <div class="author">
+            <p>
+                Créé par {{ app.user.firstName }}
+                <br>
+                Sur le campus de {{ app.user.campus.name }}
+            </p>
+        </div>
+
+        {{ form_start(event_form) }}
+        {{ form_row(event_form.name) }}
+        {{ form_row(event_form.startingDateHour) }}
+        {{ form_row(event_form.endDateHour) }}
+        {{ form_row(event_form.nbInscriptionsMax) }}
+        {{ form_row(event_form.registrationDeadline) }}
+        {{ form_row(event_form.eventInfo) }}
+        <div>
+            {{ form_label(event_form.place) }}
+
+            <div class="event-place">
+                {{ form_widget(event_form.place) }}
+
+                <div>
+                    <button type="button" data-action="click->modals#showModal" class="modal-btn"
+                            data-modals-target="button">
+                        Créez un nouveau lieu pour votre événement
+                    </button>
+                </div>
+            </div>
+        </div>
+        {{ form_row(event_form.poster_file) }}
+        <div class="save-btn">
+            {{ form_widget(event_form.saveDraft) }}
+            {{ form_widget(event_form.publish) }}
+        </div>
+        {{ form_end(event_form) }}
+
+
+        <div id="modal-container">
+            <div class="modal" data-modals-target="modal">
+                <span id="close-modal" data-action="click->modals#closeModal">&times;</span>
+                <h2>Créer un nouveau lieu d'événement</h2>
+                {{ form_start(place_form, { 'attr': { 'data-modals-target': 'form' }, 'action': path('place_createInModal') }) }}
+                {{ form_row(place_form.name, { 'attr': { 'data-modals-target': "name" } }) }}
+
+
+                <div class="tag-container">
+                    <button type="button" id="address-btn"
+                            class="active-tag"
+                            data-action="click->modals#activeTag"
+                            data-modals-tag1-param="address-btn"
+                            data-modals-tag2-param="coordinates-btn">
+                        Ajout par adresse
+                    </button>
+                    <button type="button" id="coordinates-btn"
+                            data-action="click->modals#activeTag"
+                            data-modals-tag1-param="coordinates-btn"
+                            data-modals-tag2-param="address-btn">
+                        Ajout par coordonnées
+                    </button>
+                </div>
+                <div id="address">
+                    {{ form_row(place_form.street, { 'attr': { 'data-modals-target': "street" } }) }}
+                    {{ form_row(place_form.postalCode, { 'attr': { 'data-modals-target': "postalCode" } }) }}
+                    {{ form_row(place_form.city, { 'attr': { 'data-modals-target': "city" } }) }}
+                </div>
+                <div id="coordinates">
+                    {{ form_row(place_form.latitude, { 'attr': { 'data-modals-target': "latitude" } }) }}
+                    {{ form_row(place_form.longitude, { 'attr': { 'data-modals-target': "longitude" } }) }}
+                </div>
+
+
+                {{ form_widget(place_form.save, { 'attr': { 'data-action': "click->modals#sendPlace" } }) }}
+                {{ form_end(place_form) }}
+            </div>
+        </div>
     </div>
-
-    {{ form_start(event_form) }}
-    {{ form_row(event_form.name) }}
-{#    {{ form_row(event_form.groupePrive) }}#}
-        {{ form_row(event_form.group) }}
-
-    <a id="group-create-link" href="{{ path('group_create') }}" target="_blank">ou Créer un groupe privé pour cet évènement</a>
-
-    {{ form_row(event_form.startingDateHour) }}
-    {{ form_row(event_form.endDateHour) }}
-    {{ form_row(event_form.nbInscriptionsMax) }}
-    {{ form_row(event_form.registrationDeadline) }}
-    {{ form_row(event_form.eventInfo) }}
-    {{ form_row(event_form.place) }}
-    <div class="form-btn-link">
-        <a href="{{ path('place_create') }}" class="a-btn">
-            Ou créez un lieu
-        </a>
-    </div>
-    {{ form_row(event_form.poster_file) }}
-    <div class="save-btn">
-        {{ form_widget(event_form.saveDraft) }}
-        {{ form_widget(event_form.publish) }}
-    </div>
-    {{ form_end(event_form) }}
-
 {% endblock %}
-
-

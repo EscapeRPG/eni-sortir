@@ -27,8 +27,10 @@
     <div class="logo-nav">
         <a href="{{ path('app_main') }}"><img src="" alt="logo"></a>
         <a href="{{ path('app_main') }}"><h1>ENI SORTIR</h1></a>
+        {% if is_granted('IS_AUTHENTICATED') %}
         <a href="{{ path('event_list') }}">Événements</a>
         <a href="{{ path('place_list') }}">Lieux</a>
+        {% endif %}
     </div>
     <nav data-controller="burger">
         <div class="burger-container" data-action="click->burger#menu">

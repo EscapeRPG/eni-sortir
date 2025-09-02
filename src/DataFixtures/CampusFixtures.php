@@ -3,8 +3,6 @@
 namespace App\DataFixtures;
 
 use App\Entity\Campus;
-use App\Entity\Event;
-use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -14,16 +12,16 @@ class CampusFixtures extends Fixture
     public const CAMPUS = 'campus';
     public function load(ObjectManager $manager): void
     {
-        $faker = Factory::create('fr_FR');
+        $campusNames = ['NANTES', 'RENNES', 'QUIMPER', 'NIORT'];
 
-        for ($i = 0; $i < 10; $i++) {
+        foreach ($campusNames as $i => $name) {
             $campus = new Campus();
-            $campus->setName($faker->randomElement(['NANTES','RENNES','QUIMPER', 'NIORT']));
+            $campus->setName($name);
 
             $manager->persist($campus);
-            $this->addReference(self::CAMPUS, $campus);
-
+            $this->addReference(self::CAMPUS . '_' . $i, $campus);
         }
+
         $manager->flush();
     }
 }

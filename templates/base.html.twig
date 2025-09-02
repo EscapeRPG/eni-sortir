@@ -25,7 +25,7 @@
 <body data-controller="themes">
 <header>
     <div class="logo-nav">
-        <a href="{{ path('app_main') }}"><img src="{{ asset('') }}" alt="logo"></a>
+        <a href="{{ path('app_main') }}"><img src="{{ asset('images/logo.gif') }}" alt="logo"></a>
         <a href="{{ path('app_main') }}"><h1>ENI SORTIR</h1></a>
         {% if is_granted('IS_AUTHENTICATED') %}
         <a href="{{ path('event_list') }}">Événements</a>

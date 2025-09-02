@@ -16,9 +16,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
     {% block javascripts %}
-
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 
         {% block importmap %}{{ importmap('app') }}{% endblock %}
         <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -90,8 +90,6 @@
 
                 </ul>
                 <ul>
-                    <li><a id="create-group-link" href="{{ path('group_create') }}">Créer un groupe privé</a></li>
-
                     <li><a href="{{ path('group_list') }}">Liste de mes groupes privés</a></li>
                     <li><a href="{{ path('group_create') }}">Créer un groupe privé</a></li>
 
@@ -139,8 +137,6 @@
         <button data-themes-id-param="pochi-pink" data-action="click->themes#setTheme"></button>
     {% endblock %}
 
-        {# pour charger le form de création de gruopes privés #}
-        {#        <div id="form-container"></div> #}
         <p>Connectez-vous ou créez un compte pour accéder à nos événements</p>
 
         <div class="swiper mySwiper">

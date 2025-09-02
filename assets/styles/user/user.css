@@ -30,3 +30,20 @@
         }
     }
 }
+
+@media (max-width: 430px) {
+    .profile-title {
+        padding-top: 20px;
+    }
+    .user-info {
+        width: auto;
+        padding: 5px 0 5px 0;
+        margin: 5px
+    }
+    .events-title {
+        text-align: center;
+    }
+    .return {
+        margin-top: 20px;
+    }
+}

@@ -25,6 +25,10 @@ body {
     overflow-x: hidden;
     color: var(--txt-main-color);
 
+    &:hover{
+        cursor: var(--cursor);
+    }
+
     header {
         display: flex;
         align-items: center;

@@ -2,7 +2,7 @@
     --header-bg-color: #ff8e8e;
     --other-bg-color: #ffc3c3;
     --bg-main-color: #fff8f3;
-    --txt-main-color: black;
+    --txt-main-color: #8f4c4c;
     --event-bg-color: #ffffff;
     --a-color: #ffffff;
     --a-color-hover: #aa2a2a;
@@ -20,6 +20,7 @@
 
 body {
     background-color: var(--bg-main-color);
+    color: var(--txt-main-color);
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -201,3 +202,4 @@ body {
         border-bottom: none;
     }
 }
+

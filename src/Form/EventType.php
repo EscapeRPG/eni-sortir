@@ -33,7 +33,8 @@ class EventType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-
+//@TODO supprimer la case à cocher si JS ne se lance pas
+//
 //            ->add('groupePrive', CheckboxType::class, [
 //                'label' => 'Groupe privé',
 //                'required' => false,

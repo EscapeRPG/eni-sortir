@@ -2,51 +2,48 @@
 
 {% block title %}Créer un groupe{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-{% endblock %}
-
 {% block main %}
     <h1>Créez un groupe privé pour vos sorties</h1>
 
     {% include 'group/_form.html.twig' %}
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{#@todo supprimer le script après test du stimulus#}
 
-    <script>
-        function initSelect2() {
+{#{% block javascripts %}#}
+{#    {{ parent() }}#}
+{#    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>#}
+{#    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>#}
 
-            $('.select2').select2({
-                placeholder: "Sélectionnez les membres",
-                allowClear: true,
-                width: '100%'
-            });
-        }
+{#    <script>#}
+{#        function initSelect2() {#}
 
-        // quand je recharge la page : ça c'est ok
-        document.addEventListener('DOMContentLoaded', function () {
+{#            $('.select2').select2({#}
+{#                placeholder: "Sélectionnez les membres",#}
+{#                allowClear: true,#}
+{#                width: '100%'#}
+{#            });#}
+{#        }#}
 
-            initSelect2();
-        });
+{#        // quand je recharge la page : ça c'est ok#}
+{#        document.addEventListener('DOMContentLoaded', function () {#}
 
-        // quand je clique sur le lien: à tester
-        document.getElementById('create-group-link').addEventListener('click', function (e) {
-            e.preventDefault();
-            // initSelect2();
-            // fetch('/group/create')
-            //     .then(response => response.text())
-            //     .then(html => {
-            //         document.getElementById('form-container').innerHTML = html;
-            //
-            //         // et je réinitialise après injection du HTML ???? : à tester aussi
-            //         initSelect2();
-            //     });
-        });
-    </script>
+{#            initSelect2();#}
+{#        });#}
 
-{% endblock %}
+{#        // quand je clique sur le lien: à tester#}
+{#        document.getElementById('create-group-link').addEventListener('click', function (e) {#}
+{#            e.preventDefault();#}
+{#            // initSelect2();#}
+{#            // fetch('/group/create')#}
+{#            //     .then(response => response.text())#}
+{#            //     .then(html => {#}
+{#            //         document.getElementById('form-container').innerHTML = html;#}
+{#            //#}
+{#            //         // et je réinitialise après injection du HTML ???? : à tester aussi#}
+{#            //         initSelect2();#}
+{#            //     });#}
+{#        });#}
+{#    </script>#}
+
+{#{% endblock %}#}

@@ -142,5 +142,6 @@
     <orderEntry type="library" name="swiper" level="application" />
     <orderEntry type="library" name="select2" level="application" />
     <orderEntry type="library" name="jquery-3.6.0" level="application" />
+    <orderEntry type="library" name="swiper" level="application" />
   </component>
 </module>

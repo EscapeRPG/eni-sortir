@@ -8,9 +8,33 @@
 
     <h1>Détail du lieu : </h1>
     <p>{{ place.name }}</p>
-    <p>{{ place.street }}</p>
-    <p>{{ place.city }}</p>
-    <p>{{ place.postalCode }}</p>
+
+    {# si on a une adresse #}
+    {% if place.street and place.postalCode and place.city %}
+        <p>{{ place.street }}</p>
+        <p>{{ place.city }}</p>
+        <p>{{ place.postalCode }}</p>
+
+        {% set address = place.street ~ ', ' ~ place.postalCode ~ ' ' ~ place.city %}
+        {% set addressGoogle = address|replace({' ': '+'}) %}
+
+        <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&amp;output=embed"
+                allowfullscreen loading="lazy">
+        </iframe>
+    {% endif %}
+
+    {# si on a des coordonnées GPS #}
+    {% if place.latitude is not null and place.longitude is not null %}
+        <p>Coordonnées GPS : </p>
+        <ul>
+            <li>Latitude : {{ place.latitude }}</li>
+            <li>Longitude : {{ place.longitude }}</li>
+        </ul>
+
+        <iframe src="https://maps.google.com/maps?q={{ place.latitude }},{{ place.longitude }}&amp;output=embed"
+                allowfullscreen loading="lazy">
+        </iframe>
+    {% endif %}
 
     {% if app.user and app.user.admin == app.user.id %}
     <a href="{{ path('place_edit', { id: place.id}) }}"> Modifier ce lieu</a>

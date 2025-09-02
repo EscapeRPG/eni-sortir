@@ -47,6 +47,28 @@ final class PlaceController extends AbstractController
 
     }
 
+    #[Route('/create/modal', name: '_createInModal')]
+    public function createInModal(Request $request, EntityManagerInterface $em): Response
+    {
+        $place = new Place();
+        $form = $this->createForm(PlaceType::class, $place);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($place);
+            $em->flush();
+
+            return $this->json([
+                'id' => $place->getId(),
+                'name' => $place->getName(), // ou autre champ utile
+            ]);
+        }
+
+        return $this->json([
+            'errors' => (string) $form->getErrors(true, false),
+        ], 400);
+    }
+
     #[Route('/list{page}', name: '_list',requirements: ['page' => '\d+'],defaults: ['page' => 1])]
     public function list(PlaceRepository $placeRepository, ParameterBagInterface $param, int $page, #[CurrentUser] ?user $user): Response
     {

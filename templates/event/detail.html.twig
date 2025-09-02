@@ -9,7 +9,7 @@
     <h1>Détail de l'évènement : {{ event.name }}</h1>
 
     {% if event.organizer %}
-        <p>crée par {{ event.organizer.firstName }} {{ event.organizer.name }}</p>
+        <p>Crée par {{ event.organizer.firstName }} {{ event.organizer.name }}</p>
     {% else %}
         <p>Organisateur supprimé</p>
     {% endif %}
@@ -19,10 +19,10 @@
     {% if event.group != null %}
         <p>Groupe privé : {{ event.group.name }}</p>
     {% endif %}
-    <p>participants : {{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
+    <p>Participants : {{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
 
-    <p>date : {{ event.startingDateHour | date('d/m/Y H:i:s') }}</p>
-    <p>informations pratiques : {{ event.eventInfo }}</p>
+    <p>Date : {{ event.startingDateHour | date('d/m/Y H:i:s') }}</p>
+    <p>Informations pratiques : {{ event.eventInfo }}</p>
     <p>On se retrouve ici : {{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>
 
 
@@ -93,8 +93,8 @@
 
     {% for participant in participants %}
         <a href="{{ path('app_profile', {id: participant.id}) }}">
-            <img src="{{ asset('uploads/users/' ~ participant.profilPicture) }}"
-                 alt="Image de {{ participant.firstName }}">
+            <img src="{{ asset('uploads/users/' ~ participant.profil_picture) }}"
+                 alt="Image de {{ participant.first_name }}">
         </a>
     {% endfor %}
 

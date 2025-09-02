@@ -44,7 +44,9 @@ class RegistrationController extends AbstractController
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
             $file = $form->get('profilPicture')->getData();
-            if ($file instanceof UploadedFile) {
+            if (!$file) {
+                $user->setProfilPicture("default-avatar.png");
+            } elseif ($file instanceof UploadedFile) {
                 $name = $fileUploader->upload(
                     $file,
                     $user->getName(),

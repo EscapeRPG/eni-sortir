@@ -82,8 +82,8 @@ final class EventController extends AbstractController
                 $group = $groupRepository->find($event->getGroup());
                 $id = $group->getId();
                 $listUsers = $groupRepository->findGroupUsers($id);
-                $nbParticipantsgroup = count($listUsers);
-                $event->setNbInscriptionsMax($nbParticipantsgroup);
+                $nbParticipantsGroup = count($listUsers);
+                $event->setNbInscriptionsMax($nbParticipantsGroup);
             }
 
             $place = $form->get('place')->getData();
@@ -132,14 +132,13 @@ final class EventController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
-    public function edit(Event $event, Place $place, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
+    public function edit(Event $event, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
         $this->checkStatusUser($event, $security);
 
         $form = $this->createForm(EventType::class, $event);
-        $placeForm = $this->createForm(PlaceType::class, $place);
+        $placeForm = $this->createForm(PlaceType::class, new Place());
         $form->handleRequest($request);
-
 
         if ($form->isSubmitted() && $form->isValid()) {
             $file = $form->get('poster_file')->getData();
@@ -154,6 +153,7 @@ final class EventController extends AbstractController
             $this->addFlash('success', 'Évènement édité!');
             return $this->redirectToRoute('event_list', ['id' => $event->getId()]);
         }
+
         return $this->render('event/create.html.twig', [
             'event_form' => $form,
             'place_form' => $placeForm->createView(),

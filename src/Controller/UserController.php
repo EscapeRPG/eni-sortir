@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\EditType;
 use App\Form\RegistrationFormType;
 use App\Form\UserCsvImportType;
+use App\Form\UserFilterType;
 use App\Helper\FileUploader;
 use App\Repository\UserRepository;
 use App\Service\UserCsvImporter;
@@ -101,13 +102,22 @@ class UserController extends AbstractController
         return $this->redirectToRoute('app_main');
     }
 
-    #[Route('/users/list', name: 'app_users_list')]
-    public function usersList(UserCsvImporter $userCsvImporter, Request $request,UserRepository $userRepository, #[CurrentUser] ?User $userConnected): Response
+    #[Route('/users/list/{page}', name: 'app_users_list', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
+    public function usersList(
+        UserCsvImporter $userCsvImporter,
+        Request $request,
+        UserRepository $userRepository,
+        #[CurrentUser] ?User $userConnected,
+        ParameterBagInterface $bag,
+        EntityManagerInterface $em,
+        int $page
+    ): Response
     {
         if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
             $this->addFlash('success', 'Cette page est réservée aux administrateurs');
             return $this->redirectToRoute('app_main');
         }
+
         $form = $this->createForm(UserCsvImportType::class);
         $form->handleRequest($request);
 
@@ -130,14 +140,44 @@ class UserController extends AbstractController
                 }
 
             }
+
             return $this->redirectToRoute('app_users_list');
         }
 
-        $users = $userRepository->findUsersByCampus($userConnected->getCampus());
+        $limit = $bag->get('user')['nb_max'];
+        $offset = ($page - 1) * $limit;
+
+        $campusId = $request->query->get('campus') ? $request->query->get('campus') : 0;
+
+        $filterForm = $this->createForm(UserFilterType::class, [
+            'campus' => $campusId ? $em->getReference(Campus::class, $campusId) : null,
+        ], ['method' => 'POST']);
+        $filterForm->handleRequest($request);
+
+        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+            $filters = $filterForm->getData();
+            $users = [
+                'page' => 1
+            ];
+
+            if ($filters['campus'] != null) {
+                $users['campus'] = $filters['campus']->getId();
+            }
+
+            return $this->redirectToRoute('app_users_list', $users);
+        }
+
+        $users = $userRepository->findUsersByFilter($campusId, $offset, $limit);
+        $totalItems = count($users);
+        $pages = ceil($totalItems / $limit);
+
         return $this->render('user/users_list.html.twig', [
             'users' => $users,
             'import_form' => $form->createView(),
             'message' => $logs,
+            'page' => $page,
+            'pages' => $pages,
+            'filters' => $filterForm
         ]);
     }
 

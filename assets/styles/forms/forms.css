@@ -206,6 +206,7 @@ form {
 
 .modal-btn {
     width: 100%;
+    min-height: 3em;
     margin: 0;
 }
 

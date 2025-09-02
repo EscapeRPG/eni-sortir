@@ -189,7 +189,11 @@ body {
         margin: auto;
         border-radius: 100%;
         overflow: hidden;
-        object-fit: contain;
+
+        img {
+            width: 100%;
+            object-fit: cover;
+        }
     }
 
     footer {
@@ -202,4 +206,9 @@ body {
         border-radius: 20px 20px 0 0;
         border-bottom: none;
     }
+}
+
+.alert {
+    padding: 10px;
+    text-align: center;
 }

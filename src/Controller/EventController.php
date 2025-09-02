@@ -54,8 +54,12 @@ final class EventController extends AbstractController
         $event = new Event();
         $place = new Place();
 
-        $form = $this->createForm(EventType::class, $event);
         $placeForm = $this->createForm(PlaceType::class, $place);
+        $form = $this->createForm(EventType::class, $event, [
+            'user' => $user,
+            'group_repository' => $groupRepository,
+        ]);
+
         $form->handleRequest($request);
 
         $start = $event->getStartingDateHour();

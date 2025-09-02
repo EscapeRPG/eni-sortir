@@ -11,3 +11,18 @@
     --events-a-color: #ff8d1a;
     --events-a-color-hover: #ffffff;
 }
+
+.pochi-pink {
+    --header-bg-color: #ff8e8e;
+    --other-bg-color: #ffc3c3;
+    --bg-main-color: #fff8f3;
+    --txt-main-color: black;
+    --event-bg-color: #ffffff;
+    --a-color: #ffffff;
+    --a-color-hover: #aa2a2a;
+    --events-dates-container-bg-color: #ffc3c3;
+    --events-dates-bg-color: #ff8e8e;
+    --events-a-color: #ff8e8e;
+    --events-a-color-hover: #ff5f5f;
+    --events-color: #682e2e;
+}

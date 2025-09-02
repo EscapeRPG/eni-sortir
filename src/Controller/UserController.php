@@ -217,24 +217,77 @@ class UserController extends AbstractController
         $participant = $userRepository->find($id);
         $events = $participant->getEvents();
         $organizer = $participant->getMyEvents();
+
+        $uniqueDates = [];
+        foreach ($events as $event) {
+            $formattedDate = $event->getStartingDateHour()->format('d/m/Y');
+            $uniqueDates[$formattedDate] = $formattedDate;
+        }
+        $uniqueDates = array_values(array_unique($uniqueDates));
+
         return $this->render('user/profile.html.twig', [
             'participant' => $participant,
             'events' => $events,
             'organizer' => $organizer,
+            'eventsDates' => $uniqueDates,
         ]);
     }
 
 
     #[Route('/preferences/{id}', name: 'app_preferences', requirements: ['id' => '\d+'])]
-    public function preferences(#[CurrentUser] ?User $userConnected): Response
+    public function preferences(
+        #[CurrentUser] ?User   $userConnected,
+        ParameterBagInterface  $parameterBag,
+        UserRepository         $userRepository,
+        FileUploader           $fileUploader,
+        int                    $id,
+        Request                $request,
+        EntityManagerInterface $em
+    ): Response
     {
         if (!$userConnected) {
             $this->addFlash('error', 'Vous devez être connecté pour consulter cette page');
             return $this->redirectToRoute('app_main');
         }
 
-        return $this->render('user/preferences.html.twig', [
-            'user' => $userConnected
-        ]);
+        $user = $userRepository->findUserById($id);
+
+        if ($userConnected === $user || in_array('ROLE_ADMIN', $userConnected->getRoles(), true)) {
+            $isSelfEdit = $this->getUser() === $user;
+            $form = $this->createForm(EditType::class, $user, [
+                'is_admin' => $this->isGranted('ROLE_ADMIN'),
+                'is_self_edit' => $isSelfEdit,
+            ]);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $file = $form->get('profilPicture')->getData();
+
+                if ($file instanceof UploadedFile) {
+                    $name = $fileUploader->upload(
+                        $file,
+                        $user->getName(),
+                        $parameterBag->get('user')['profil_picture']
+                    );
+
+                    $user->setProfilPicture($name);
+                }
+                $em->flush();
+
+                $this->addFlash('success', "Mise à jour enregistrée");
+
+                if ($user->isAdmin() === true) {
+                    return $this->redirectToRoute('app_users_list');
+                } else {
+                    return $this->redirectToRoute('app_update', ['id' => $id]);
+                }
+            }
+
+            return $this->render('user/preferences.html.twig', [
+                'edit_form' => $form,
+                'user' => $user,
+                'id' => $id
+            ]);
+        }
     }
 }

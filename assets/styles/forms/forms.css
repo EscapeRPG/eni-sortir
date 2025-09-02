@@ -35,15 +35,15 @@ form {
         border: none;
         border-radius: 5px;
         padding: 10px 20px;
-        background-color: var(--header-bg-color);
+        background-color: var(--header-bg-color) !important;
         cursor: pointer;
         font-weight: bold;
         margin: 10px;
         color: var(--a-color);
 
         &:hover {
-            background-color: var(--bg-main-color);
-            color: var(--header-bg-color);
+            background-color: var(--bg-main-color) !important;
+            color: var(--header-bg-color) !important;
         }
     }
 

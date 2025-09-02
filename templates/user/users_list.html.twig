@@ -1,17 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ parent() }} - Liste d'utilisateur{% endblock %}
+{% block title %}{{ parent() }} - Liste des utilisateurs{% endblock %}
 
 {% block main %}
-
     <h2>Liste des utilisateurs</h2>
 
-    <ul>
+    <div class="users-list">
         {% for user in users %}
-
-            <li><a href="{{ path('app_update', {id: user.id}) }}">{{ user.name | upper }} {{ user.firstName }} </a></li>
-
+            <div class="user">
+                <div class="user-pic">
+                    <a href="{{ path('app_profile', {id: user.id}) }}">
+                        <img src="{{ asset('uploads/users/' ~ user.profilPicture) }}"
+                             alt="Image de {{ user.firstName }}">
+                    </a>
+                </div>
+                <a href="{{ path('app_profile', {id: user.id}) }}">
+                    <p>{{ user.name | upper }} {{ user.firstName }}</p>
+                </a>
+            </div>
         {% endfor %}
-    </ul>
-
+    </div>
 {% endblock %}

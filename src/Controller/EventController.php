@@ -132,11 +132,12 @@ final class EventController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
-    public function edit(Event $event, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
+    public function edit(Event $event, Place $place, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
         $this->checkStatusUser($event, $security);
 
         $form = $this->createForm(EventType::class, $event);
+        $placeForm = $this->createForm(PlaceType::class, $place);
         $form->handleRequest($request);
 
 
@@ -155,6 +156,7 @@ final class EventController extends AbstractController
         }
         return $this->render('event/create.html.twig', [
             'event_form' => $form,
+            'place_form' => $placeForm->createView(),
         ]);
     }
 

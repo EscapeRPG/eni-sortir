@@ -1,9 +1,28 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ parent() }} - Profil{% endblock %}
+{% block title %}{{ parent() }} - Préférences{% endblock %}
 
 {% block main %}
-
-
-    {% include 'user/edit.html.twig' %}
+    <div class="preferences-container">
+        <div class="menu" data-controller="preferences">
+            <button id="profile-btn" data-action="click->preferences#activeTag" data-preferences-tag1-param="profile-btn"
+                    data-preferences-tag2-param="theme-btn" class="active-tag">
+                Éditer le profil
+            </button>
+            <button id="theme-btn" data-action="click->preferences#activeTag" data-preferences-tag1-param="theme-btn"
+                    data-preferences-tag2-param="profile-btn">
+                Paramètres d'interface
+            </button>
+        </div>
+        <div class="preferences">
+            <div id="profile">
+                {% include 'user/edit.html.twig' %}
+            </div>
+            <div id="themes">
+                <button data-themes-id-param="default" data-action="click->themes#setTheme" id="default">Thème par défaut</button>
+                <button data-themes-id-param="dark-mode" data-action="click->themes#setTheme" id="dark-mode">Dark Mode</button>
+                <button data-themes-id-param="pochi-pink" data-action="click->themes#setTheme" id="pochi-pink">Pochi Pink</button>
+            </div>
+        </div>
+    </div>
 {% endblock %}

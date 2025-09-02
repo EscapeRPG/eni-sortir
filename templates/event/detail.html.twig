@@ -16,7 +16,7 @@
 
     <p>Campus de {{ event.campus.name }}</p>
 
-    {%  if event.group != null %}
+    {% if event.group != null %}
         <p>Groupe privé : {{ event.group.name }}</p>
     {% endif %}
     <p>participants : {{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
@@ -64,7 +64,7 @@
         {% if event.organizer %}
             {% if event.state.label == 'Annulée' %}
                 <a href="{{ path('event_reactivate', {id:event.id}) }}"> Réactivez votre sortie </a>
-                {% else %}
+            {% else %}
                 <a href=""></a>
             {% endif %}
         {% endif %}
@@ -83,7 +83,6 @@
 
     {# si on a des coordonnées GPS #}
     {% if event.place.latitude is not null and event.place.longitude is not null %}
-
         <iframe src="https://maps.google.com/maps?q={{ event.place.latitude }},{{ event.place.longitude }}&amp;output=embed"
                 allowfullscreen loading="lazy">
         </iframe>
@@ -93,10 +92,10 @@
     <h3>Liste des participants</h3>
 
     {% for participant in participants %}
-        <a href="{{ path('app_profile', {id: participant.id}) }}"><img
-                    src="{{ asset('uploads/users/' ~ participant.profil_picture) }}"
-                    alt="Image de {{ participant.first_name }}"></a>
-
+        <a href="{{ path('app_profile', {id: participant.id}) }}">
+            <img src="{{ asset('uploads/users/' ~ participant.profilPicture) }}"
+                 alt="Image de {{ participant.firstName }}">
+        </a>
     {% endfor %}
 
 {% endblock %}

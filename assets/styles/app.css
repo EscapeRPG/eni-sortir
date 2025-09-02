@@ -184,6 +184,11 @@ body {
 
         h2 {
             text-align: center;
+            padding: 20px;
+        }
+
+        p {
+            text-align: center;
         }
     }
 
@@ -251,3 +256,17 @@ body {
 
 }
 
+.alert {
+    padding: 10px;
+    text-align: center;
+}
+
+.link-btn {
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+
+    &:hover {
+        background-color: var(--a-color-hover);
+        transform: scale(1.05);
+    }
+}

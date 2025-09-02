@@ -104,6 +104,9 @@ class EditType extends AbstractType
         $builder
             ->add('submit', SubmitType::class, [
                 'label' => 'Enregistrer',
+                'attr' => [
+                    'class' => 'link-btn',
+                ]
             ]);
     }
 

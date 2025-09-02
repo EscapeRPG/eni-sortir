@@ -5,12 +5,13 @@
 {% block main %}
     <div class="preferences-container">
         <div class="menu" data-controller="preferences">
-            <button id="profile-btn" data-action="click->preferences#activeTag" data-preferences-tag1-param="profile-btn"
-                    data-preferences-tag2-param="theme-btn" class="active-tag">
+            <button id="profile-btn" data-action="click->preferences#activeTag"
+                    data-preferences-tag1-param="profile-btn"
+                    data-preferences-tag2-param="theme-btn" class="active-tag link-btn">
                 Éditer le profil
             </button>
             <button id="theme-btn" data-action="click->preferences#activeTag" data-preferences-tag1-param="theme-btn"
-                    data-preferences-tag2-param="profile-btn">
+                    data-preferences-tag2-param="profile-btn" class="link-btn">
                 Paramètres d'interface
             </button>
         </div>
@@ -19,9 +20,15 @@
                 {% include 'user/edit.html.twig' %}
             </div>
             <div id="themes">
-                <button data-themes-id-param="default" data-action="click->themes#setTheme" id="default">Thème par défaut</button>
-                <button data-themes-id-param="dark-mode" data-action="click->themes#setTheme" id="dark-mode">Dark Mode</button>
-                <button data-themes-id-param="pochi-pink" data-action="click->themes#setTheme" id="pochi-pink">Pochi Pink</button>
+                <button data-themes-id-param="default" data-action="click->themes#setTheme" id="default"
+                        class="link-btn">Thème par défaut
+                </button>
+                <button data-themes-id-param="dark-mode" data-action="click->themes#setTheme" id="dark-mode"
+                        class="link-btn">Dark Mode
+                </button>
+                <button data-themes-id-param="pochi-pink" data-action="click->themes#setTheme" id="pochi-pink"
+                        class="link-btn">Pochi Pink
+                </button>
             </div>
         </div>
     </div>

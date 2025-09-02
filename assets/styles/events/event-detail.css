@@ -1,6 +1,6 @@
 
 .event-detail-container {
-    max-width: 900px;
+    width: 80%;
     margin: 40px auto;
     padding: 20px;
     border-radius: 20px;
@@ -27,14 +27,21 @@
     color: #ff5f5f;
 }
 
-
 .event-detail-container p {
     font-size: 1em;
     margin: 5px 0;
 }
 
+.event-detail-container .detail-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
 .event-detail-container a {
-    display: inline-block;
+    width: 25%;
     padding: 10px 20px;
     margin: 10px 10px 0 0;
     border-radius: 10px;
@@ -43,11 +50,12 @@
     color: #fff;
     background-color: #FF8E8EFF;
     transition: background-color 0.3s ease, transform 0.2s ease;
-}
+    text-align: center;
 
-.event-detail-container a:hover {
-    background-color: #ff5f5f;
-    transform: scale(1.05);
+    &:hover {
+        background-color: #ff5f5f;
+        transform: scale(1.05);
+    }
 }
 
 .event-detail-container iframe {

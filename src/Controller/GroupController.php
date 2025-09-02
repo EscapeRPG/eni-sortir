@@ -10,6 +10,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -31,6 +32,7 @@ final class GroupController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Groupe créé avec succès !');
+
             return $this->redirectToRoute('group_list');
         }
 
@@ -72,4 +74,18 @@ final class GroupController extends AbstractController
             'id' => $id
         ]);
     }
+
+    // src/Controller/GroupController.php
+
+    /**
+     * @throws Exception
+     */
+    #[Route('/members-count/{id}', name: '_members_count', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function countGroupMembers(int $id, GroupRepository $groupRepository): Int
+    {
+        $listUsers = $groupRepository->findGroupUsers($id);
+
+        return count($listUsers);
+    }
+
 }

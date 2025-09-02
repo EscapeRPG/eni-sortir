@@ -5,12 +5,13 @@
     --txt-main-color: black;
     --event-bg-color: #ffffff;
     --a-color: #ffffff;
-    --a-color-hover: #a54b0c;
+    --a-color-hover: #aa2a2a;
     --event-shadow: rgba(20, 115, 168, 0.6);
     --events-dates-container-bg-color: #ffc3c3;
     --events-dates-bg-color: #ff8e8e;
     --events-a-color: #ff8e8e;
     --events-a-color-hover: #ff5f5f;
+    --events-color: #682e2e;
     --green: #89df45;
     --orange: #f67749;
     --red: #f64949;

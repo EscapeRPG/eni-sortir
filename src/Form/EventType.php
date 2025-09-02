@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Controller\PlaceController;
 use App\Entity\Campus;
 use App\Entity\Event;
+use App\Entity\Group;
 use App\Entity\Place;
 use App\Entity\State;
 use App\Entity\User;
@@ -13,6 +14,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -31,6 +33,27 @@ class EventType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+
+//            ->add('groupePrive', CheckboxType::class, [
+//                'label' => 'Groupe privé',
+//                'required' => false,
+//                'mapped' => false,
+//                'attr' => ['id' => 'groupePriveCheckbox']
+//            ])
+
+
+            ->add('group', EntityType::class, [
+                'class' => Group::class,
+                'label' => 'Définir un groupe privé (optionnel)',
+                'required' => false,
+                'choice_label' => 'name',
+                'placeholder' => '-- Garder cet évènement public --',
+                'attr' => ['id' => 'groupSelect'],
+                'query_builder' => function(EntityRepository $er) {
+                    return $er->createQueryBuilder('g')->orderBy('g.name', 'ASC');
+                }
+            ])
+
             ->add('name', TextType::class, [
                 'label' => 'Nom de l\'evènement',
                 'required' => true,

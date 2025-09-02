@@ -114,7 +114,9 @@ SQL;
             ->leftJoin('e.organizer', 'organizer')
             ->addSelect('organizer')
             ->leftJoin('e.state', 'state')
-            ->addSelect('state');
+            ->addSelect('state')
+            ->andWhere('e.state != 1')
+            ->andWhere('e.state != 7');
 
         if (!empty($campus)) {
             $req->andWhere('e.campus = :campus')

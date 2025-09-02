@@ -16,7 +16,11 @@
 
     <p>Campus de {{ event.campus.name }}</p>
 
+    {%  if event.group != null %}
+        <p>Groupe privé : {{ event.group.name }}</p>
+    {% endif %}
     <p>participants : {{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
+
     <p>date : {{ event.startingDateHour | date('d/m/Y H:i:s') }}</p>
     <p>informations pratiques : {{ event.eventInfo }}</p>
     <p>On se retrouve ici : {{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>

@@ -1,17 +1,59 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ parent() }} - Liste d'utilisateur{% endblock %}
+{% block title %}{{ parent() }} - Liste des utilisateurs{% endblock %}
 
 {% block main %}
+    {{ form_start(filters, { 'attr': { 'id': 'filters' } }) }}
+    <div>
+        {{ form_label(filters.campus) }}
+        {{ form_widget(filters.campus) }}
+    </div>
+    {{ form_widget(filters.submit) }}
+    {{ form_end(filters) }}
 
     <h2>Liste des utilisateurs</h2>
 
-    <ul>
+    {{ form_errors(import_form) }}
+
+    <div class="users-list">
         {% for user in users %}
-
-            <li><a href="{{ path('app_update', {id: user.id}) }}">{{ user.name | upper }} {{ user.firstName }} </a></li>
-
+            <div class="user">
+                <div class="user-pic">
+                    <a href="{{ path('app_profile', {id: user.id}) }}">
+                        <img src="{{ asset('uploads/users/' ~ user.profilPicture) }}"
+                             alt="Image de {{ user.firstName }}">
+                        <p>{{ user.name | upper }} {{ user.firstName }}</p>
+                    </a>
+                </div>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 
+    {% if pages != 0 and pages != 1 %}
+        <div class="pagination">
+            {% if page == 1 %}
+                <div></div>
+                <div></div>
+                <div><a href="{{ path('event_list', {page: page}) }}">{{ page }}</a></div>
+                <div><a href="{{ path('event_list', {page: page + 1}) }}">Next ></a></div>
+                <div><a href="{{ path('event_list', {page: pages}) }}">Last >></a></div>
+            {% elseif page < pages %}
+                <div><a href="{{ path('event_list', {page: 1}) }}"><< First</a></div>
+                <div><a href="{{ path('event_list', {page: page - 1}) }}">< Prev</a></div>
+                <div><a href="{{ path('event_list', {page: page}) }}">{{ page }}</a></div>
+                <div><a href="{{ path('event_list', {page: page + 1}) }}">Next ></a></div>
+                <div><a href="{{ path('event_list', {page: pages}) }}">Last >></a></div>
+            {% else %}
+                <div><a href="{{ path('event_list', {page: 1}) }}"><< First</a></div>
+                <div><a href="{{ path('event_list', {page: page - 1}) }}">< Prev</a></div>
+                <div><a href="{{ path('event_list', {page: page}) }}">{{ page }}</a></div>
+                <div></div>
+                <div></div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {{ form_start(import_form) }}
+    {{ form_widget(import_form) }}
+    {{ form_end(import_form) }}
 {% endblock %}

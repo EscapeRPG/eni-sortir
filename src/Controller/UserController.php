@@ -7,8 +7,11 @@ use App\Entity\State;
 use App\Entity\User;
 use App\Form\EditType;
 use App\Form\RegistrationFormType;
+use App\Form\UserCsvImportType;
+use App\Form\UserFilterType;
 use App\Helper\FileUploader;
 use App\Repository\UserRepository;
+use App\Service\UserCsvImporter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -99,17 +102,82 @@ class UserController extends AbstractController
         return $this->redirectToRoute('app_main');
     }
 
-    #[Route('/users/list', name: 'app_users_list')]
-    public function usersList(UserRepository $userRepository, #[CurrentUser] ?User $userConnected): Response
+    #[Route('/users/list/{page}', name: 'app_users_list', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
+    public function usersList(
+        UserCsvImporter $userCsvImporter,
+        Request $request,
+        UserRepository $userRepository,
+        #[CurrentUser] ?User $userConnected,
+        ParameterBagInterface $bag,
+        EntityManagerInterface $em,
+        int $page
+    ): Response
     {
         if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
             $this->addFlash('success', 'Cette page est réservée aux administrateurs');
             return $this->redirectToRoute('app_main');
         }
 
-        $users = $userRepository->findUsersByCampus($userConnected->getCampus());
+        $form = $this->createForm(UserCsvImportType::class);
+        $form->handleRequest($request);
+
+        $logs = [];
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file = $form->get('csv_file')->getData();
+
+            if (!$file) {
+                $this->addFlash('error', 'Le formulaire n\'est pas valide');
+            } else {
+                $logs = $userCsvImporter->import($file->getPathname());
+
+                foreach ($logs as $log) {
+                    if (str_contains(strtolower($log), 'ignorée') || str_contains(strtolower($log), 'inconnu') || str_contains(strtolower($log), 'erreur')) {
+                        $this->addFlash('error', $log);
+                    } else {
+                        $this->addFlash('success', $log);
+                    }
+                }
+
+            }
+
+            return $this->redirectToRoute('app_users_list');
+        }
+
+        $limit = $bag->get('user')['nb_max'];
+        $offset = ($page - 1) * $limit;
+
+        $campusId = $request->query->get('campus') ? $request->query->get('campus') : 0;
+
+        $filterForm = $this->createForm(UserFilterType::class, [
+            'campus' => $campusId ? $em->getReference(Campus::class, $campusId) : null,
+        ], ['method' => 'POST']);
+        $filterForm->handleRequest($request);
+
+        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+            $filters = $filterForm->getData();
+            $users = [
+                'page' => 1
+            ];
+
+            if ($filters['campus'] != null) {
+                $users['campus'] = $filters['campus']->getId();
+            }
+
+            return $this->redirectToRoute('app_users_list', $users);
+        }
+
+        $users = $userRepository->findUsersByFilter($campusId, $offset, $limit);
+        $totalItems = count($users);
+        $pages = ceil($totalItems / $limit);
+
         return $this->render('user/users_list.html.twig', [
             'users' => $users,
+            'import_form' => $form->createView(),
+            'message' => $logs,
+            'page' => $page,
+            'pages' => $pages,
+            'filters' => $filterForm
         ]);
     }
 
@@ -217,24 +285,76 @@ class UserController extends AbstractController
         $participant = $userRepository->find($id);
         $events = $participant->getEvents();
         $organizer = $participant->getMyEvents();
+
+        $uniqueDates = [];
+        foreach ($events as $event) {
+            $formattedDate = $event->getStartingDateHour()->format('d/m/Y');
+            $uniqueDates[$formattedDate] = $formattedDate;
+        }
+        $uniqueDates = array_values(array_unique($uniqueDates));
+
         return $this->render('user/profile.html.twig', [
             'participant' => $participant,
             'events' => $events,
             'organizer' => $organizer,
+            'eventsDates' => $uniqueDates,
         ]);
     }
 
-
     #[Route('/preferences/{id}', name: 'app_preferences', requirements: ['id' => '\d+'])]
-    public function preferences(#[CurrentUser] ?User $userConnected): Response
+    public function preferences(
+        #[CurrentUser] ?User   $userConnected,
+        ParameterBagInterface  $parameterBag,
+        UserRepository         $userRepository,
+        FileUploader           $fileUploader,
+        int                    $id,
+        Request                $request,
+        EntityManagerInterface $em
+    ): Response
     {
         if (!$userConnected) {
             $this->addFlash('error', 'Vous devez être connecté pour consulter cette page');
             return $this->redirectToRoute('app_main');
         }
 
-        return $this->render('user/preferences.html.twig', [
-            'user' => $userConnected
-        ]);
+        $user = $userRepository->findUserById($id);
+
+        if ($userConnected === $user || in_array('ROLE_ADMIN', $userConnected->getRoles(), true)) {
+            $isSelfEdit = $this->getUser() === $user;
+            $form = $this->createForm(EditType::class, $user, [
+                'is_admin' => $this->isGranted('ROLE_ADMIN'),
+                'is_self_edit' => $isSelfEdit,
+            ]);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $file = $form->get('profilPicture')->getData();
+
+                if ($file instanceof UploadedFile) {
+                    $name = $fileUploader->upload(
+                        $file,
+                        $user->getName(),
+                        $parameterBag->get('user')['profil_picture']
+                    );
+
+                    $user->setProfilPicture($name);
+                }
+                $em->flush();
+
+                $this->addFlash('success', "Mise à jour enregistrée");
+
+                if ($user->isAdmin() === true) {
+                    return $this->redirectToRoute('app_users_list');
+                } else {
+                    return $this->redirectToRoute('app_update', ['id' => $id]);
+                }
+            }
+
+            return $this->render('user/preferences.html.twig', [
+                'edit_form' => $form,
+                'user' => $user,
+                'id' => $id
+            ]);
+        }
     }
 }

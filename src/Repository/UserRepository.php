@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Campus;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -34,7 +35,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
-    public function findUserById($id): ?User {
+    public function findUserById($id): ?User
+    {
         return $this->createQueryBuilder('u')
             ->andWhere('u.id = :id')
             ->setParameter('id', $id)
@@ -42,13 +44,33 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getOneOrNullResult();
     }
 
-    public function findUsersByCampus(Campus $campus): array {
+    public function findUsersByCampus(Campus $campus): array
+    {
         return $this->createQueryBuilder('u')
             ->orderBy('u.name', 'ASC')
             ->andWhere('u.campus = :campus')
             ->setParameter('campus', $campus)
             ->getQuery()
             ->getResult();
+    }
+
+    public function findUsersByFilter(int $campusId, int $offset, int $limit): Paginator
+    {
+        $req = $this->createQueryBuilder('u')
+            ->select('u')
+            ->orderBy('u.name', 'ASC');
+
+        if ($campusId != 0) {
+            $req->andWhere('u.campus = :campus')
+                ->setParameter(':campus', $campusId);
+        }
+
+        $req->setFirstResult($offset)
+            ->setMaxResults($limit);
+
+        $query = $req->getQuery();
+
+        return new Paginator($query);
     }
 
 //    /**

@@ -54,8 +54,12 @@ final class EventController extends AbstractController
         $event = new Event();
         $place = new Place();
 
-        $form = $this->createForm(EventType::class, $event);
         $placeForm = $this->createForm(PlaceType::class, $place);
+        $form = $this->createForm(EventType::class, $event, [
+            'user' => $user,
+            'group_repository' => $groupRepository,
+        ]);
+
         $form->handleRequest($request);
 
         $start = $event->getStartingDateHour();
@@ -82,8 +86,8 @@ final class EventController extends AbstractController
                 $group = $groupRepository->find($event->getGroup());
                 $id = $group->getId();
                 $listUsers = $groupRepository->findGroupUsers($id);
-                $nbParticipantsgroup = count($listUsers);
-                $event->setNbInscriptionsMax($nbParticipantsgroup);
+                $nbParticipantsGroup = count($listUsers);
+                $event->setNbInscriptionsMax($nbParticipantsGroup);
             }
 
             $place = $form->get('place')->getData();
@@ -140,7 +144,6 @@ final class EventController extends AbstractController
         $placeForm = $this->createForm(PlaceType::class, new Place());
         $form->handleRequest($request);
 
-
         if ($form->isSubmitted() && $form->isValid()) {
             $file = $form->get('poster_file')->getData();
 
@@ -155,6 +158,7 @@ final class EventController extends AbstractController
             $this->addFlash('success', 'Évènement édité!');
             return $this->redirectToRoute('event_list', ['id' => $event->getId()]);
         }
+
         return $this->render('event/create.html.twig', [
             'event_form' => $form,
             'place_form' => $placeForm->createView(),

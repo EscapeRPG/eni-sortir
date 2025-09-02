@@ -1,17 +1,17 @@
 :root {
-    --header-bg-color: #ff8e8e;
-    --other-bg-color: #ffc3c3;
+    --header-bg-color: #3d86e1;
+    --other-bg-color: #b9e1ff;
     --bg-main-color: #fff8f3;
-    --txt-main-color: black;
+    --txt-main-color: #114565;
     --event-bg-color: #ffffff;
     --a-color: #ffffff;
-    --a-color-hover: #aa2a2a;
+    --a-color-hover: #114565;
     --event-shadow: rgba(20, 115, 168, 0.6);
-    --events-dates-container-bg-color: #ffc3c3;
-    --events-dates-bg-color: #ff8e8e;
-    --events-a-color: #ff8e8e;
-    --events-a-color-hover: #ff5f5f;
-    --events-color: #682e2e;
+    --events-dates-container-bg-color: #c3f1ff;
+    --events-dates-bg-color: #8ed7ff;
+    --events-a-color: #8eddff;
+    --events-a-color-hover: #5fc7ff;
+    --events-color: #2e5268;
     --green: #89df45;
     --orange: #f67749;
     --red: #f64949;
@@ -20,10 +20,13 @@
 
 body {
     background-color: var(--bg-main-color);
-    margin: 0;
+    margin: var(--margin-top) 0;
     padding: 0;
     overflow-x: hidden;
-    &:hover{cursor: var(--cursor);
+    color: var(--txt-main-color);
+
+    &:hover{
+        cursor: var(--cursor);
     }
 
     header {
@@ -36,6 +39,7 @@ body {
         position: fixed;
         top: 0;
         left: 0;
+        z-index: 99;
 
         .logo-nav {
             display: flex;
@@ -175,8 +179,9 @@ body {
     }
 
     main {
-        width: 100%;
+        width: calc(100% - 60px);
         margin-top: var(--margin-top);
+        padding: 30px;
 
         h2 {
             text-align: center;
@@ -189,7 +194,11 @@ body {
         margin: auto;
         border-radius: 100%;
         overflow: hidden;
-        object-fit: contain;
+
+        img {
+            width: 100%;
+            object-fit: cover;
+        }
     }
 
     footer {
@@ -202,4 +211,36 @@ body {
         border-radius: 20px 20px 0 0;
         border-bottom: none;
     }
+
+    .swiper {
+        max-height: calc(100vh - var(--margin-top));
+        width: 50%;
+    }
+
+    .swiper-slide {
+        text-align: center;
+        font-size: 18px;
+        background: #444;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .swiper-slide img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1.5 / 1;
+        object-fit: cover;
+    }
+}
+
+@media screen and (max-width: 430px) {
+    .nav-responsive {
+        display: none;
+    }
+}
+
+.alert {
+    padding: 10px;
+    text-align: center;
 }

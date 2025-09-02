@@ -21,13 +21,17 @@ final class GroupController extends AbstractController
 {
 
     #[Route('/create', name: '_create')]
-    public function create(Request $request, EntityManagerInterface $em): Response
+    public function create(Request $request, EntityManagerInterface $em, #[CurrentUser]?User $userConnecter): Response
     {
         $group = new Group();
         $form = $this->createForm(GroupType::class, $group);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if($userConnecter) {
+                $group->addUserList($userConnecter);
+            }
+
             $em->persist($group);
             $em->flush();
 

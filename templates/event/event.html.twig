@@ -1,0 +1,63 @@
+{% for date in eventsDates %}
+    <div class="event-date-container">
+        <div class="event-date">
+            {{ date }}
+            {{ ux_icon('tabler:calendar-month') }}
+        </div>
+
+        {% for event in events %}
+            {% if event.startingDateHour | date('d/m/Y') == date %}
+
+                <div class="event">
+                    <div class="event-poster">
+                        <a href="{{ path('event_detail', {id: event.id}) }}">
+                            <img src="{{ asset('uploads/events/' ~ event.posterFile) }}"
+                                 alt="{{ event.name }}"
+                                 title="{{ event.name }}">
+                        </a>
+                    </div>
+
+                    <div class="event-info">
+                        <div class="event-body">
+                            <div class="event-description">
+                                <h2>
+                                    <a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a>
+                                </h2>
+                                <div>
+                                    {{ ux_icon('tabler:clock-hour-7') }}
+                                    Heure de rendez-vous :
+                                    {{ event.startingDateHour | date('H:i:s') }}
+                                </div>
+                                <div>
+                                    {{ ux_icon('tabler:map-pin') }}
+                                    Adresse :
+                                    {{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}
+                                </div>
+                            </div>
+                            <div class="participants">
+                                {% if event.organizer %}
+                                    <img src="{{ asset('uploads/users/' ~ event.organizer.profilPicture) }}"
+                                         class="event-organizer"
+                                         alt="{{ event.organizer.name }}">
+                                {% else %}
+                                    <img src="" alt="Organisateur supprimé">
+                                {% endif %}
+
+                                <div>
+                                    {{ ux_icon('tabler:user') }}
+                                    {{ event.participants|length }} / {{ event.nbInscriptionsMax }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="event-state">
+                            {{ event.state.label }}
+                            <div class="{{ event.state.label == "Ouverte" ? 'event-green' : 'event-red' }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endfor %}

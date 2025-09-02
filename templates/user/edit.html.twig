@@ -22,7 +22,7 @@
     {% if app.user.id == id %}
         {{ form_row(edit_form.plainPassword) }}
     {% endif %}
-    {% if user.id == id and is_granted('ROLE_ADMIN') %}
+    {% if app.user.id == id and is_granted('ROLE_ADMIN')%}
         {{ form_row(edit_form.campus) }}
     {% endif %}
     <div class="save-btn">

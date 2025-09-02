@@ -52,7 +52,7 @@ class UserController extends AbstractController
         Request                $request,
         EntityManagerInterface $em,
         #[CurrentUser] ?User   $userConnected,
-        ParameterBagInterface   $parameterBag,
+        ParameterBagInterface  $parameterBag,
         FileUploader           $fileUploader,
     ): Response
     {
@@ -82,9 +82,9 @@ class UserController extends AbstractController
 
                 $this->addFlash('success', "Mise à jour enregistrée");
 
-                if ($user->isAdmin() === true){
+                if ($user->isAdmin() === true) {
                     return $this->redirectToRoute('app_users_list');
-                }else{
+                } else {
                     return $this->redirectToRoute('app_update', ['id' => $id]);
                 }
             }
@@ -149,8 +149,8 @@ class UserController extends AbstractController
             return $this->redirectToRoute('app_main');
         }
 
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->get('_token'))) {
-            $cancelState = $em->getRepository(State::class)->findOneBy(['label'=>'Annulée']);
+        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->get('_token'))) {
+            $cancelState = $em->getRepository(State::class)->findOneBy(['label' => 'Annulée']);
 
             foreach ($user->getMyEvents() as $event) {
                 $event->setState($cancelState);
@@ -165,7 +165,7 @@ class UserController extends AbstractController
 
             $this->addFlash('success', "L'utilisateur a été supprimé");
 
-        }else{
+        } else {
             $this->addFlash('success', "Impossible de supprimer l'utilisateur");
         }
         return $this->redirectToRoute('app_users_list');
@@ -180,55 +180,55 @@ class UserController extends AbstractController
         }
 
         //partie ajoutée pour supprimer les event si l'uti est desac
-        if($user->isActive() === true) {
+        if ($user->isActive() === true) {
             $user->setIsActive(false);
 
-            $cancelState = $em->getRepository(State::class)->findOneBy(['label'=>'Annulée']);
-                foreach ($user->getMyEvents() as $event) {
-                    $event->setState($cancelState);
-                    $event->setCancellationReason('Le profil de l\'utilisateur à été désactivé');
-                    $em->persist($event);
-                    }
+            $cancelState = $em->getRepository(State::class)->findOneBy(['label' => 'Annulée']);
+            foreach ($user->getMyEvents() as $event) {
+                $event->setState($cancelState);
+                $event->setCancellationReason('Le profil de l\'utilisateur à été désactivé');
+                $em->persist($event);
+            }
 
-        $em->flush();
-        $em->persist($user);
+            $em->flush();
+            $em->persist($user);
 
-        $this->addFlash('success', "L'utilisateur a été désactivé");
+            $this->addFlash('success', "L'utilisateur a été désactivé");
 
-    }else{
-        $user->setIsActive(true);
+        } else {
+            $user->setIsActive(true);
 
-        $activeState=$em->getRepository(State::class)->findOneBy(['label'=>'Ouverte']);
+            $activeState = $em->getRepository(State::class)->findOneBy(['label' => 'Ouverte']);
             foreach ($user->getMyEvents() as $event) {
                 $event->setState($activeState);
                 $em->persist($event);
             }
 
-        $em->flush();
-        $em->persist($user);
+            $em->flush();
+            $em->persist($user);
 
-        $this->addFlash('success', "L'utilisateur a été activé");
-    }
+            $this->addFlash('success', "L'utilisateur a été activé");
+        }
 
-    return $this->redirectToRoute('app_update', ['id' => $user->getId()]);
+        return $this->redirectToRoute('app_update', ['id' => $user->getId()]);
     }
 
     #[Route('users/promote/{id}', name: 'app_users_promote', requirements: ['id' => '\d+'])]
     public function promoteUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
     {
         if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
-        $this->addFlash('success', 'Cette page est réservée aux administrateurs');
-        return $this->redirectToRoute('app_main');
+            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
         }
 
-        if($user->isAdmin() === false) {
+        if ($user->isAdmin() === false) {
             $user->setIsAdmin(true);
             $em->flush();
             $em->persist($user);
 
             $this->addFlash('success', "L'utilisateur est maintenant administrateur");
 
-        }else{
+        } else {
             $user->setIsAdmin(false);
             $em->flush();
             $em->persist($user);
@@ -240,7 +240,8 @@ class UserController extends AbstractController
     }
 
     #[Route('profile/{id}', name: 'app_profile', requirements: ['id' => '\d+'])]
-    public function profile(int $id, UserRepository $userRepository): Response{
+    public function profile(int $id, UserRepository $userRepository): Response
+    {
         $participant = $userRepository->find($id);
         $events = $participant->getEvents();
         $organizer = $participant->getMyEvents();
@@ -251,5 +252,16 @@ class UserController extends AbstractController
         ]);
     }
 
+    #[Route('/preferences/{id}', name: 'app_preferences', requirements: ['id' => '\d+'])]
+    public function preferences(#[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected) {
+            $this->addFlash('error', 'Vous devez être connecté pour consulter cette page');
+            return $this->redirectToRoute('app_main');
+        }
 
+        return $this->render('user/preferences.html.twig', [
+            'user' => $userConnected
+        ]);
+    }
 }

@@ -1,36 +1,3 @@
-.events-filters {
-    background-color: var(--other-bg-color);
-    padding: 20px;
-
-    form {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        width: 100%;
-
-        div {
-            align-items: flex-start;
-            width: fit-content;
-        }
-    }
-
-    .filters-checkboxes {
-        align-items: flex-start;
-
-        h3 {
-            font-size: 1em;
-            margin: 0;
-        }
-
-        div {
-            flex-direction: row;
-            width: 100%;
-            margin: 0;
-            justify-content: flex-start;
-        }
-    }
-}
-
 .events-container {
     display: flex;
     flex-direction: column;
@@ -49,10 +16,18 @@
             width: calc(100% - 20px);
             text-align: right;
             font-size: 1.2em;
+            font-weight: bold;
             padding: 5px 10px;
             border-radius: 10px;
             background-color: var(--events-dates-bg-color);
             margin-bottom: 1em;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+
+            svg {
+                width: 1em;
+            }
         }
     }
 
@@ -65,6 +40,7 @@
         margin-top: 20px;
         background-color: var(--event-bg-color);
         transition: transform .3s ease;
+        color: var(--events-color);
 
         &:hover {
             transform: scale(1.02);
@@ -111,9 +87,13 @@
                         }
                     }
 
-                    p {
+                    div {
                         margin: 0;
                         padding: 0 20px;
+
+                        svg {
+                            width: 1em;
+                        }
                     }
                 }
 
@@ -122,18 +102,23 @@
                     flex-direction: column;
                     align-items: center;
                     justify-content: space-around;
-                    width: 10%;
+                    flex-wrap: nowrap;
+                    width: 7em;
 
                     .event-organizer {
-                        width: 80%;
+                        width: 60%;
                         aspect-ratio: 1 / 1;
                         margin: 0 auto;
                         border: 1px solid grey;
                         border-radius: 50%;
                     }
 
-                    p {
+                    div {
                         margin: 0;
+
+                        svg {
+                            width: 1em;
+                        }
                     }
                 }
             }
@@ -178,11 +163,11 @@
     }
 
     a {
-        color: var(--a-color);
+        color: var(--events-a-color);
         text-decoration: none;
 
         &:hover {
-            color: var(--a-color-hover);
+            color: var(--events-a-color-hover);
             text-decoration: underline;
         }
     }

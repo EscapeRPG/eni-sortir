@@ -1,0 +1,13 @@
+.dark-mode {
+    --header-bg-color: #101010;
+    --other-bg-color: #2b2b2b;
+    --bg-main-color: #222222;
+    --txt-main-color: #ffffff;
+    --event-bg-color: #303030;
+    --a-color: #ffffff;
+    --a-color-hover: #d66718;
+    --events-dates-container-bg-color: #1c1c1c;
+    --events-dates-bg-color: #636363;
+    --events-a-color: #ff8d1a;
+    --events-a-color-hover: #ffffff;
+}

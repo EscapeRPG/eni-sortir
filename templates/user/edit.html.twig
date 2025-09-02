@@ -3,37 +3,56 @@
 {% block title %}{{ parent() }} - Profil{% endblock %}
 
 {% block main %}
+    <h2>Profil {{ user.firstName|first|lower in "aeiouy" ? "d'" : "de" }}{{ user.firstName }}</h2>
 
-    <h2>Profil de {{ user.firstName }}</h2>
+    <div class="profile-pic">
+        <img src="{{ asset('uploads/users/' ~ user.profilPicture) }}" id="profile-pic"
+             alt="photo de profil de {{ user.firstName }}">
+    </div>
 
-    {{ form_errors(edit_form) }}
+    <div class="form-errors">
+        {{ form_errors(edit_form) }}
+    </div>
 
-    <img src="{{ asset('uploads/users/' ~ user.profilPicture) }}" alt="photo de profil de {{ user.firstName }}">
-
-    {{ form(edit_form) }}
-
-    {% if is_granted('ROLE_ADMIN') %}
-        <a href="{{ path('app_users_delete', {id: user.id, _token : csrf_token('delete'~user.id)}) }}"
-           onclick="return confirm('Etes vous sûr?')">Supprimer</a>
-        {% if user.isActive == true %}
-            <a href="{{ path('app_users_disable', {id: user.id}) }}"
-               onclick="return confirm('Etes vous sûr?')">Désactiver</a>
-        {% else %}
-            <a href="{{ path('app_users_disable', {id: user.id}) }}" onclick="return confirm('Etes vous sûr?')">Activer</a>
-        {% endif %}
-
-        {% if user.isAdmin == false %}
-            <a href="{{ path('app_users_promote', {id: user.id}) }}">Promouvoir </a>
-        {% else %}
-            <a href="{{ path('app_users_promote', {id: user.id}) }}">Retrograder </a>
-        {% endif %}
+    {{ form_start(edit_form) }}
+    {{ form_row(edit_form.profilPicture) }}
+    {{ form_row(edit_form.firstName) }}
+    {{ form_row(edit_form.name) }}
+    {{ form_row(edit_form.phoneNumber) }}
+    {% if app.user.id == id %}
+        {{ form_row(edit_form.plainPassword) }}
     {% endif %}
-
-    {% if is_granted('ROLE_ADMIN') %}
-        <a href="{{ path('app_users_list') }}">Retour</a>
-    {% else %}
-        <a href="{{ path('app_main') }}">Retour</a>
+    {% if app.user.id == id and is_granted('ROLE_ADMIN')%}
+        {{ form_row(edit_form.campus) }}
     {% endif %}
+    <div class="save-btn">
+        {{ form_widget(edit_form.submit) }}
+    </div>
+    <div class="save-btn separator">
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_users_delete', {id: user.id, _token : csrf_token('delete'~user.id)}) }}"
+               onclick="return confirm('Etes vous sûr ?')" class="delete">Supprimer</a>
+
+            {% if user.isActive == true %}
+                <a href="{{ path('app_users_disable', {id: user.id}) }}"
+                   onclick="return confirm('Etes vous sûr ?')" class="deactivate">Désactiver</a>
+            {% else %}
+                <a href="{{ path('app_users_disable', {id: user.id}) }}"
+                   onclick="return confirm('Etes vous sûr ?')" class="activate">Activer</a>
+            {% endif %}
+
+            {% if user.isAdmin == false %}
+                <a href="{{ path('app_users_promote', {id: user.id}) }}" class="activate">Promouvoir </a>
+            {% else %}
+                <a href="{{ path('app_users_promote', {id: user.id}) }}" class="deactivate">Retrograder </a>
+            {% endif %}
+
+            <a href="{{ path('app_users_list') }}" class="return">Retour</a>
+        {% else %}
+            <a href="{{ path('app_main') }}" class="return">Retour</a>
+        {% endif %}
+    </div>
+
+    {{ form_end(edit_form) }}
 
 {% endblock %}
-

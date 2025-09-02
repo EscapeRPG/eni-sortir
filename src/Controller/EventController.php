@@ -4,38 +4,58 @@ namespace App\Controller;
 
 use App\Entity\Campus;
 use App\Entity\Event;
+use App\Entity\Place;
 use App\Entity\State;
 use App\Entity\User;
 use App\Form\CancellationReasonType;
 use App\Form\EventType;
 use App\Form\FiltersType;
+use App\Form\PlaceType;
 use App\Helper\FileUploader;
+use App\Message\SendMailReminder;
+use App\Repository\GroupRepository;
 use App\Repository\StateRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SortieRepository;
 use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Messenger\MessageBus;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+use Symfony\Component\Mime\Email;
 #[Route('/event', name: 'event')]
 final class EventController extends AbstractController
 {
 
+
+    public function __construct(private readonly EntityManagerInterface $entityManager)
+    {
+    }
+/**
+     * @throws Exception
+     * @throws TransportExceptionInterface
+     */
     #[Route('/create', name: '_create')]
-    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, Security $security): Response
+    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, Security $security, GroupRepository $groupRepository, MailerInterface $mailer): Response
     {
         $event = new Event();
+        $place = new Place();
 
         $form = $this->createForm(EventType::class, $event);
+        $placeForm = $this->createForm(PlaceType::class, $place);
         $form->handleRequest($request);
 
         $start = $event->getStartingDateHour();
@@ -58,6 +78,14 @@ final class EventController extends AbstractController
             $event->setOrganizer($user);
             $event->setCampus($user->getCampus());
 
+            if ($event->getGroup() != null) {
+                $group = $groupRepository->find($event->getGroup());
+                $id = $group->getId();
+                $listUsers = $groupRepository->findGroupUsers($id);
+                $nbParticipantsgroup = count($listUsers);
+                $event->setNbInscriptionsMax($nbParticipantsgroup);
+            }
+
             $place = $form->get('place')->getData();
             $event->setPlace($place);
 
@@ -72,11 +100,34 @@ final class EventController extends AbstractController
             $em->persist($event);
             $em->flush();
 
+            if ($event->getGroup() !== null) {
+                $group = $event->getGroup();
+                $users = $group->getUserList();
+
+                foreach ($users as $member) {
+                    if ($member->getId() === $user->getId()) {
+                        continue;
+                    }
+
+                    $email = (new Email())
+                        ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
+                        ->to($member->getEmail())
+                        ->subject('Invitation à un nouvel évènement : '.$event->getName())
+                        ->html($this->renderView('email/invitation.html.twig', [
+                            'event' => $event,
+                            'user' => $member,
+                        ]));
+
+                    $mailer->send($email);
+                }
+            }
+
             $this->addFlash('success', 'Évènement crée !');
-            return $this->redirectToRoute('app_main');
+            return $this->redirectToRoute('event_list');
         }
         return $this->render('event/create.html.twig', [
             'event_form' => $form,
+            'place_form' => $placeForm->createView(),
         ]);
     }
 
@@ -273,12 +324,12 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/join/{id}', name: '_join', requirements: ['id' => '\d+'])]
-    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): Response
+    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager, MailerInterface $mailer, LoggerInterface $logger, MessageBusInterface $bus): Response
     {
 
         $event = $sortieRepository->find($id);
         $participants = $sortieRepository->findParticipantsByEvent($event->getId());
-
+        $user= $userConnected->getId();
 
         if ($event->getState()->getId() !== 2) {
             throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet évènement");
@@ -292,8 +343,47 @@ final class EventController extends AbstractController
             $entityManager->persist($event);
             $entityManager->flush();
 
+
+            //insérer l'envoi de mail
+
+            if(!$userConnected->getEmail()) { //si l'adresse n'existe pas ?
+                $this->addFlash('danger', 'Impossible d\'envoyer un mail, adresse invalide');
+                return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
+            }
+
+            $email = (new TemplatedEmail())
+                ->from('no-reply@eni-sortir.fr')
+                ->to($userConnected->getEmail())
+                ->subject('Confirmation d\'inscription à l\'évènement ' . $event->getName())
+                ->htmlTemplate('email/join.html.twig')
+                ->context([
+                    'user' => $userConnected,
+                    'event' => $event,
+                ]);
+            try{ //pour ne pas bloquer si l'envoi ne fonctionne pas
+                $mailer->send($email);
+            } catch (\Throwable $e) {
+                $this->addFlash('danger', 'Ton inscription est validée mais le mail n\'a pas pu être envoyé');
+                $logger->error('mail error : ' .$e->getMessage()); //logger : stock messages dans des fichiers (log)
+            }
+
+
+            $this->addFlash('success', 'Vous êtes inscrit à l\'évènement ! Un mail de confirmation va vous être envoyé');
+
+
             $this->closeIfFullParticipants($stateRepository, $sortieRepository, $event->getId(), $bag, $entityManager);
-            $this->redirectToRoute('event_list', ['id' => $event->getId()]);
+            //$this->redirectToRoute('event_list', ['id' => $event->getId()]);
+
+
+            //pour le mail délai 48h !
+
+            $eventId = $event->getId();
+            $delay = ($event->getStartingDateHour()->getTimestamp() - 48*3600 - time()) * 1000; // convertir en ms
+            $delay = max(0, $delay); // pas  négatif
+
+            $bus->dispatch(new SendMailReminder($eventId), [new DelayStamp($delay)]);
+            //timestamp renvoie nbr secondes, puis calcul 48h en sec. puis *1000 car messenger att millisecondes
+            //si -48h alors on programme le message avec un delaystamp
 
         }
         return $this->redirectToRoute('event_list', [
@@ -310,7 +400,8 @@ final class EventController extends AbstractController
         SortieRepository       $sortieRepository,
         EntityManagerInterface $entityManager,
         #[CurrentUser] ?User   $userConnected,
-        int                    $id
+        int                    $id,
+        MailerInterface       $mailer
     ): Response
     {
         $event = $sortieRepository->find($id);
@@ -331,7 +422,23 @@ final class EventController extends AbstractController
                 $entityManager->persist($event);
                 $entityManager->flush();
 
-                $this->addFlash('success', "Désistement réussi");
+
+                //mail de désistement
+
+                $email = (new TemplatedEmail())
+                    ->from('no-reply@eni-sortir.fr')
+                    ->to($userConnected->getEmail())
+                    ->subject('Confirmation de désinscription à l\'évènement ' . $event->getName())
+                    ->htmlTemplate('email/withdraw.html.twig')
+                    ->context([
+                        'user' => $userConnected,
+                        'event' => $event,
+                    ]);
+                $mailer->send($email);
+
+
+                $this->addFlash('success', 'Vous vous êtes désinscrit de l\'évènement. Un mail de conformation va vous être envoyé');
+
                 $found = true;
                 break;
             }

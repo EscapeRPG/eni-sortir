@@ -5,14 +5,17 @@
     --txt-main-color: black;
     --event-bg-color: #ffffff;
     --a-color: #ffffff;
-    --a-color-hover: #a54b0c;
+    --a-color-hover: #aa2a2a;
     --event-shadow: rgba(20, 115, 168, 0.6);
     --events-dates-container-bg-color: #ffc3c3;
     --events-dates-bg-color: #ff8e8e;
     --events-a-color: #ff8e8e;
     --events-a-color-hover: #ff5f5f;
+    --events-color: #682e2e;
     --green: #89df45;
+    --orange: #f67749;
     --red: #f64949;
+    --margin-top: 67px;
 }
 
 body {
@@ -65,6 +68,12 @@ body {
                 border: 2px solid white;
                 transform: rotate(45deg);
 
+                &:hover {
+                    #burger {
+                        transform: scale(1);
+                    }
+                }
+
                 .burgerBtn {
                     width: 20px;
                     height: 20px;
@@ -78,6 +87,7 @@ body {
                     display: inline-block;
                     position: absolute;
                     top: 50%;
+                    transform: scale(0.8);
 
                     &::before, &::after {
                         content: '';
@@ -118,8 +128,8 @@ body {
 
             #responsive {
                 position: absolute;
-                top: 67px;
-                height: calc(100vh - 67px);
+                top: var(--margin-top);
+                height: calc(100vh - var(--margin-top));
                 right: 0;
                 transform: translateX(100%);
                 transition: transform .4s ease;
@@ -145,6 +155,13 @@ body {
                 a {
                     color: var(--a-color);
                     text-decoration: none;
+                    display: flex;
+                    align-items: center;
+                    gap: 7px;
+
+                    svg {
+                        width: 20px;
+                    }
 
                     &:hover {
                         color: var(--a-color-hover);
@@ -157,7 +174,20 @@ body {
 
     main {
         width: 100%;
-        margin-top: 67px;
+        margin-top: var(--margin-top);
+
+        h2 {
+            text-align: center;
+        }
+    }
+
+    .profile-pic {
+        width: 300px;
+        height: 300px;
+        margin: auto;
+        border-radius: 100%;
+        overflow: hidden;
+        object-fit: contain;
     }
 
     footer {

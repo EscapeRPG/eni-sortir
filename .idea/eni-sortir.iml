@@ -134,7 +134,9 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfonycasts/verify-email-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/rate-limiter" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfonycasts/reset-password-bundle" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/ux-icons" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/league/csv" />
+
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

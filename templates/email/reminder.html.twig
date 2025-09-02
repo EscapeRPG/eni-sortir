@@ -1,0 +1,11 @@
+<h2> Bonjour {{ user.name }}</h2>
+
+<p> Rappel, l'évènement {{  event.name }} commence dans 48h !</p>
+<p> Petit rappel des informations :</p>
+<p> Organisateur : {{ event.organizer.name }}</p>
+<p> Date : {{ event.startingDateHour | date('d/m/Y H:i') }}</p>
+<p> Lieu : {{  event.place }}</p>
+<p> N'oublie pas tes chaussettes ! </p>
+
+
+

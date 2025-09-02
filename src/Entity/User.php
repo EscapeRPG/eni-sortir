@@ -72,10 +72,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $profilPicture = null;
 
+    /**
+     * @var Collection<int, Group>
+     */
+    #[ORM\ManyToMany(targetEntity: Group::class, mappedBy: 'userList')]
+    private Collection $groupList;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->myEvents = new ArrayCollection();
+        $this->groupList = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -298,4 +305,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @return Collection<int, Group>
+     */
+    public function getGroupList(): Collection
+    {
+        return $this->groupList;
+    }
+
+    public function addGroupList(Group $groupList): static
+    {
+        if (!$this->groupList->contains($groupList)) {
+            $this->groupList->add($groupList);
+            $groupList->addUserList($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupList(Group $groupList): static
+    {
+        if ($this->groupList->removeElement($groupList)) {
+            $groupList->removeUserList($this);
+        }
+
+        return $this;
+    }
+
+    public function isRegisteredForEvent(Event $event): bool
+{
+    return $this->events->contains($event);
+}
 }

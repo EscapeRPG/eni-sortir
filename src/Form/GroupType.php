@@ -20,7 +20,9 @@ class GroupType extends AbstractType
             ])
             ->add('userList', EntityType::class, [
                 'attr' => [
-                    'class' => 'select2'
+                    'class' => 'select2',
+                    'data-controller' => 'select2',
+                    'data-select2-placeholder-value' => 'Sélectionnez les membres',
                 ],
                 'class' => User::class,
                 'label' => 'Membres du groupe',
@@ -30,8 +32,8 @@ class GroupType extends AbstractType
                 'multiple' => true,
                 'expanded' => false,
                 'required' => true,
-
             ]);
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void

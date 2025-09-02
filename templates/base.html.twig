@@ -45,7 +45,7 @@
 <body data-controller="themes">
 <header>
     <div class="logo-nav">
-        <a href="{{ path('app_main') }}"><img src="" alt="logo"></a>
+        <a href="{{ path('app_main') }}"><img src="{{ asset('images/logo.gif') }}" alt="logo"></a>
         <a href="{{ path('app_main') }}"><h1>ENI SORTIR</h1></a>
         {% if is_granted('IS_AUTHENTICATED') %}
             <a class="nav-responsive" href="{{ path('event_list') }}">Événements</a>
@@ -134,6 +134,10 @@
 
     {% block main %}
         <h2>Bienvenue sur le site de Sortir.com !</h2>
+        <p>Salut !</p>
+        <button data-themes-id-param="dark-mode" data-action="click->themes#setTheme"></button>
+        <button data-themes-id-param="pochi-pink" data-action="click->themes#setTheme"></button>
+    {% endblock %}
 
         {# pour charger le form de création de gruopes privés #}
         {#        <div id="form-container"></div> #}
@@ -153,6 +157,7 @@
         </div>
     {% endblock %}
 </main>
+
 <footer></footer>
 
 </body>

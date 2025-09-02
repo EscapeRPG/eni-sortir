@@ -137,6 +137,7 @@ final class EventController extends AbstractController
         $this->checkStatusUser($event, $security);
 
         $form = $this->createForm(EventType::class, $event);
+        $placeForm = $this->createForm(PlaceType::class, new Place());
         $form->handleRequest($request);
 
 
@@ -147,6 +148,7 @@ final class EventController extends AbstractController
                 $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_dir']);
                 $event->setPosterFile($name);
             }
+
             //$event->setPosterFile($name);
 
             $em->flush();
@@ -155,6 +157,7 @@ final class EventController extends AbstractController
         }
         return $this->render('event/create.html.twig', [
             'event_form' => $form,
+            'place_form' => $placeForm->createView(),
         ]);
     }
 
@@ -272,6 +275,7 @@ final class EventController extends AbstractController
         $event = $sortieRepository->find($id);
         $userConnectedId = $userConnected->getId();
 
+
         if (!$event) {
             throw $this->createNotFoundException('Cet évènement n\'existe pas');
         }
@@ -370,20 +374,19 @@ final class EventController extends AbstractController
 
             $this->addFlash('success', 'Vous êtes inscrit à l\'évènement ! Un mail de confirmation va vous être envoyé');
 
-
             $this->closeIfFullParticipants($stateRepository, $sortieRepository, $event->getId(), $bag, $entityManager);
-            //$this->redirectToRoute('event_list', ['id' => $event->getId()]);
 
 
             //pour le mail délai 48h !
 
             $eventId = $event->getId();
-            $delay = ($event->getStartingDateHour()->getTimestamp() - 48*3600 - time()) * 1000; // convertir en ms
+            $delay = ($event->getStartingDateHour()->getTimestamp() - 48*3600 - time()) * 1000;
+            //timestamp renvoie nbr secondes, puis calcul 48h en sec. puis *1000 car messenger att millisecondes
             $delay = max(0, $delay); // pas  négatif
 
             $bus->dispatch(new SendMailReminder($eventId), [new DelayStamp($delay)]);
-            //timestamp renvoie nbr secondes, puis calcul 48h en sec. puis *1000 car messenger att millisecondes
             //si -48h alors on programme le message avec un delaystamp
+
 
         }
         return $this->redirectToRoute('event_list', [

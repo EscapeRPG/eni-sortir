@@ -172,3 +172,14 @@
         }
     }
 }
+
+@media (max-width: 430px) {
+    .events-container {
+        width: 95%;
+        margin:7px;
+    }
+
+    .list-event-responsive {
+        display: none
+    }
+}

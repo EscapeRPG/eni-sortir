@@ -282,3 +282,58 @@ form {
         }
     }
 }
+
+@media (max-width: 430px) {
+    form {
+        width: 95%;
+        margin: 5px auto;
+        padding: 0;
+
+
+
+        div {
+            width: 95%;
+            padding: 7px;
+            margin: 0;
+
+            .event-place {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                padding:  5px 0 0 0;
+                margin: 0;
+
+                select, button {
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    .events-filters {
+        padding: 0;
+
+
+        form {
+            margin: 0;
+            flex-direction: column;
+            align-items: center;
+
+            div {
+                width: 95%;
+                padding: 7px;
+                margin: 0;
+            }
+        }
+    }
+
+    .save-btn {
+        width: 60%;
+
+        button {
+            width: 100%;
+        }
+
+
+    }
+}

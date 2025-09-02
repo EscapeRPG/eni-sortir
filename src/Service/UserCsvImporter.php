@@ -78,7 +78,7 @@ class UserCsvImporter
         foreach ($records as $row) {
             $line ++;
             if (empty($row['email'])) {
-                $logs[] = ("Email manquant : ligne $line ignorée : ");
+                $logs[] = ("Email manquant : ligne $line ignorée ");
                 continue;
             }
 

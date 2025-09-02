@@ -1,30 +1,36 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/events/event-detail.css') }}">
+{% endblock %}
+
 {% block title %}
     {{ parent() }} - Détails
 {% endblock %}
 
 {% block main %}
-    <img src="{{ event.posterFile }}" alt="image de l'évènement">
+    <div class="event-detail-container">
+        <img src="{{ asset('uploads/events/' ~ event.posterFile) }}" alt="image de l'évènement">
     <h1>Détail de l'évènement : {{ event.name }}</h1>
 
+   <div class="event-detail-frame">
     {% if event.organizer %}
-        <p>crée par {{ event.organizer.firstName }} {{ event.organizer.name }}</p>
+        <p><b>Crée par : </b> {{ event.organizer.firstName }} {{ event.organizer.name }}</p>
     {% else %}
         <p>Organisateur supprimé</p>
     {% endif %}
 
-    <p>Campus de {{ event.campus.name }}</p>
+       <p><b>Campus de : </b>{{ event.campus.name }}</p>
 
     {%  if event.group != null %}
         <p>Groupe privé : {{ event.group.name }}</p>
     {% endif %}
-    <p>participants : {{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
+       <p><b>Participants : </b>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
 
-    <p>date : {{ event.startingDateHour | date('d/m/Y H:i:s') }}</p>
-    <p>informations pratiques : {{ event.eventInfo }}</p>
-    <p>On se retrouve ici : {{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>
-
+       <p><b>Date : </b>{{ event.startingDateHour | date('d/m/Y H:i:s') }}</p>
+       <p><b>Informations pratiques : </b>{{ event.eventInfo }}</p>
+       <p><b>On se retrouve ici : </b>{{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>
+    </div>
 
     {% set found = false %}
 
@@ -33,6 +39,7 @@
             {% set found = true %}
         {% endif %}
     {% endfor %}
+
 
     {% if event.state.label == 'Ouverte' %}
         {% if not found %}
@@ -46,7 +53,7 @@
         {% endif %}
     {% endif %}
     {% if event.state.label == 'Annulée' %}
-        <p> Raison d'annulation : {{ event.cancellationReason }}</p>
+        <p> <b>Raison d'annulation : </b>{{ event.cancellationReason }}</p>
     {% endif %}
 
 
@@ -64,8 +71,7 @@
         {% if event.organizer %}
             {% if event.state.label == 'Annulée' %}
                 <a href="{{ path('event_reactivate', {id:event.id}) }}"> Réactivez votre sortie </a>
-                {% else %}
-                <a href=""></a>
+
             {% endif %}
         {% endif %}
 
@@ -90,15 +96,16 @@
     {% endif %}
 
 
-    <h3>Liste des participants</h3>
-
+    <h3>Liste des participants : </h3>
+<div class="participants-list">
     {% for participant in participants %}
         <a href="{{ path('app_profile', {id: participant.id}) }}"><img
                     src="{{ asset('uploads/users/' ~ participant.profil_picture) }}"
                     alt="Image de {{ participant.first_name }}"></a>
 
     {% endfor %}
-
+    </div>
+    </div>
 {% endblock %}
 
 

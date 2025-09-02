@@ -11,3 +11,22 @@
     --events-a-color: #ff8d1a;
     --events-a-color-hover: #ffffff;
 }
+
+.pochi-pink {
+    --header-bg-color: #f8c8dc;
+    --other-bg-color: #ffe0f0;
+    --bg-main-color: #fff8fb;
+    --txt-main-color: #5a3c4f;
+    --event-bg-color: #ffffff;
+    --a-color: #ff9acb;
+    --a-color-hover: #e85a9f;
+    --events-dates-container-bg-color: #ffd6e8;
+    --events-dates-bg-color: #ffb6d9;
+    --events-a-color: #ff80bf;
+    --events-a-color-hover: #ff5ca9;
+    --events-color: #803d67;
+    --green: #b6f7c1;
+    --orange: #ffc3a0;
+    --red: #ff9a9e;
+    --cursor :url('/images/pochi.png')4 4, auto;
+}

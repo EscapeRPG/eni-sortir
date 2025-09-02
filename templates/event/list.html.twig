@@ -62,14 +62,14 @@
                                             <h2>
                                                 <a href="{{ path('event_detail', {id: event.id}) }}">{{ event.name }}</a>
                                             </h2>
-                                            <div>
+                                            <div class="heure-lieu">
                                                 {{ ux_icon('tabler:clock-hour-7') }}
-                                                Heure de rendez-vous :
+                                                <p class="list-event-responsive"> Heure de rendez-vous : </p>
                                                 {{ event.startingDateHour | date('H:i:s') }}
                                             </div>
-                                            <div>
+                                            <div class="heure-lieu">
                                                 {{ ux_icon('tabler:map-pin') }}
-                                                Adresse :
+                                                <p class="list-event-responsive"> Adresse : </p>
                                                 {{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}
                                             </div>
                                         </div>

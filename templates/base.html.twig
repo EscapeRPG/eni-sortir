@@ -43,8 +43,8 @@
         <a href="{{ path('app_main') }}"><img src="{{ asset('') }}" alt="logo"></a>
         <a href="{{ path('app_main') }}"><h1>ENI SORTIR</h1></a>
         {% if is_granted('IS_AUTHENTICATED') %}
-        <a href="{{ path('event_list') }}">Événements</a>
-        <a href="{{ path('place_list') }}">Lieux</a>
+        <a class="nav-responsive" href="{{ path('event_list') }}">Événements</a>
+        <a class="nav-responsive" href="{{ path('place_list') }}">Lieux</a>
         {% endif %}
     </div>
     <nav data-controller="burger">
@@ -126,13 +126,10 @@
 
     {% block main %}
         <h2>Bienvenue sur le site de Sortir.com !</h2>
-        <p>Salut !</p>
+        <p>Connectez-vous ou créez un compte et accédez à vos évènements</p>
         <button data-themes-id-param="dark-mode" data-action="click->themes#setTheme"></button>
         <button data-themes-id-param="pochi-pink" data-action="click->themes#setTheme"></button>
     {% endblock %}
-
-{#pour charger le form de création de gruopes privés#}
-{#        <div id="form-container"></div>#}
 
     <div class="swiper mySwiper">
         <div class="swiper-wrapper">
@@ -146,6 +143,7 @@
         </div>
         <div class="swiper-scrollbar"></div>
     </div>
+    
 </main>
 
 <footer></footer>

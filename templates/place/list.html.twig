@@ -6,8 +6,8 @@
 
 {% block main %}
 <div class= "places-container" >
-    <h1> Liste des endroits de jeunes !! </h1>
-
+    <h1> Lieux de sorties </h1>
+<p>Choissisez ou créer de nouveaux lieux !</p>
     {% for place in places %}
         <a href="{{ path('place_detail', {id:place.id }) }}" class="place-card">
             <h2>{{ place.name }}</h2> </a>

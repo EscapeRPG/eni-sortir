@@ -11,100 +11,101 @@
 {% block main %}
     <div class="event-detail-container">
         <img src="{{ asset('uploads/events/' ~ event.posterFile) }}" alt="image de l'évènement">
-    <h1>Détail de l'évènement : {{ event.name }}</h1>
 
-   <div class="event-detail-frame">
-    {% if event.organizer %}
-        <p><b>Crée par : </b> {{ event.organizer.firstName }} {{ event.organizer.name }}</p>
-    {% else %}
-        <p>Organisateur supprimé</p>
-    {% endif %}
+        <h1>Détail de l'évènement : {{ event.name }}</h1>
 
-       <p><b>Campus de : </b>{{ event.campus.name }}</p>
+        <div class="event-detail-frame">
+            {% if event.organizer %}
+                <p><strong>Crée par : </strong> {{ event.organizer.firstName }} {{ event.organizer.name }}</p>
+            {% else %}
+                <p>Organisateur supprimé</p>
+            {% endif %}
 
-    {%  if event.group != null %}
-        <p>Groupe privé : {{ event.group.name }}</p>
-    {% endif %}
-       <p><b>Participants : </b>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
+            <p><strong>Campus de : </strong>{{ event.campus.name }}</p>
 
-       <p><b>Date : </b>{{ event.startingDateHour | date('d/m/Y H:i:s') }}</p>
-       <p><b>Informations pratiques : </b>{{ event.eventInfo }}</p>
-       <p><b>On se retrouve ici : </b>{{ event.place.street }}, {{ event.place.postalCode }} {{ event.place.city }}</p>
-    </div>
+            {% if event.group != null %}
+                <p>Groupe privé : {{ event.group.name }}</p>
+            {% endif %}
+            <p><strong>Participants : </strong>{{ event.participants|length }} / {{ event.nbInscriptionsMax }}</p>
 
-    {% set found = false %}
+            <p><strong>Date : </strong>{{ event.startingDateHour | date('d/m/Y H:i:s') }}</p>
+            <p><strong>Informations pratiques : </strong>{{ event.eventInfo }}</p>
+            <p><strong>On se retrouve ici : </strong>{{ event.place.street }}
+                , {{ event.place.postalCode }} {{ event.place.city }}
+            </p>
+        </div>
 
-    {% for Idparticipant in participants %}
-        {% if Idparticipant.id == userConnectedId %}
-            {% set found = true %}
-        {% endif %}
-    {% endfor %}
+        {% set found = false %}
 
-
-    {% if event.state.label == 'Ouverte' %}
-        {% if not found %}
-            <a href="{{ path('event_join', { id: event.id }) }}">S'inscrire</a>
-        {% endif %}
-    {% endif %}
-
-    {% if event.state.label in ['Ouverte', 'Cloturée'] %}
-        {% if found %}
-            <a href="{{ path('event_withdraw', { id: event.id }) }}">Se désister</a>
-        {% endif %}
-    {% endif %}
-    {% if event.state.label == 'Annulée' %}
-        <p> <b>Raison d'annulation : </b>{{ event.cancellationReason }}</p>
-    {% endif %}
+        {% for Idparticipant in participants %}
+            {% if Idparticipant.id == userConnectedId %}
+                {% set found = true %}
+            {% endif %}
+        {% endfor %}
 
 
-    {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
-
-        <a href="{{ path('event_edit', { id: event.id}) }}"> Éditez votre sortie </a>
-        <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}"
-           onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')"> Supprimez votre sortie </a>
-        {% if event.state.label != 'Annulée' %}
-            <a href="{{ path('event_cancel', {id:event.id}) }}"> Annulez votre event </a>
-
-        {% endif %}
-
-
-        {% if event.organizer %}
-            {% if event.state.label == 'Annulée' %}
-                <a href="{{ path('event_reactivate', {id:event.id}) }}"> Réactivez votre sortie </a>
-
+        {% if event.state.label == 'Ouverte' %}
+            {% if not found %}
+                <a href="{{ path('event_join', { id: event.id }) }}">S'inscrire</a>
             {% endif %}
         {% endif %}
 
-    {% endif %}
-
-    {# si on a une adresse #}
-    {% if event.place.street and event.place.postalCode and event.place.city %}
-        {% set address = event.place.street ~ ', ' ~ event.place.postalCode ~ ' ' ~ event.place.city %}
-        {% set addressGoogle = address|replace({' ': '+'}) %}
-
-        <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&amp;output=embed"
-                allowfullscreen loading="lazy">
-        </iframe>
-    {% endif %}
-
-    {# si on a des coordonnées GPS #}
-    {% if event.place.latitude is not null and event.place.longitude is not null %}
-
-        <iframe src="https://maps.google.com/maps?q={{ event.place.latitude }},{{ event.place.longitude }}&amp;output=embed"
-                allowfullscreen loading="lazy">
-        </iframe>
-    {% endif %}
+        {% if event.state.label in ['Ouverte', 'Cloturée'] %}
+            {% if found %}
+                <a href="{{ path('event_withdraw', { id: event.id }) }}">Se désister</a>
+            {% endif %}
+        {% endif %}
+        {% if event.state.label == 'Annulée' %}
+            <p><b>Raison d'annulation : </b>{{ event.cancellationReason }}</p>
+        {% endif %}
 
 
-    <h3>Liste des participants : </h3>
-<div class="participants-list">
-    {% for participant in participants %}
-        <a href="{{ path('app_profile', {id: participant.id}) }}"><img
-                    src="{{ asset('uploads/users/' ~ participant.profil_picture) }}"
-                    alt="Image de {{ participant.first_name }}"></a>
+        {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
+            <div class="detail-links">
+                <a href="{{ path('event_edit', { id: event.id}) }}" class="link-btn"> Éditez votre sortie </a>
+                <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}"
+                   onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')" class="link-btn"> Supprimez votre
+                    sortie </a>
+                {% if event.state.label != 'Annulée' %}
+                    <a href="{{ path('event_cancel', {id:event.id}) }}" class="link-btn"> Annulez votre event </a>
+                {% endif %}
 
-    {% endfor %}
-    </div>
+                {% if event.organizer %}
+                    {% if event.state.label == 'Annulée' %}
+                        <a href="{{ path('event_reactivate', {id:event.id}) }}" class="link-btn"> Réactivez votre sortie </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {# si on a une adresse #}
+        {% if event.place.street and event.place.postalCode and event.place.city %}
+            {% set address = event.place.street ~ ', ' ~ event.place.postalCode ~ ' ' ~ event.place.city %}
+            {% set addressGoogle = address|replace({' ': '+'}) %}
+
+            <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&amp;output=embed"
+                    allowfullscreen loading="lazy">
+            </iframe>
+        {% endif %}
+
+        {# si on a des coordonnées GPS #}
+        {% if event.place.latitude is not null and event.place.longitude is not null %}
+
+            <iframe src="https://maps.google.com/maps?q={{ event.place.latitude }},{{ event.place.longitude }}&amp;output=embed"
+                    allowfullscreen loading="lazy">
+            </iframe>
+        {% endif %}
+
+
+        <h3>Liste des participants : </h3>
+        <div class="participants-list">
+            {% for participant in participants %}
+                <a href="{{ path('app_profile', {id: participant.id}) }}"><img
+                            src="{{ asset('uploads/users/' ~ participant.profil_picture) }}"
+                            alt="Image de {{ participant.first_name }}" class="link-btn"></a>
+
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}
 

@@ -11,9 +11,9 @@
 
     {{ form_row(place_create.name) }}
 
-    <div>
-        <button type="button" id="for-address">Ajout avec l'adresse</button>
-        <button type="button" id="for-gps">Ou avec les coordonnées GPS</button>
+    <div class="save-btn">
+        <button type="button" id="for-address" class="link-btn">Ajout avec l'adresse</button>
+        <button type="button" id="for-gps" class="link-btn">Ou avec les coordonnées GPS</button>
     </div>
 
     <div id="address" style="display: none;">
@@ -27,7 +27,7 @@
         {{ form_row(place_create.longitude) }}
     </div>
 
-    {{ form_row(place_create.save) }}
+    {{ form_widget(place_create.save) }}
 
     {{ form_end(place_create) }}
 

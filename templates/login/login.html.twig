@@ -32,10 +32,11 @@
                 <label for="_remember_me">Se souvenir de moi</label>
             </div>
         </div>
-        <button>
+        <button class="link-btn">
             S'identifier
         </button>
 
-        <a href="{{ path('app_forgot_password_request') }}">Mot de passe oublié ?</a>
+        <p><a href="{{ path('app_forgot_password_request') }}">Mot de passe oublié ?</a></p>
+        <p>Pas de compte ? <a href="{{ path('app_register') }}">Inscrivez-vous dès maintenant</a> !</p>
     </form>
 {% endblock %}

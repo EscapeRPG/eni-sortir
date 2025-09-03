@@ -26,6 +26,9 @@ class UserCsvImportType extends AbstractType
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Importer',
+                'attr' => [
+                    'class' => 'link-btn',
+                ]
             ])
         ;
     }

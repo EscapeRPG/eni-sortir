@@ -26,25 +26,25 @@
 <div class="save-btn separator">
     {% if is_granted('ROLE_ADMIN') %}
         <a href="{{ path('app_users_delete', {id: user.id, _token : csrf_token('delete'~user.id)}) }}"
-           onclick="return confirm('Etes vous sûr ?')" class="delete">Supprimer</a>
+           onclick="return confirm('Etes vous sûr ?')" class="delete link-btn">Supprimer</a>
 
         {% if user.isActive == true %}
             <a href="{{ path('app_users_disable', {id: user.id}) }}"
-               onclick="return confirm('Etes vous sûr ?')" class="deactivate">Désactiver</a>
+               onclick="return confirm('Etes vous sûr ?')" class="deactivate link-btn">Désactiver</a>
         {% else %}
             <a href="{{ path('app_users_disable', {id: user.id}) }}"
-               onclick="return confirm('Etes vous sûr ?')" class="activate">Activer</a>
+               onclick="return confirm('Etes vous sûr ?')" class="activate link-btn">Activer</a>
         {% endif %}
 
         {% if user.isAdmin == false %}
-            <a href="{{ path('app_users_promote', {id: user.id}) }}" class="activate">Promouvoir </a>
+            <a href="{{ path('app_users_promote', {id: user.id}) }}" class="activate link-btn">Promouvoir </a>
         {% else %}
-            <a href="{{ path('app_users_promote', {id: user.id}) }}" class="deactivate">Retrograder </a>
+            <a href="{{ path('app_users_promote', {id: user.id}) }}" class="deactivate link-btn">Retrograder </a>
         {% endif %}
 
-        <a href="{{ path('app_users_list') }}" class="return">Retour</a>
+        <a href="{{ path('app_users_list') }}" class="return link-btn">Retour</a>
     {% else %}
-        <a href="{{ path('app_main') }}" class="return">Retour</a>
+        <a href="{{ path('app_main') }}" class="return link-btn">Retour</a>
     {% endif %}
 </div>
 

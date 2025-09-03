@@ -136,13 +136,13 @@ class EventType extends AbstractType
             ->add('saveDraft', SubmitType::class, [
                 'label' => 'Enregistrer pour plus tard',
                 'attr' => [
-                    'class' => 'deactivate'
+                    'class' => 'deactivate link-btn'
                 ]
             ])
             ->add('publish', SubmitType::class, [
                 'label' => 'Ouvrir aux inscriptions',
                 'attr' => [
-                    'class' => 'activate'
+                    'class' => 'activate link-btn'
                 ]
             ]);
         ;

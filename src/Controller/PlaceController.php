@@ -23,7 +23,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/place', name: 'place')]
 final class PlaceController extends AbstractController
 {
-
     #[Route('/create', name: '_create')]
     public function create(Request $request, EntityManagerInterface $em): Response
     {
@@ -60,7 +59,7 @@ final class PlaceController extends AbstractController
 
             return $this->json([
                 'id' => $place->getId(),
-                'name' => $place->getName(), // ou autre champ utile
+                'name' => $place->getName(),
             ]);
         }
 

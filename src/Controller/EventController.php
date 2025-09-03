@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Campus;
 use App\Entity\Event;
+use App\Entity\Group;
 use App\Entity\Place;
 use App\Entity\State;
 use App\Entity\User;
 use App\Form\CancellationReasonType;
 use App\Form\EventType;
 use App\Form\FiltersType;
+use App\Form\GroupType;
 use App\Form\PlaceType;
 use App\Helper\FileUploader;
 use App\Message\SendMailReminder;
@@ -53,8 +55,10 @@ final class EventController extends AbstractController
     {
         $event = new Event();
         $place = new Place();
+        $group = new Group();
 
         $placeForm = $this->createForm(PlaceType::class, $place);
+        $groupForm = $this->createForm(GroupType::class, $group, []);
         $form = $this->createForm(EventType::class, $event, [
             'user' => $user,
             'group_repository' => $groupRepository,
@@ -132,6 +136,7 @@ final class EventController extends AbstractController
         return $this->render('event/create.html.twig', [
             'event_form' => $form,
             'place_form' => $placeForm->createView(),
+            'group_form' => $groupForm->createView(),
         ]);
     }
 

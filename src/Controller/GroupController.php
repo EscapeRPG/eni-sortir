@@ -25,6 +25,8 @@ final class GroupController extends AbstractController
     #[Route('/create', name: '_create')]
     public function create(Request $request, EntityManagerInterface $em, #[CurrentUser]?User $userConnecter): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $group = new Group();
         $form = $this->createForm(GroupType::class, $group);
         $form->handleRequest($request);
@@ -52,8 +54,10 @@ final class GroupController extends AbstractController
      * @throws Exception
      */
     #[Route('/list', name: '_list',requirements: ['page' => '\d+'])]
-    public function list(GroupRepository $groupRepository, ParameterBagInterface $param, #[CurrentUser] ?user $user): Response
+    public function list(GroupRepository $groupRepository, #[CurrentUser] ?user $user): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $userId = $user->getId();
 
         $groups = $groupRepository->findAllMyGroups($userId);
@@ -67,12 +71,20 @@ final class GroupController extends AbstractController
      * @throws Exception
      */
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
-    public function detail(GroupRepository $groupRepository,int $id, ParameterBagInterface $param): Response
+    public function detail(GroupRepository $groupRepository,int $id, #[CurrentUser] $userConnected) : Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $groupDetails = $groupRepository->findGroupDetails($id);
 
         if(!$groupDetails){
-            throw $this->createNotFoundException('Ce groupe n\'existe pas');
+            $this->addFlash('error','Ce groupe n\'existe pas');
+            return $this->redirectToRoute('group_list');
+        }
+
+        if (!$groupDetails->getUserList()->contains($userConnected)) {
+            $this->addFlash('error', 'Vous ne faites pas partie de ce groupe');
+            return $this->redirectToRoute('group_list');
         }
 
         return $this->render('group/detail.html.twig', [

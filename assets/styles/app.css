@@ -47,6 +47,12 @@ body {
             align-items: center;
             gap: 20px;
 
+            .title-nav {
+                display: flex;
+                align-items: baseline;
+                gap: 20px;
+            }
+
             h1 {
                 margin: 0;
             }
@@ -289,6 +295,11 @@ body {
 a {
     text-decoration: none;
     font-weight: bold;
+    color: var(--header-bg-color);
+
+    &:hover {
+        color: var(--a-color-hover);
+    }
 }
 
 .link-btn {
@@ -298,6 +309,7 @@ a {
     text-decoration: none;
     background-color: var(--header-bg-color);
     color: var(--bg-main-color);
+    transform-origin: center;
 
     &:hover {
         background-color: var(--bg-main-color);
@@ -317,7 +329,7 @@ a {
         .swiper {
             width: 100%;
         }
-      
+
         header {
             padding: 5px 40px;
             min-height: 57px;
@@ -342,17 +354,20 @@ a {
                 }
             }
         }
+
         main {
             h2 {
                 margin-bottom: 0;
                 padding-bottom: 0;
             }
+
             h1 {
                 padding-top: 5px;
                 font-size: 1.2em;
                 text-align: center;
             }
         }
+
         .place-title {
             text-align: center;
             font-size: 1.2em;

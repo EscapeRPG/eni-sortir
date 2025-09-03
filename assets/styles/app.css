@@ -24,6 +24,7 @@ body {
     padding: 0;
     overflow-x: hidden;
     color: var(--txt-main-color);
+    font-family: 'Roboto', sans-serif;
 
     &:hover {
         cursor: var(--cursor);

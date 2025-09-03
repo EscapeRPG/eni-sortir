@@ -6,14 +6,12 @@
 
 {% block main %}
     <div class="group-container">
-    <div class="group-detail-container">
     <h2>Liste de mes groupes privés</h2>
-    <ul>
+
         {% for group in groups %}
-                    <a href="{{ path('group_detail', {id:group.id }) }}" class="place-card">
+                    <a href="{{ path('group_detail', {id:group.id }) }}" class="group-card">
                         <h2>{{ group.name }} </h2></a>
         {% endfor %}
-    </ul>
+
 </div>
-    </div>
 {% endblock %}

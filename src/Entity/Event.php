@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SortieRepository::class)]
@@ -72,21 +73,36 @@ class Event
     #[ORM\ManyToOne(targetEntity: Group::class, inversedBy: 'events')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Group $group = null;
+
+    #[Groups("event:read")]
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    #[Groups("event:read")]
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    #[Groups("event:read")]
+    public function getStartingDateHour(): ?\DateTime
+    {
+        return $this->startingDateHour;
+    }
+
+    #[Groups("event:read")]
+    public function getEndDateHour(): ?\DateTime
+    {
+        return $this->endDateHour;
+    }
     public function __construct()
     {
         $this->participants = new ArrayCollection();
     }
 
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
 
     public function setName(string $name): static
     {
@@ -95,10 +111,6 @@ class Event
         return $this;
     }
 
-    public function getStartingDateHour(): ?\DateTime
-    {
-        return $this->startingDateHour;
-    }
 
     public function setStartingDateHour(\DateTime $startingDateHour): static
     {
@@ -107,10 +119,6 @@ class Event
         return $this;
     }
 
-    public function getEndDateHour(): ?\DateTime
-    {
-        return $this->endDateHour;
-    }
 
     public function setEndDateHour(\DateTime $endDateHour): static
     {

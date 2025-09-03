@@ -171,4 +171,24 @@ SQL;
 
         return new Paginator($query);
     }
+
+    public function findActiveEvents(array $excludedStates): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.state NOT IN (:excludedStates)')
+            ->setParameter('excludedStates', $excludedStates)
+            ->orderBy('e.startingDateHour', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findEventsByStateApi(int $stateId): array
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.state = :stateId')
+            ->setParameter('stateId', $stateId)
+            ->orderBy('e.startingDateHour', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

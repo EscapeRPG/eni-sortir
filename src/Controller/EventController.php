@@ -27,6 +27,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -36,17 +37,22 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-
+use OpenApi\Attributes as OA;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Serializer\SerializerInterface; 
+
 #[Route('/event', name: 'event')]
 final class EventController extends AbstractController
 {
 
+    private SerializerInterface $serializer;
 
-    public function __construct(private readonly EntityManagerInterface $entityManager)
+    public function __construct(SerializerInterface $serializer)
     {
+        $this->serializer = $serializer;
     }
-/**
+
+    /**
      * @throws Exception
      * @throws TransportExceptionInterface
      */
@@ -122,7 +128,7 @@ final class EventController extends AbstractController
                     $email = (new Email())
                         ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
                         ->to($member->getEmail())
-                        ->subject('Invitation à un nouvel événement : '.$event->getName())
+                        ->subject('Invitation à un nouvel événement : ' . $event->getName())
                         ->html($this->renderView('email/invitation.html.twig', [
                             'event' => $event,
                             'user' => $member,
@@ -354,7 +360,7 @@ final class EventController extends AbstractController
 
         $event = $sortieRepository->find($id);
         $participants = $sortieRepository->findParticipantsByEvent($event->getId());
-        $user= $userConnected->getId();
+        $user = $userConnected->getId();
 
         if ($event->getState()->getId() !== 2) {
             $this->addFlash('error',"Tu ne peux pas t'inscrire à cet évènement");
@@ -372,7 +378,7 @@ final class EventController extends AbstractController
 
             //insérer l'envoi de mail
 
-            if(!$userConnected->getEmail()) { //si l'adresse n'existe pas ?
+            if (!$userConnected->getEmail()) { //si l'adresse n'existe pas ?
                 $this->addFlash('danger', 'Impossible d\'envoyer un mail, adresse invalide');
                 return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
             }
@@ -386,11 +392,11 @@ final class EventController extends AbstractController
                     'user' => $userConnected,
                     'event' => $event,
                 ]);
-            try{ //pour ne pas bloquer si l'envoi ne fonctionne pas
+            try { //pour ne pas bloquer si l'envoi ne fonctionne pas
                 $mailer->send($email);
             } catch (\Throwable $e) {
                 $this->addFlash('danger', 'Ton inscription est validée mais le mail n\'a pas pu être envoyé');
-                $logger->error('mail error : ' .$e->getMessage()); //logger : stock messages dans des fichiers (log)
+                $logger->error('mail error : ' . $e->getMessage()); //logger : stock messages dans des fichiers (log)
             }
 
 
@@ -402,7 +408,7 @@ final class EventController extends AbstractController
             //pour le mail délai 48h !
 
             $eventId = $event->getId();
-            $delay = ($event->getStartingDateHour()->getTimestamp() - 48*3600 - time()) * 1000;
+            $delay = ($event->getStartingDateHour()->getTimestamp() - 48 * 3600 - time()) * 1000;
             //timestamp renvoie nbr secondes, puis calcul 48h en sec. puis *1000 car messenger att millisecondes
             $delay = max(0, $delay); // pas  négatif
 
@@ -426,7 +432,7 @@ final class EventController extends AbstractController
         EntityManagerInterface $entityManager,
         #[CurrentUser] ?User   $userConnected,
         int                    $id,
-        MailerInterface       $mailer
+        MailerInterface        $mailer
     ): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -554,6 +560,61 @@ final class EventController extends AbstractController
             $this->addFlash('error',"Accès interdit");
             return $this->redirectToRoute('app_main');
         }
+      
+
+    }
+
+    #[Route('/api/events/filterByDate', name: '_api_events', methods: ['GET'])]
+    #[OA\Get(
+        path: '/api/events/filterByDate',
+        description: 'Cette méthode retourne tous les événements ouverts, cloturés et en cours, à l\'exclusion des évènements passés, annulés ou archivés',
+        summary: 'Récupérer tous les événements filtrés par date',
+        responses: [
+            new OA\Response(response: 200, description: 'Liste des événements'),
+            new OA\Response(response: 400, description: 'requête erronée')
+        ]
+    )]
+    public function apiGetEvents(SortieRepository $sortieRepository, Request $request): JsonResponse
+    {
+        $statusToExclude = [1, 5, 6, 7]; // Je retire les états: créée, passée, annulée et archivée
+
+        $events = $sortieRepository->findActiveEvents($statusToExclude);
+
+        $jsonContent = $this->serializer->serialize($events, 'json', ['groups' => 'event:read']);
+
+        return new JsonResponse($jsonContent, 200, [], true);
+    }
+
+#[Route('/api/events/filterByState/{id}', name: '_api_events_filter_by_state', requirements: ['id' => '\d+'], methods: ['GET'])]
+#[OA\Get(
+    path: '/api/events/filterByState/{id}',
+    description: 'Cette méthode retourne les événements en fonction de l\'état spécifié.',
+    summary: 'Récupérer tous les événements par état',
+    parameters: [
+        new OA\Parameter(name: 'id', description: 'ID de l\'état de l\'événement', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+    ],
+    responses: [
+        new OA\Response(response: 200, description: 'Liste des événements correspondant à l\'état filtré'),
+        new OA\Response(response: 400, description: 'État d\'évènement non valide')
+    ]
+)]
+    public function apiGetEventsByState(SortieRepository $sortieRepository, int $id): JsonResponse
+    {
+        $stateIdAuthorized = [2, 3, 4]; // les états que je peux choisir pour mon tri : ouverte, clôturée et en cours
+
+        if (!$id) {
+            return new JsonResponse(['erreur' => 'Il faut préciser un paramètre de tri : état de la sortie'], 400);
+        }
+
+        if (!in_array($id, $stateIdAuthorized, true)) {
+            return new JsonResponse(['erreur' => 'Cet état de sortie n\'est pas valide'], 400);
+        }
+
+        $events = $sortieRepository->findEventsByStateApi($id);
+
+        $jsonContent = $this->serializer->serialize($events, 'json', ['groups' => 'event:read']);
+
+        return new JsonResponse($jsonContent, 200, [], true);
     }
 
 }

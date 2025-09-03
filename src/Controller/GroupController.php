@@ -108,7 +108,13 @@ final class GroupController extends AbstractController
 
     #[Route('/create/modal', name: '_createInModal')]
     public function createInModal(Request $request, EntityManagerInterface $em): Response
-    {
+        {
+            $referer = $request->headers->get('referer');
+            if (!$referer || !str_contains($referer, '/event/create')) {
+                $this->addFlash('error','Accès interdit');
+                return $this->redirectToRoute('event_create');
+            }
+
         $group = new Group();
         $form = $this->createForm(GroupType::class, $group);
         $form->handleRequest($request);

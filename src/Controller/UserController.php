@@ -58,7 +58,7 @@ class UserController extends AbstractController
         FileUploader           $fileUploader,
     ): Response
     {
-        $this->checkUserConnected($userConnected);
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $user = $userRepository->findUserById($id);
 
@@ -119,7 +119,7 @@ class UserController extends AbstractController
         if ($redirect = $this->checkUserAdmin($userConnected))
             {
                 return $redirect;
-            };
+            }
 
         $form = $this->createForm(UserCsvImportType::class);
         $form->handleRequest($request);
@@ -285,7 +285,7 @@ class UserController extends AbstractController
     #[Route('profile/{id}', name: 'app_profile', requirements: ['id' => '\d+'])]
     public function profile(int $id, UserRepository $userRepository, #[CurrentUser] $userConnected): Response
     {
-        $this->checkUserConnected($userConnected);
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $participant = $userRepository->find($id);
         $events = $participant->getEvents();
@@ -317,7 +317,7 @@ class UserController extends AbstractController
         EntityManagerInterface $em
     ): Response
     {
-        $this->checkUserConnected($userConnected);
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $user = $userRepository->findUserById($id);
 
@@ -360,19 +360,13 @@ class UserController extends AbstractController
 
     }
 
-    private function checkUserConnected(#[CurrentUser] ?User $userConnected): void
-    {
-        if (!$userConnected) {
-            throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à cette page');
-        }
-    }
-
-    private function checkUserAdmin(#[CurrentUser] ?User $userConnected): Response
+    private function checkUserAdmin(#[CurrentUser] ?User $userConnected): ?Response
     {
         if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
             $this->addFlash('error','Cette page est réservée aux administrateurs');
             return $this->redirectToRoute('app_main');
         }
+        return null;
     }
 
 }

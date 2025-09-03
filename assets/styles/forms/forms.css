@@ -60,16 +60,17 @@ form {
 
     .event-place {
         flex-direction: row;
+        flex-wrap: wrap;
         align-items: center;
         gap: 10px;
         width: 100%;
 
         select {
-            width: 40%;
+            width: 67%;
         }
 
         div {
-            width: 100%;
+            width: 30%;
         }
     }
 }
@@ -224,8 +225,13 @@ form {
             }
         }
 
-        div {
-            width: 60%;
+        #place-modal, #group-modal {
+            display: none;
+            width: 100%;
+        }
+
+        #group div {
+            width: 100%;
         }
 
         .tag-container {
@@ -240,8 +246,8 @@ form {
             }
 
             .active-tag {
-                background-color: var(--bg-main-color);
-                color: var(--header-bg-color);
+                background-color: var(--bg-main-color) !important;
+                color: var(--header-bg-color) !important;
                 border-bottom: 2px solid var(--header-bg-color);
             }
         }
@@ -266,8 +272,6 @@ form {
         margin: 5px auto;
         padding: 0;
 
-
-
         div {
             width: 95%;
             padding: 7px;
@@ -289,7 +293,6 @@ form {
 
     .events-filters {
         padding: 0;
-
 
         form {
             margin: 0;

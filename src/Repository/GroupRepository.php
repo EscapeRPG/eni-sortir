@@ -35,30 +35,47 @@ SQL;
             ->fetchAllAssociative();
     }
 
+    #todo ancien repository à supprimer?
     /**
      * @throws Exception
      */
-    public function findGroupDetails(int $groupId): array
+    /*public function findGroupDetails(int $groupId): Group
     {
         $sql = <<<SQL
-SELECT 
-    g.id,
-    g.name AS group_name,
-    e.name AS event_name,
-    u.first_name,
-    u.name AS last_name
-FROM `group` g
-LEFT JOIN group_user gu ON gu.group_id = g.id
-LEFT JOIN user u ON gu.user_id = u.id
-LEFT JOIN event e ON g.id = e.group_id
-WHERE g.id = :group_id
-SQL;
+
+            SELECT
+                g.id,
+                g.name AS group_name,
+                e.name AS event_name,
+                u.first_name,
+                u.name AS last_name
+            FROM `group` g
+            LEFT JOIN group_user gu ON gu.group_id = g.id
+            LEFT JOIN user u ON gu.user_id = u.id
+            LEFT JOIN event e ON g.id = e.group_id
+            WHERE g.id = :group_id
+            SQL;
+
         $stmt = $this->getEntityManager()->getConnection();
         return $stmt->prepare($sql)
             ->executeQuery(['group_id' => $groupId])
             ->fetchAllAssociative();
 
+    }*/
+
+    public function findGroupDetails(int $groupId): ?Group
+    {
+        return $this->createQueryBuilder('g')
+            ->leftJoin('g.userList', 'u')
+            ->addSelect('u')
+            ->leftJoin('g.events', 'e')
+            ->addSelect('e')
+            ->where('g.id = :id')
+            ->setParameter('id', $groupId)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
+
 
     /**
      * @throws Exception

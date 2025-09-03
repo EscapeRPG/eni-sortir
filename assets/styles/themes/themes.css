@@ -1,15 +1,18 @@
 .dark-mode {
     --header-bg-color: #101010;
     --other-bg-color: #2b2b2b;
-    --bg-main-color: #222222;
-    --txt-main-color: #ffffff;
-    --event-bg-color: #303030;
-    --a-color: #ffffff;
-    --a-color-hover: #d66718;
+    --bg-main-color: #1a1a1a;
+    --txt-main-color: #f5f5f5;
+    --event-bg-color: #2a2a2a;
+    --a-color: #f5f5f5;
+    --a-color-hover: #ffd280;
     --events-dates-container-bg-color: #1c1c1c;
-    --events-dates-bg-color: #636363;
+    --events-dates-bg-color: #444444;
     --events-a-color: #ff8d1a;
     --events-a-color-hover: #ffffff;
+    --events-color: #f5f5f5;
+    --event-shadow: rgba(0, 0, 168, 0.6);
+
 }
 
 .pochi-pink {

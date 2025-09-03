@@ -178,8 +178,9 @@
         <h2>Bienvenue sur le site de Sortir.com !</h2>
 
         <p>Salut !</p>
+        {% if is_granted('!IS_AUTHENTICATED') %}
         <p>Connectez-vous ou créez un compte pour accéder à nos événements</p>
-
+        {% endif %}
         <div class="swiper mySwiper">
             <div class="swiper-wrapper">
                 <div class="swiper-slide"><img src="{{ asset('slider/GroupeSymfony.jpg') }}" alt=""></div>

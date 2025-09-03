@@ -1,4 +1,4 @@
-.places-container {
+.group-container {
     display: flex;
     flex-direction: column;
     gap: 1.5em;
@@ -6,7 +6,7 @@
     margin: 40px auto;
 }
 
-.places-container h1 {
+.group-container h1 {
     text-align: center;
     font-size: 2em;
     margin-bottom: 20px;
@@ -37,4 +37,3 @@
     position: relative;
     color: #fff;
 }
-

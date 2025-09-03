@@ -59,9 +59,10 @@
                 {% endif %}
             {% endif %}
 
-            {% if event.state.label == 'Annulée' %}
-                <p><b>Raison d'annulation : </b>{{ event.cancellationReason }}</p>
-            {% endif %}
+
+                {% if event.state.label == 'Annulée' %}
+                    <p><b>Raison d'annulation : </b>{{ event.cancellationReason }}</p>
+                {% endif %}
 
 
 

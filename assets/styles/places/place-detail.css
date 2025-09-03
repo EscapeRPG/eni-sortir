@@ -39,9 +39,15 @@
     border-radius: 10px;
     text-decoration: none;
     font-weight: bold;
-    color:var(--events-dates-container-bg-color);
+    color:var(--txt-main-color);
     background-color: var(--events-a-color);
     transition: background-color 0.3s ease, transform 0.2s ease;
+    &:hover {
+
+        background-color: var(--a-color-hover);
+        color:var(--other-bg-color);
+        transform: scale(1.05);
+    }
 }
 
 
@@ -54,7 +60,7 @@
 }
 
 .place-detail-frame{
-    background-color: var(--events-dates-container-bg-color);
+    background-color: var(--event-bg-color);
     border-radius : 20px;
     padding : 30px;
     max-width : 900px;
@@ -62,7 +68,7 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    color: #333;
+    color: var(--txt-main-color);
 }
 
 

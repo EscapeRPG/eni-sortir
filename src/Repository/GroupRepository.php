@@ -46,7 +46,9 @@ SELECT
     g.name AS group_name,
     e.name AS event_name,
     u.first_name,
-    u.name AS last_name
+    u.name AS last_name,
+    u.profil_picture AS profil_picture
+
 FROM `group` g
 LEFT JOIN group_user gu ON gu.group_id = g.id
 LEFT JOIN user u ON gu.user_id = u.id

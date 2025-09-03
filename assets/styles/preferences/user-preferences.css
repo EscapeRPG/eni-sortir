@@ -13,7 +13,7 @@
 
         &:hover {
             background-color: var(--bg-main-color);
-            color: var(--header-bg-color);
+            color: var(--a-color);
         }
     }
 
@@ -37,13 +37,13 @@
 
         button:hover {
             background-color: var(--bg-main-color);
-            color: var(--header-bg-color);
+            color: var(--a-color);
             border-bottom: 2px solid var(--header-bg-color);
         }
 
         .active-tag {
             background-color: var(--bg-main-color);
-            color: var(--header-bg-color);
+            color: var(--a-color);
             border-bottom: 2px solid var(--header-bg-color);
         }
     }

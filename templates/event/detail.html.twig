@@ -43,7 +43,7 @@
             {% endif %}
         {% endfor %}
 
-
+        <div class="detail-links">
         {% if event.state.label == 'Ouverte' %}
             {% if not found %}
                 <a href="{{ path('event_join', { id: event.id }) }}">S'inscrire</a>
@@ -61,7 +61,7 @@
 
 
         {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
-            <div class="detail-links">
+
                 <a href="{{ path('event_edit', { id: event.id}) }}" class="link-btn"> Éditez votre sortie </a>
                 <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}"
                    onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')" class="link-btn delete"> Supprimez votre
@@ -101,7 +101,8 @@
             {% for participant in participants %}
                 <a href="{{ path('app_profile', {id: participant.id}) }}"><img
                             src="{{ asset('uploads/users/' ~ participant.profil_picture) }}"
-                            alt="Image de {{ participant.first_name }}" class="link-btn"></a>
+                            alt="Image de {{ participant.first_name }}" class="link-btn">
+                    <p>{{ participant.first_name }}</p></a>
 
             {% endfor %}
         </div>

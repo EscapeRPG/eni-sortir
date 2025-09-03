@@ -43,6 +43,7 @@
             {% endif %}
         {% endfor %}
 
+
         {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
             <div class="detail-links">
                 {% if event.state.label == 'Ouverte' %}
@@ -57,11 +58,16 @@
                     {% endif %}
                 {% endif %}
 
+
                 {% if event.state.label == 'Annulée' %}
                     <p><b>Raison d'annulation : </b>{{ event.cancellationReason }}</p>
                 {% endif %}
 
+
+        {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
+
                 <a href="{{ path('event_edit', { id: event.id}) }}" class="link-btn">Éditer</a>
+
                 <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}"
                    onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')" class="link-btn delete">Supprimer</a>
 
@@ -100,7 +106,8 @@
             {% for participant in participants %}
                 <a href="{{ path('app_profile', {id: participant.id}) }}"><img
                             src="{{ asset('uploads/users/' ~ participant.profil_picture) }}"
-                            alt="Image de {{ participant.first_name }}" class="link-btn"></a>
+                            alt="Image de {{ participant.first_name }}" class="link-btn">
+                    <p>{{ participant.first_name }}</p></a>
 
             {% endfor %}
         </div>

@@ -18,17 +18,19 @@
 .event-detail-container h1 {
     font-size: 2em;
     margin-bottom: 10px;
-    color: var(--events-a-color);
+    color: var(--txt-main-color);
 }
 
 .event-detail-container h3 {
     margin-bottom: 10px;
-    color: var(--events-a-color);
+    color: var(--txt-main-color);
 }
 
 .event-detail-container p {
     font-size: 1em;
     margin: 5px 0;
+    color: var(--txt-main-color);
+
 }
 
 .event-detail-container .detail-links {
@@ -43,6 +45,20 @@
     width: 20%;
     padding: 10px 20px;
     border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    color: var(--a-color);
+    background-color: var(--events-a-color);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+
+    &:hover {
+
+        background-color: var(--a-color-hover);
+        color:var(--other-bg-color);
+        transform: scale(1.05);
+    }
+
 }
 
 .event-detail-container iframe {
@@ -54,8 +70,8 @@
 }
 
 .participants-list {
+    max-width: 40%;
     display: flex;
-    flex-wrap: wrap;
     gap: 10px;
     margin-top: 20px;
 }

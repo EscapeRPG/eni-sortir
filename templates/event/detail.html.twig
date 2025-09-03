@@ -65,7 +65,6 @@
 
 
         {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
-
                 <a href="{{ path('event_edit', { id: event.id}) }}" class="link-btn">Éditer</a>
 
                 <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}"
@@ -100,7 +99,6 @@
             </iframe>
         {% endif %}
 
-
         <h3>Liste des participants : </h3>
         <div class="participants-list">
             {% for participant in participants %}
@@ -108,7 +106,6 @@
                             src="{{ asset('uploads/users/' ~ participant.profil_picture) }}"
                             alt="Image de {{ participant.first_name }}" class="link-btn">
                     <p>{{ participant.first_name }}</p></a>
-
             {% endfor %}
         </div>
     </div>

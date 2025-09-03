@@ -6,19 +6,19 @@
 
 {% block main %}
 
-    <h1>Détail du groupe : {{ groupDetails[0].group_name }}</h1>
+    <h1>Détail du groupe : {{ groupDetails.name }}</h1>
 
     <h2>Événement associé :</h2>
-    {% if groupDetails[0].event_name is not null %}
-        <p>{{ groupDetails[0].event_name }}</p>
+    {% if groupDetails.name is not null %}
+        <p>{{ groupDetails.name }}</p>
     {% else %}
         <p><em>Pas d’événement associé pour l’instant.</em></p>
     {% endif %}
 
     <h2>Membres du groupe :</h2>
     <ul>
-        {% for member in groupDetails %}
-            <li>{{ member.first_name }} {{ member.last_name }}</li>
+        {% for member in groupDetails.userList %}
+            <li>{{ member.firstName }} {{ member.name }}</li>
         {% endfor %}
     </ul>
 

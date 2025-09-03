@@ -22,3 +22,6 @@
 
 .idea
 
+.env
+.env.test
+

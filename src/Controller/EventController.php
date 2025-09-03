@@ -149,9 +149,11 @@ final class EventController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
-    public function edit(Event $event, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
+    public function edit(Event $event, Request $request, #[CurrentUser] $userConnected, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
-        if ($redirect = $this->checkStatusUser($event, $security))
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        if ($redirect = $this->checkStatusUser($event, $userConnected))
         {
            return $redirect;
         };
@@ -534,9 +536,9 @@ final class EventController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
-    public function delete(Event $event, Request $request, EntityManagerInterface $em, Security $security): Response
+    public function delete(Event $event, Request $request, #[CurrentUser] $userConnected, EntityManagerInterface $em, Security $security): Response
     {
-        if ($redirect = $this->checkStatusUser($event, $security))
+        if ($redirect = $this->checkStatusUser($event, $userConnected))
         {
             return $redirect;
         };
@@ -554,15 +556,7 @@ final class EventController extends AbstractController
         return $this->redirectToRoute('event_list');
     }
 
-    private function checkStatusUser(Event $event, Security $security): Response
-    {
-        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
-            $this->addFlash('error',"Accès interdit");
-            return $this->redirectToRoute('app_main');
-        }
-      
 
-    }
 
     #[Route('/api/events/filterByDate', name: '_api_events', methods: ['GET'])]
     #[OA\Get(
@@ -616,5 +610,12 @@ final class EventController extends AbstractController
 
         return new JsonResponse($jsonContent, 200, [], true);
     }
-
+    private function checkStatusUser(Event $event, #[CurrentUser] ?User $userConnected): ?Response
+    {
+        if ($event->getOrganizer() !== $userConnected && !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('error',"Accès interdit");
+            return $this->redirectToRoute('app_main');
+        }
+        return null;
+    }
 }

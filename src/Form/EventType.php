@@ -43,7 +43,7 @@ class EventType extends AbstractType
             'label' => 'Définir un groupe privé (optionnel)',
             'required' => false,
             'choice_label' => 'name',
-            'placeholder' => '-- Garder cet évènement public --',
+            'placeholder' => '-- Garder cet événement public --',
             'attr' => ['id' => 'groupSelect'],
             'query_builder' => fn() => $groupRepository->findGroupsOfUserConnected($userId),
         ])
@@ -61,7 +61,7 @@ class EventType extends AbstractType
 
 
             ->add('name', TextType::class, [
-                'label' => 'Nom de l\'evènement',
+                'label' => 'Nom de l\'événement',
                 'required' => true,
             ])
             ->add('startingDateHour', DateTimeType::class, [
@@ -93,7 +93,7 @@ class EventType extends AbstractType
                     'rows' => 10,
                 ]
             ])
-            /*la personne qui crée l'évènement est l'oganisateur, à ajouter*/
+            /*la personne qui crée l'événement est l'oganisateur, à ajouter*/
 
 //            ->add('state', EntityType::class, [
 //                'placeholder'=>'--Choisir un "état--',

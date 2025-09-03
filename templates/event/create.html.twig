@@ -4,7 +4,7 @@
 
 {% block main %}
     <div data-controller="modals">
-        <h2> Créez votre évènement</h2>
+        <h2> Créez votre événement</h2>
         <div class="author">
             <p>
                 Créé par {{ app.user.firstName }}
@@ -18,7 +18,7 @@
 {#        @TODO à voir si on supprime#}
         {#    {{ form_row(event_form.groupePrive) }}#}
         {{ form_row(event_form.group) }}
-        <a class="create-group-link-responsive" id="group-create-link" href="{{ path('group_create') }}">ou Créer un groupe privé pour cet évènement</a>
+        <a class="create-group-link-responsive" id="group-create-link" href="{{ path('group_create') }}">ou Créer un groupe privé pour cet événement</a>
         {{ form_row(event_form.startingDateHour) }}
         {{ form_row(event_form.endDateHour) }}
         {{ form_row(event_form.nbInscriptionsMax) }}

@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{{ asset('styles/preferences/user-preferences.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/user/user.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/user/list.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/events/event.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/events/event-list.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
@@ -83,17 +84,46 @@
                     </li>
                 </ul>
                 <ul>
-                    <li><a href="{{ path('event_list') }}">Liste des événements</a></li>
-                    <li><a href="{{ path('event_create') }}">Créer un événement</a></li>
+                    <li>
+                        <a href="{{ path('event_list') }}">
+                            {{ ux_icon('tabler:layout-list') }}
+                            Liste des événements
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('event_create') }}">
+                            {{ ux_icon('tabler:browser-plus') }}
+                            Créer un événement
+                        </a>
+                    </li>
                 </ul>
                 <ul>
-                    <li><a href="{{ path('place_list') }}">Liste des lieux de sortie</a></li>
-                    <li><a href="{{ path('place_create') }}">Créer un lieu de sortie</a></li>
+                    <li>
+                        <a href="{{ path('place_list') }}">
+                            {{ ux_icon('tabler:layout-list') }}
+                            Liste des lieux de sortie
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('place_create') }}">
+                            {{ ux_icon('tabler:map-pin-plus') }}
+                            Créer un lieu de sortie
+                        </a>
+                    </li>
 
                 </ul>
                 <ul>
-                    <li><a href="{{ path('group_list') }}">Liste de mes groupes privés</a></li>
-                    <li><a href="{{ path('group_create') }}">Créer un groupe privé</a></li>
+                    <li>
+                        <a href="{{ path('group_list') }}">
+                            {{ ux_icon('tabler:layout-list') }}
+                            Liste de mes groupes privés
+                        </a>
+                    </li>
+                    <li><a href="{{ path('group_create') }}">
+                            {{ ux_icon('tabler:users-plus') }}
+                            Créer un groupe privé
+                        </a>
+                    </li>
 
                 </ul>
 
@@ -116,8 +146,18 @@
 
             {% if is_granted('ROLE_ADMIN') %}
                 <ul>
-                    <li><a href="{{ path('app_users_list') }}">Liste des utilisateurs</a></li>
-                    <li><a href="{{ path('app_register') }}">Ajouter un utilisateur</a></li>
+                    <li>
+                        <a href="{{ path('app_users_list') }}">
+                            {{ ux_icon('tabler:layout-list') }}
+                            Liste des utilisateurs
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('app_register') }}">
+                            {{ ux_icon('tabler:user-plus') }}
+                            Ajouter un utilisateur
+                        </a>
+                    </li>
                 </ul>
             {% endif %}
         </div>
@@ -136,7 +176,6 @@
         <h2>Bienvenue sur le site de Sortir.com !</h2>
 
         <p>Salut !</p>
-
         <p>Connectez-vous ou créez un compte pour accéder à nos événements</p>
 
         <div class="swiper mySwiper">

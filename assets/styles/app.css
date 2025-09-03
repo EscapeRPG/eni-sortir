@@ -1,21 +1,21 @@
 :root {
     --header-bg-color: #3d86e1;
-    --other-bg-color: #b9e1ff;
+    --other-bg-color: #8ed7ff;
     --bg-main-color: #fff8f3;
     --txt-main-color: #114565;
     --event-bg-color: #ffffff;
     --a-color: #ffffff;
     --a-color-hover: #114565;
     --event-shadow: rgba(20, 115, 168, 0.6);
-    --events-dates-container-bg-color: #c3f1ff;
+    --events-dates-container-bg-color: #d3faff;
     --events-dates-bg-color: #8ed7ff;
-    --events-a-color: #8eddff;
-    --events-a-color-hover: #5fc7ff;
+    --events-a-color: #37baed;
+    --events-a-color-hover: #147cb1;
     --events-color: #2e5268;
     --green: #89df45;
     --orange: #f67749;
     --red: #f64949;
-    --margin-top: 67px;
+    --margin-top: 81px;
 }
 
 body {
@@ -244,35 +244,80 @@ body {
     text-align: center;
 }
 
+.delete, .activate, .deactivate, .return {
+    width: 20%;
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: var(--a-color);
+    text-decoration: none;
+
+    &:hover {
+        background-color: var(--a-color) !important;
+        color: var(--header-bg-color) !important;
+        text-decoration: underline;
+    }
+}
+
+.delete {
+    background-color: var(--red) !important;
+
+    &:hover {
+        color: var(--red) !important;
+    }
+}
+
+.activate {
+    background-color: var(--green) !important;
+
+    &:hover {
+        color: var(--green) !important;
+    }
+}
+
+.deactivate {
+    background-color: var(--orange) !important;
+
+    &:hover {
+        color: var(--orange) !important;
+    }
+}
+
+.return {
+    background-color: var(--events-a-color);
+}
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link-btn {
+    margin: 10px auto;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    text-decoration: none;
+    background-color: var(--header-bg-color);
+    color: var(--bg-main-color);
+
+    &:hover {
+        background-color: var(--bg-main-color);
+        color: var(--header-bg-color);
+        box-shadow: 5px 5px 5px var(--event-shadow);
+        transform: scale(1.05);
+    }
+}
+
 @media (max-width: 430px) {
 
     .nav-responsive {
         display: none;
     }
+
     body {
         .swiper {
             width: 100%;
         }
-    }
-
-}
-
-.alert {
-    padding: 10px;
-    text-align: center;
-}
-
-.link-btn {
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    text-align: center;
-
-    &:hover {
-        background-color: var(--a-color-hover);
-        transform: scale(1.05);
-    }
-}
-
-    body {
+      
         header {
             padding: 5px 40px;
             min-height: 57px;
@@ -314,5 +359,4 @@ body {
             padding-top: 10px;
         }
     }
-
-
+}

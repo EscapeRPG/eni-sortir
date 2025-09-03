@@ -116,7 +116,7 @@ final class EventController extends AbstractController
                     $email = (new Email())
                         ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
                         ->to($member->getEmail())
-                        ->subject('Invitation à un nouvel évènement : '.$event->getName())
+                        ->subject('Invitation à un nouvel événement : '.$event->getName())
                         ->html($this->renderView('email/invitation.html.twig', [
                             'event' => $event,
                             'user' => $member,
@@ -126,7 +126,7 @@ final class EventController extends AbstractController
                 }
             }
 
-            $this->addFlash('success', 'Évènement crée !');
+            $this->addFlash('success', 'Événement crée !');
             return $this->redirectToRoute('event_list');
         }
         return $this->render('event/create.html.twig', [
@@ -155,7 +155,7 @@ final class EventController extends AbstractController
             //$event->setPosterFile($name);
 
             $em->flush();
-            $this->addFlash('success', 'Évènement édité!');
+            $this->addFlash('success', 'Événement édité!');
             return $this->redirectToRoute('event_list', ['id' => $event->getId()]);
         }
 
@@ -281,7 +281,7 @@ final class EventController extends AbstractController
 
 
         if (!$event) {
-            throw $this->createNotFoundException('Cet évènement n\'existe pas');
+            throw $this->createNotFoundException('Cet événement n\'existe pas');
         }
 
         $participants = $sortieRepository->findParticipantsByEvent($event->getId());
@@ -340,7 +340,7 @@ final class EventController extends AbstractController
         $user= $userConnected->getId();
 
         if ($event->getState()->getId() !== 2) {
-            throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet évènement");
+            throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet événement");
         }
 
         $nbParticipants = count($participants);
@@ -362,7 +362,7 @@ final class EventController extends AbstractController
             $email = (new TemplatedEmail())
                 ->from('no-reply@eni-sortir.fr')
                 ->to($userConnected->getEmail())
-                ->subject('Confirmation d\'inscription à l\'évènement ' . $event->getName())
+                ->subject('Confirmation d\'inscription à l\'événement ' . $event->getName())
                 ->htmlTemplate('email/join.html.twig')
                 ->context([
                     'user' => $userConnected,
@@ -376,7 +376,7 @@ final class EventController extends AbstractController
             }
 
 
-            $this->addFlash('success', 'Vous êtes inscrit à l\'évènement ! Un mail de confirmation va vous être envoyé');
+            $this->addFlash('success', 'Vous êtes inscrit à l\'événement ! Un mail de confirmation va vous être envoyé');
 
             $this->closeIfFullParticipants($stateRepository, $sortieRepository, $event->getId(), $bag, $entityManager);
 
@@ -435,7 +435,7 @@ final class EventController extends AbstractController
                 $email = (new TemplatedEmail())
                     ->from('no-reply@eni-sortir.fr')
                     ->to($userConnected->getEmail())
-                    ->subject('Confirmation de désinscription à l\'évènement ' . $event->getName())
+                    ->subject('Confirmation de désinscription à l\'événement ' . $event->getName())
                     ->htmlTemplate('email/withdraw.html.twig')
                     ->context([
                         'user' => $userConnected,
@@ -444,7 +444,7 @@ final class EventController extends AbstractController
                 $mailer->send($email);
 
 
-                $this->addFlash('success', 'Vous vous êtes désinscrit de l\'évènement. Un mail de conformation va vous être envoyé');
+                $this->addFlash('success', 'Vous vous êtes désinscrit de l\'événement. Un mail de conformation va vous être envoyé');
 
                 $found = true;
                 break;
@@ -452,7 +452,7 @@ final class EventController extends AbstractController
         }
 
         if (!$found) {
-            $this->addFlash('danger', "Tu n'es pas inscrit à cet évènement");
+            $this->addFlash('danger', "Tu n'es pas inscrit à cet événement");
         }
 
         return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
@@ -511,7 +511,7 @@ final class EventController extends AbstractController
             $em->remove($event);
             $em->flush();
 
-            $this->addFlash('success', 'Évènement supprimé !');
+            $this->addFlash('success', 'Événement supprimé !');
         } else {
             $this->addFlash('danger', 'Suppression impossible !');
 
@@ -523,7 +523,7 @@ final class EventController extends AbstractController
     {
 
         if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet évènement");
+            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet événement");
         }
 
 

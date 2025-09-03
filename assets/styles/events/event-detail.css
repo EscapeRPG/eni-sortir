@@ -85,7 +85,7 @@
 }
 
 .event-detail-frame{
-    background-color: var(--events-a-color);
+    background-color: var(--event-bg-color);
     border-radius : 20px;
     padding : 30px;
     max-width : 900px;
@@ -95,6 +95,3 @@
     gap: 20px;
     color: #333;
 }
-
-
-

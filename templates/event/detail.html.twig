@@ -10,9 +10,9 @@
 
 {% block main %}
     <div class="event-detail-container">
-        <img src="{{ asset('uploads/events/' ~ event.posterFile) }}" alt="image de l'évènement">
+        <img src="{{ asset('uploads/events/' ~ event.posterFile) }}" alt="image de l'événement">
 
-        <h1>Détail de l'évènement : {{ event.name }}</h1>
+        <h1>Détail de l'événement : {{ event.name }}</h1>
 
         <div class="event-detail-frame">
             {% if event.organizer %}
@@ -64,15 +64,15 @@
             <div class="detail-links">
                 <a href="{{ path('event_edit', { id: event.id}) }}" class="link-btn"> Éditez votre sortie </a>
                 <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}"
-                   onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')" class="link-btn"> Supprimez votre
+                   onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')" class="link-btn delete"> Supprimez votre
                     sortie </a>
                 {% if event.state.label != 'Annulée' %}
-                    <a href="{{ path('event_cancel', {id:event.id}) }}" class="link-btn"> Annulez votre event </a>
+                    <a href="{{ path('event_cancel', {id:event.id}) }}" class="link-btn deactivate"> Annulez votre event </a>
                 {% endif %}
 
                 {% if event.organizer %}
                     {% if event.state.label == 'Annulée' %}
-                        <a href="{{ path('event_reactivate', {id:event.id}) }}" class="link-btn"> Réactivez votre sortie </a>
+                        <a href="{{ path('event_reactivate', {id:event.id}) }}" class="link-btn activate"> Réactivez votre sortie </a>
                     {% endif %}
                 {% endif %}
             </div>
@@ -90,7 +90,6 @@
 
         {# si on a des coordonnées GPS #}
         {% if event.place.latitude is not null and event.place.longitude is not null %}
-
             <iframe src="https://maps.google.com/maps?q={{ event.place.latitude }},{{ event.place.longitude }}&amp;output=embed"
                     allowfullscreen loading="lazy">
             </iframe>

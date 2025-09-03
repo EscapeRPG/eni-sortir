@@ -1,25 +1,47 @@
 import { Controller } from '@hotwired/stimulus';
 export default class extends Controller {
-    static targets=["modal", "button", "name", "street", "postalCode", "city", "latitude", "longitude", "form"];
+    static targets=["modal", "place", "group"];
 
     connect() {
         this.outsideClick = this.outsideClick.bind(this);
     }
 
-    showModal(event) {
+    showPlaceModal(event) {
         event.stopPropagation();
-        const modal = document.getElementById("modal-container");
+        const modal = document.getElementById("modal-container"),
+            placeModal = document.getElementById('place-modal'),
+            groupModal = document.getElementById('group-modal');
 
         modal.style.display = "flex";
+        placeModal.style.display = "block";
+        groupModal.style.display = "none";
+
+        document.addEventListener('click', this.outsideClick);
+        document.body.style.overflow = "hidden";
+    }
+
+    showGroupModal(event) {
+        event.stopPropagation();
+        const modal = document.getElementById("modal-container"),
+            placeModal = document.getElementById('place-modal'),
+            groupModal = document.getElementById('group-modal');
+
+        modal.style.display = "flex";
+        placeModal.style.display = "none";
+        groupModal.style.display = "block";
 
         document.addEventListener('click', this.outsideClick);
         document.body.style.overflow = "hidden";
     }
 
     closeModal() {
-        const modal = document.getElementById("modal-container");
+        const modal = document.getElementById("modal-container"),
+            placeModal = document.getElementById('place-modal'),
+            groupModal = document.getElementById('group-modal');
 
         modal.style.display = "none";
+        placeModal.style.display = "none";
+        groupModal.style.display = "none";
 
         document.removeEventListener('click', this.outsideClick);
         document.body.style.overflow = "";
@@ -43,10 +65,10 @@ export default class extends Controller {
     async sendPlace(event) {
         event.preventDefault();
 
-        const placeData = new FormData(this.formTarget);
+        const placeData = new FormData(this.placeTarget);
 
         try {
-            const response = await fetch(this.formTarget.action, {
+            const response = await fetch(this.placeTarget.action, {
                 method: 'POST',
                 body: placeData
             });
@@ -66,7 +88,43 @@ export default class extends Controller {
             select.add(option, undefined);
 
             // Reset le formulaire
-            this.formTarget.reset();
+            this.placeTarget.reset();
+
+        } catch (error) {
+            console.error("Erreur AJAX :", error);
+            alert("Une erreur est survenue.");
+        }
+
+        this.closeModal();
+    }
+
+    async sendGroup(event) {
+        event.preventDefault();
+
+        const groupData = new FormData(this.groupTarget);
+
+        try {
+            const response = await fetch(this.groupTarget.action, {
+                method: 'POST',
+                body: groupData
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                alert("Erreur : " + data.errors);
+                return;
+            }
+
+            const place = await response.json();
+
+            // Met à jour le champ "event_form.place"
+            const select = document.getElementById('event_group'),
+                option = new Option(place.name, place.id, true, true);
+
+            select.add(option, undefined);
+
+            // Reset le formulaire
+            this.groupTarget.reset();
 
         } catch (error) {
             console.error("Erreur AJAX :", error);
@@ -77,7 +135,7 @@ export default class extends Controller {
     }
 
     outsideClick(event) {
-        if (!this.modalTarget.contains(event.target) && !this.buttonTarget.contains(event.target)) {
+        if (!this.modalTarget.contains(event.target)) {
             this.closeModal();
         }
     }

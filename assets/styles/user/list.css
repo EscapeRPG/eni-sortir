@@ -49,11 +49,12 @@
 #filters {
     display: flex;
     flex-direction: row;
-    align-items: flex-end;
+    align-items: center;
+    justify-content: space-evenly;
     background-color: var(--other-bg-color);
     padding: 0 20px;
     margin: 0;
-    width: 100%;
+    width: calc(100% - 40px);
     border-radius: 0;
 
     div {
@@ -62,5 +63,6 @@
 
     button {
         min-height: 3em;
+        margin: 0;
     }
 }

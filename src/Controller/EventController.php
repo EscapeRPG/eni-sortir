@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Campus;
 use App\Entity\Event;
+use App\Entity\Group;
 use App\Entity\Place;
 use App\Entity\State;
 use App\Entity\User;
 use App\Form\CancellationReasonType;
 use App\Form\EventType;
 use App\Form\FiltersType;
+use App\Form\GroupType;
 use App\Form\PlaceType;
 use App\Helper\FileUploader;
 use App\Message\SendMailReminder;
@@ -37,8 +39,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Serializer\SerializerInterface;
-//use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface; 
 
 #[Route('/event', name: 'event')]
 final class EventController extends AbstractController
@@ -56,12 +57,16 @@ final class EventController extends AbstractController
      * @throws TransportExceptionInterface
      */
     #[Route('/create', name: '_create')]
-    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, Security $security, GroupRepository $groupRepository, MailerInterface $mailer): Response
+    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, GroupRepository $groupRepository, MailerInterface $mailer): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $event = new Event();
         $place = new Place();
+        $group = new Group();
 
         $placeForm = $this->createForm(PlaceType::class, $place);
+        $groupForm = $this->createForm(GroupType::class, $group, []);
         $form = $this->createForm(EventType::class, $event, [
             'user' => $user,
             'group_repository' => $groupRepository,
@@ -139,13 +144,17 @@ final class EventController extends AbstractController
         return $this->render('event/create.html.twig', [
             'event_form' => $form,
             'place_form' => $placeForm->createView(),
+            'group_form' => $groupForm->createView(),
         ]);
     }
 
     #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
     public function edit(Event $event, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
-        $this->checkStatusUser($event, $security);
+        if ($redirect = $this->checkStatusUser($event, $security))
+        {
+           return $redirect;
+        };
 
         $form = $this->createForm(EventType::class, $event);
         $placeForm = $this->createForm(PlaceType::class, new Place());
@@ -186,6 +195,8 @@ final class EventController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $limit = $bag->get('event')['nb_max'];
         $offset = ($page - 1) * $limit;
 
@@ -281,14 +292,17 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
-    public function detail(SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, #[CurrentUser] ?User $userConnected): Response
+    public function detail(SortieRepository $sortieRepository, int $id, #[CurrentUser] ?User $userConnected): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $event = $sortieRepository->find($id);
         $userConnectedId = $userConnected->getId();
 
 
         if (!$event) {
-            throw $this->createNotFoundException('Cet événement n\'existe pas');
+            $this->addFlash('error','Cet évènement n\'existe pas');
+            return $this->redirectToRoute('event_list');
         }
 
         $participants = $sortieRepository->findParticipantsByEvent($event->getId());
@@ -305,7 +319,7 @@ final class EventController extends AbstractController
      * @throws Exception
      */
 
-    public function closeIfFullParticipants(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
+    public function closeIfFullParticipants(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, EntityManagerInterface $entityManager): void
     {
         $event = $sortieRepository->find($id);
         $participants = $sortieRepository->findParticipantsByEvent($event->getId());
@@ -321,7 +335,8 @@ final class EventController extends AbstractController
         }
     }
 
-    public function closeIfOutDate(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager): void
+    #todo non utilisé à supprimer?
+    /*public function closeIfOutDate(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, EntityManagerInterface $entityManager): void
     {
         $event = $sortieRepository->find($id);
         $today = new \DateTime();
@@ -333,7 +348,7 @@ final class EventController extends AbstractController
             $entityManager->persist($event);
             $entityManager->flush();
         }
-    }
+    }*/
 
     /**
      * @throws Exception
@@ -341,13 +356,15 @@ final class EventController extends AbstractController
     #[Route('/join/{id}', name: '_join', requirements: ['id' => '\d+'])]
     public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager, MailerInterface $mailer, LoggerInterface $logger, MessageBusInterface $bus): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $event = $sortieRepository->find($id);
         $participants = $sortieRepository->findParticipantsByEvent($event->getId());
         $user = $userConnected->getId();
 
         if ($event->getState()->getId() !== 2) {
-            throw $this->createAccessDeniedException("Tu ne peux pas t'inscrire à cet événement");
+            $this->addFlash('error',"Tu ne peux pas t'inscrire à cet évènement");
+            return $this->redirectToRoute('event_list');
         }
 
         $nbParticipants = count($participants);
@@ -418,6 +435,8 @@ final class EventController extends AbstractController
         MailerInterface        $mailer
     ): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $event = $sortieRepository->find($id);
         if (!$event) {
             $this->addFlash('danger', "Événement introuvable.");
@@ -469,7 +488,10 @@ final class EventController extends AbstractController
     #[Route ('/cancel/{id}', name: '_cancel', requirements: ['id' => '\d+'])]
     public function cancel(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository, Request $request): Response
     {
-        $this->checkStatusUser($event, $security);
+        if ($redirect = $this->checkStatusUser($event, $security))
+        {
+            return $redirect;
+        };
 
         $form = $this->createForm(CancellationReasonType::class, $event);
         $form->handleRequest($request);
@@ -495,7 +517,10 @@ final class EventController extends AbstractController
     #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
     public function reactivate(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
     {
-        $this->checkStatusUser($event, $security);
+        if ($redirect = $this->checkStatusUser($event, $security))
+        {
+            return $redirect;
+        };
 
         $reac = $stateRepository->findOneBy(['label' => 'Ouverte']);
         if (!$reac) {
@@ -511,8 +536,11 @@ final class EventController extends AbstractController
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
     public function delete(Event $event, Request $request, EntityManagerInterface $em, Security $security): Response
     {
+        if ($redirect = $this->checkStatusUser($event, $security))
+        {
+            return $redirect;
+        };
 
-        $this->checkStatusUser($event, $security);
         if ($this->isCsrfTokenValid('delete' . $event->getId(), $request->get('token'))) {
 
             $em->remove($event);
@@ -526,12 +554,13 @@ final class EventController extends AbstractController
         return $this->redirectToRoute('event_list');
     }
 
-    private function checkStatusUser(Event $event, Security $security): void
+    private function checkStatusUser(Event $event, Security $security): Response
     {
-
         if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException("Tu n'es pas l'organisateur de cet événement");
+            $this->addFlash('error',"Accès interdit");
+            return $this->redirectToRoute('app_main');
         }
+      
 
     }
 
@@ -587,4 +616,5 @@ final class EventController extends AbstractController
 
         return new JsonResponse($jsonContent, 200, [], true);
     }
+
 }

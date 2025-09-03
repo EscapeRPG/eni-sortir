@@ -4,3 +4,38 @@
 .select2-selection__choice__remove {
     margin:0;
 }
+
+.select2-container .select2-selection--multiple {
+    display: flex;
+    flex-direction: column;
+    border: none;
+
+    ul {
+        border-bottom: 1px solid var(--txt-main-color);
+        margin: 0;
+        padding: 10px 0;
+
+        li {
+            margin: .2em;
+            border: none !important;
+            background-color: transparent !important;
+
+            button {
+                background-color: var(--bg-main-color) !important;
+
+                &:hover {
+                    background-color: var(--red) !important;
+
+                    span {
+                        color: var(--bg-main-color);
+                    }
+                }
+
+                span {
+                    background-color: transparent !important;
+                    color: var(--red);
+                }
+            }
+        }
+    }
+}

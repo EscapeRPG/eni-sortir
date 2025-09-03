@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -57,6 +58,8 @@ class UserController extends AbstractController
         FileUploader           $fileUploader,
     ): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $user = $userRepository->findUserById($id);
 
         if ($userConnected === $user || in_array('ROLE_ADMIN', $userConnected->getRoles(), true)) {
@@ -113,10 +116,10 @@ class UserController extends AbstractController
         int $page
     ): Response
     {
-        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
-            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
-            return $this->redirectToRoute('app_main');
-        }
+        if ($redirect = $this->checkUserAdmin($userConnected))
+            {
+                return $redirect;
+            }
 
         $form = $this->createForm(UserCsvImportType::class);
         $form->handleRequest($request);
@@ -184,10 +187,10 @@ class UserController extends AbstractController
     #[Route('users/delete/{id}', name: 'app_users_delete', requirements: ['id' => '\d+'])]
     public function deleteUser(Request $request, User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
     {
-        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
-            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
-            return $this->redirectToRoute('app_main');
-        }
+        if ($redirect = $this->checkUserAdmin($userConnected))
+        {
+            return $redirect;
+        };
 
         if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->get('_token'))) {
             $cancelState = $em->getRepository(State::class)->findOneBy(['label' => 'Annulée']);
@@ -214,10 +217,10 @@ class UserController extends AbstractController
     #[Route('users/disable/{id}', name: 'app_users_disable', requirements: ['id' => '\d+'])]
     public function disableUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
     {
-        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
-            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
-            return $this->redirectToRoute('app_main');
-        }
+        if ($redirect = $this->checkUserAdmin($userConnected))
+        {
+            return $redirect;
+        };
 
         //partie ajoutée pour supprimer les event si l'uti est desac
         if ($user->isActive() === true) {
@@ -256,10 +259,10 @@ class UserController extends AbstractController
     #[Route('users/promote/{id}', name: 'app_users_promote', requirements: ['id' => '\d+'])]
     public function promoteUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
     {
-        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
-            $this->addFlash('success', 'Cette page est réservée aux administrateurs');
-            return $this->redirectToRoute('app_main');
-        }
+        if ($redirect = $this->checkUserAdmin($userConnected))
+        {
+            return $redirect;
+        };
 
         if ($user->isAdmin() === false) {
             $user->setIsAdmin(true);
@@ -280,8 +283,10 @@ class UserController extends AbstractController
     }
 
     #[Route('profile/{id}', name: 'app_profile', requirements: ['id' => '\d+'])]
-    public function profile(int $id, UserRepository $userRepository): Response
+    public function profile(int $id, UserRepository $userRepository, #[CurrentUser] $userConnected): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $participant = $userRepository->find($id);
         $events = $participant->getEvents();
         $organizer = $participant->getMyEvents();
@@ -312,14 +317,11 @@ class UserController extends AbstractController
         EntityManagerInterface $em
     ): Response
     {
-        if (!$userConnected) {
-            $this->addFlash('error', 'Vous devez être connecté pour consulter cette page');
-            return $this->redirectToRoute('app_main');
-        }
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $user = $userRepository->findUserById($id);
 
-        if ($userConnected === $user || in_array('ROLE_ADMIN', $userConnected->getRoles(), true)) {
+        if ($userConnected === $user) {
             $isSelfEdit = $this->getUser() === $user;
             $form = $this->createForm(EditType::class, $user, [
                 'is_admin' => $this->isGranted('ROLE_ADMIN'),
@@ -343,18 +345,29 @@ class UserController extends AbstractController
 
                 $this->addFlash('success', "Mise à jour enregistrée");
 
-                if ($user->isAdmin() === true) {
-                    return $this->redirectToRoute('app_users_list');
-                } else {
-                    return $this->redirectToRoute('app_update', ['id' => $id]);
-                }
+                return $this->redirectToRoute('app_preferences', ['id' => $id]);
             }
 
-            return $this->render('user/preferences.html.twig', [
-                'edit_form' => $form,
-                'user' => $user,
-                'id' => $id
-            ]);
+        } else {
+            $this->addFlash('error','Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
         }
+        return $this->render('user/preferences.html.twig', [
+            'edit_form' => $form,
+            'user' => $user,
+            'id' => $id
+        ]);
+
     }
+
+    private function checkUserAdmin(#[CurrentUser] ?User $userConnected): ?Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('error','Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+        return null;
+    }
+
 }
+

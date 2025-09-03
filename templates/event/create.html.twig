@@ -15,10 +15,29 @@
 
         {{ form_start(event_form) }}
         {{ form_row(event_form.name) }}
-{#        @TODO à voir si on supprime#}
-        {#    {{ form_row(event_form.groupePrive) }}#}
-        {{ form_row(event_form.group) }}
-        <a class="create-group-link-responsive" id="group-create-link" href="{{ path('group_create') }}">ou Créer un groupe privé pour cet événement</a>
+        {#        @TODO à voir si on supprime #}
+        {#    {{ form_row(event_form.groupePrive) }} #}
+
+        <!--
+        <a class="create-group-link-responsive" id="group-create-link" href="{# {{ path('group_create') }} #}">ou Créer un
+            groupe privé pour cet événement</a>
+           -->
+
+        <div>
+            {{ form_label(event_form.group) }}
+
+            <div class="event-place">
+                {{ form_widget(event_form.group) }}
+
+                <div>
+                    <button type="button" data-action="click->modals#showGroupModal" class="modal-btn link-btn">
+                        Créez un groupe
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
         {{ form_row(event_form.startingDateHour) }}
         {{ form_row(event_form.endDateHour) }}
         {{ form_row(event_form.nbInscriptionsMax) }}
@@ -31,9 +50,8 @@
                 {{ form_widget(event_form.place) }}
 
                 <div>
-                    <button type="button" data-action="click->modals#showModal" class="modal-btn link-btn"
-                            data-modals-target="button">
-                        Créez un nouveau lieu pour votre événement
+                    <button type="button" data-action="click->modals#showPlaceModal" class="modal-btn link-btn">
+                        Créez un lieu
                     </button>
                 </div>
             </div>
@@ -49,39 +67,56 @@
         <div id="modal-container">
             <div class="modal" data-modals-target="modal">
                 <span id="close-modal" data-action="click->modals#closeModal">&times;</span>
-                <h2>Créer un nouveau lieu d'événement</h2>
-                {{ form_start(place_form, { 'attr': { 'data-modals-target': 'form' }, 'action': path('place_createInModal') }) }}
-                {{ form_row(place_form.name, { 'attr': { 'data-modals-target': "name" } }) }}
+                <div id="place-modal">
+                    <h2>Créer un nouveau lieu d'événement</h2>
+                    {{ form_start(place_form, { 'attr': { 'data-modals-target': 'place' }, 'action': path('place_createInModal') }) }}
+                    {{ form_row(place_form.name, { 'attr': { 'data-modals-target': "name" } }) }}
 
+                    <div class="tag-container">
+                        <button type="button" id="address-btn"
+                                class="active-tag"
+                                data-action="click->modals#activeTag"
+                                data-modals-tag1-param="address-btn"
+                                data-modals-tag2-param="coordinates-btn">
+                            Ajout par adresse
+                        </button>
+                        <button type="button" id="coordinates-btn"
+                                data-action="click->modals#activeTag"
+                                data-modals-tag1-param="coordinates-btn"
+                                data-modals-tag2-param="address-btn">
+                            Ajout par coordonnées
+                        </button>
+                    </div>
+                    <div id="address">
+                        {{ form_row(place_form.street) }}
+                        {{ form_row(place_form.postalCode) }}
+                        {{ form_row(place_form.city) }}
+                    </div>
+                    <div id="coordinates">
+                        {{ form_row(place_form.latitude) }}
+                        {{ form_row(place_form.longitude) }}
+                    </div>
 
-                <div class="tag-container">
-                    <button type="button" id="address-btn"
-                            class="active-tag"
-                            data-action="click->modals#activeTag"
-                            data-modals-tag1-param="address-btn"
-                            data-modals-tag2-param="coordinates-btn">
-                        Ajout par adresse
-                    </button>
-                    <button type="button" id="coordinates-btn"
-                            data-action="click->modals#activeTag"
-                            data-modals-tag1-param="coordinates-btn"
-                            data-modals-tag2-param="address-btn">
-                        Ajout par coordonnées
-                    </button>
+                    {{ form_widget(place_form.save, { 'attr': { 'data-action': "click->modals#sendPlace" } }) }}
+                    {{ form_end(place_form) }}
                 </div>
-                <div id="address">
-                    {{ form_row(place_form.street, { 'attr': { 'data-modals-target': "street" } }) }}
-                    {{ form_row(place_form.postalCode, { 'attr': { 'data-modals-target': "postalCode" } }) }}
-                    {{ form_row(place_form.city, { 'attr': { 'data-modals-target': "city" } }) }}
-                </div>
-                <div id="coordinates">
-                    {{ form_row(place_form.latitude, { 'attr': { 'data-modals-target': "latitude" } }) }}
-                    {{ form_row(place_form.longitude, { 'attr': { 'data-modals-target': "longitude" } }) }}
-                </div>
 
+                <div id="group-modal">
+                    <span id="close-modal" data-action="click->modals#closeModal">&times;</span>
+                    <h2>Créer un groupe privé</h2>
 
-                {{ form_widget(place_form.save, { 'attr': { 'data-action': "click->modals#sendPlace" } }) }}
-                {{ form_end(place_form) }}
+                    {{ form_start(group_form, { 'attr': { 'id' : 'group', 'data-modals-target': 'group' }, 'action': path('group_createInModal') }) }}
+                    <div>
+                        {{ form_label(group_form.name) }}
+                        {{ form_widget(group_form.name) }}
+                    </div>
+                    <div>
+                        {{ form_label(group_form.userList) }}
+                        {{ form_widget(group_form.userList) }}
+                    </div>
+                    <button data-action="click->modals#sendGroup">Enregistrer</button>
+                    {{ form_end(group_form) }}
+                </div>
             </div>
         </div>
     </div>

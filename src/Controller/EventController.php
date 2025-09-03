@@ -554,13 +554,13 @@ final class EventController extends AbstractController
         return $this->redirectToRoute('event_list');
     }
 
-    private function checkStatusUser(Event $event, Security $security): Response
+    private function checkStatusUser(Event $event, Security $security): ?Response
     {
         if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
             $this->addFlash('error',"Accès interdit");
             return $this->redirectToRoute('app_main');
         }
-      
+      return null;
 
     }
 

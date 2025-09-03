@@ -48,12 +48,12 @@ form {
     }
 
     a {
-        color: var(--red);
+        color: var(--header-bg-color);
         text-decoration: none;
         font-weight: bold;
 
         &:hover {
-            color: var(--a-color);
+            color: var(--a-color-hover);
             text-decoration: underline;
         }
     }
@@ -108,35 +108,6 @@ form {
 
     button {
         min-width: 40%;
-    }
-
-    .delete, .activate, .deactivate, .return {
-        width: 20%;
-        padding: 10px 20px;
-        border-radius: 5px;
-        text-decoration: none;
-        color: var(--a-color);
-
-        &:hover {
-            background-color: var(--a-color) !important;
-            color: var(--header-bg-color) !important;
-        }
-    }
-
-    .delete {
-        background-color: var(--red) !important;
-    }
-
-    .activate {
-        background-color: var(--green) !important;
-    }
-
-    .deactivate {
-        background-color: var(--orange) !important;
-    }
-
-    .return {
-        background-color: var(--events-a-color) !important;
     }
 }
 

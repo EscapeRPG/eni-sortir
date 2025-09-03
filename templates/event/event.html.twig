@@ -1,8 +1,9 @@
 {% for date in eventsDates %}
     <div class="event-date-container">
         <div class="event-date">
-            {{ date }}
             {{ ux_icon('tabler:calendar-month') }}
+            <div class="line-separator"></div>
+            {{ date }}
         </div>
 
         {% for event in events %}
@@ -25,12 +26,12 @@
                                 </h2>
                                 <div>
                                     {{ ux_icon('tabler:clock-hour-7') }}
-                                    Heure de rendez-vous :
+                                    <strong>Heure de rendez-vous :</strong>
                                     {{ event.startingDateHour | date('H:i:s') }}
                                 </div>
                                 <div>
                                     {{ ux_icon('tabler:map-pin') }}
-                                    Adresse :
+                                    <strong>Adresse :</strong>
                                     {{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}
                                 </div>
                             </div>

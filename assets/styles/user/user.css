@@ -18,14 +18,14 @@
 
     a {
         text-decoration: none;
-        color: var(--header-bg-color);
+        color: var(--a-color);
     }
 
     &:hover {
         background-color: var(--header-bg-color);
 
         a {
-            color: var(--a-color);
+            color: var(--header-bg-color);
             text-decoration: underline;
         }
     }

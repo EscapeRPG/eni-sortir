@@ -15,7 +15,7 @@
     --green: #89df45;
     --orange: #f67749;
     --red: #f64949;
-    --margin-top: 81px;
+    --margin-top: 77px;
 }
 
 body {
@@ -316,7 +316,7 @@ a {
         .swiper {
             width: 100%;
         }
-      
+
         header {
             padding: 5px 40px;
             min-height: 57px;
@@ -341,20 +341,24 @@ a {
                 }
             }
         }
+
         main {
             h2 {
                 margin-bottom: 0;
                 padding-bottom: 0;
             }
+
             h1 {
                 padding-top: 5px;
                 font-size: 1.2em;
                 text-align: center;
             }
         }
+
         .place-title {
             text-align: center;
             font-size: 1.2em;
             padding-top: 10px;
         }
     }
+}

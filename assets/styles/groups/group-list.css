@@ -1,0 +1,39 @@
+.group-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    width: 70%;
+    margin: 40px auto;
+}
+
+.group-container h1 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: var(--events-a-color);
+}
+
+.place-card {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: var(--events-a-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: var(--events-a-color);
+}
+
+.place-card:hover {
+    transform: scale(1.02);
+    background-color: var(--events-a-color);
+    text-decoration: none;
+}
+
+.place-card h2 {
+    margin: 0;
+    padding: 10px 0;
+    font-size: 1.5em;
+    font-weight: bold;
+    position: relative;
+    color: #fff;
+}

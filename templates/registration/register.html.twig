@@ -12,15 +12,24 @@
     {{ form_errors(registrationForm) }}
 
     {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.profilPicture) }}
-        {{ form_row(registrationForm.name) }}
-        {{ form_row(registrationForm.firstName) }}
-        {{ form_row(registrationForm.campus) }}
-        {{ form_row(registrationForm.phoneNumber) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+    {{ form_row(registrationForm.profilPicture) }}
+    {{ form_row(registrationForm.name) }}
+    {{ form_row(registrationForm.firstName) }}
+    {{ form_row(registrationForm.campus) }}
+    {{ form_row(registrationForm.phoneNumber) }}
+    {{ form_row(registrationForm.email) }}
+    {{ form_row(registrationForm.plainPassword) }}
+    <div class="filters-checkboxes">
+        <div>
+            {{ form_widget(registrationForm.agreeTerms) }}
+            {{ form_label(registrationForm.agreeTerms) }}
+        </div>
+    </div>
 
-        <button type="submit" class="btn">Valider</button>
+    <button type="submit" class="btn link-btn">Valider</button>
     {{ form_end(registrationForm) }}
+
+    {% if not is_granted('ROLE_USER') %}
+        <p>Déjà un compte ? <a href="{{ path('app_login') }}">Connectez-vous</a> !</p>
+    {% endif %}
 {% endblock %}

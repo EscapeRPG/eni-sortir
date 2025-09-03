@@ -150,7 +150,7 @@ public function delete(Place $place, Request $request, EntityManagerInterface $e
         }
 
         if(count($place->getEvents())>0){
-            $this-> addFlash('danger','suppression impossible, ce lieu est lié à un évènement');
+            $this-> addFlash('danger','suppression impossible, ce lieu est lié à un événement');
             return $this->redirectToRoute('place_list');
         }
         $em->remove($place);

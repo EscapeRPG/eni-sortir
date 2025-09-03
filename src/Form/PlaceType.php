@@ -33,7 +33,10 @@ class PlaceType extends AbstractType
                 'scale' => 6,
             ])
             ->add('save', SubmitType::class, [
-                'label' => 'Enregistrer'
+                'label' => 'Enregistrer',
+                'attr' => [
+                    'class' => 'link-btn',
+                ]
             ]);
     }
 

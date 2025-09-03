@@ -1,0 +1,71 @@
+.places-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5em;
+    width: 70%;
+    margin: 40px auto;
+}
+
+.places-container h1 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: var(--events-color);
+}
+
+.place-card {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: var(--events-a-color-hover);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: var(--events-a-color-hover);
+}
+
+.place-card:hover {
+    transform: scale(1.02);
+    background-color: var(--events-a-color);
+    text-decoration: none;
+}
+
+.place-card h2 {
+    margin: 0;
+    padding: 10px 0;
+    font-size: 1.5em;
+    font-weight: bold;
+    position: relative;
+    color: #fff;
+}
+
+@media (max-width: 430px) {
+    main {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .places-container {
+        width: 95%;
+        gap: 0.5em;
+        margin:0 5px 0 5px;
+    }
+
+    .places-container h1 {
+
+        font-size: 1.2em;
+        margin-bottom: 0;
+    }
+
+    .place-card {
+                padding: 5px;
+    }
+
+
+
+    .place-card h2 {
+        margin: 0;
+        padding: 10px 0;
+        font-size: 1em;
+    }
+}

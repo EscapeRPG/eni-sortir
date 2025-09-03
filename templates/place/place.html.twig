@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer un super event{% endblock %}
+{% block title %}{{ parent() }} - Créer un super event{% endblock %}
 
 {% block main %}
-    <h1>Créez une discothèque ou tout autre lieu d'ambiançage de jeune</h1>
+    <h1 class="place-title">Créez un lieu</h1>
 
     {{ form_start(place_create) }}
 
@@ -11,9 +11,21 @@
 
     {{ form_row(place_create.name) }}
 
-    <div>
-        <button type="button" id="for-address">Ajout avec l'adresse</button>
-        <button type="button" id="for-gps">Ou avec les coordonnées GPS</button>
+    <div class="save-btn" data-controller="placemaker">
+        <button type="button"
+                data-action="click->placemaker#showForm"
+                data-placemaker-div1-param="address"
+                data-placemaker-div2-param="gps"
+                class="link-btn">
+            Ajout avec l'adresse
+        </button>
+        <button type="button"
+                data-action="click->placemaker#showForm"
+                data-placemaker-div1-param="gps"
+                data-placemaker-div2-param="address"
+                class="link-btn">
+            Ou avec les coordonnées GPS
+        </button>
     </div>
 
     <div id="address" style="display: none;">
@@ -27,29 +39,9 @@
         {{ form_row(place_create.longitude) }}
     </div>
 
-    {{ form_row(place_create.save) }}
+    {{ form_widget(place_create.save) }}
 
     {{ form_end(place_create) }}
 
-    <script>
-        const addressFields = ['place_street', 'place_postalCode', 'place_city'];
-        const gpsFields = ['place_latitude', 'place_longitude'];
 
-        document.getElementById('for-address').addEventListener('click', function () {
-            document.getElementById('address').style.display = 'block';
-            document.getElementById('gps').style.display = 'none';
-
-            addressFields.forEach(id => document.getElementById(id).required = true);
-            gpsFields.forEach(id => document.getElementById(id).required = false);
-        });
-
-        document.getElementById('for-gps').addEventListener('click', function () {
-            document.getElementById('address').style.display = 'none';
-            document.getElementById('gps').style.display = 'block';
-
-            addressFields.forEach(id => document.getElementById(id).required = false);
-            gpsFields.forEach(id => document.getElementById(id).required = true);
-        });
-
-    </script>
 {% endblock %}

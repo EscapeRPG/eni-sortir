@@ -3,7 +3,7 @@
 {% block title %}{{ parent() }} - Profil{% endblock %}
 
 {% block main %}
-    <h2>{{ participant.name | upper }} {{ participant.firstName }}</h2>
+    <h2 class="profile-title">{{ participant.firstName }} {{ participant.name | upper }} </h2>
 
     <div class="profile-pic">
         <img src="{{ asset('uploads/users/' ~ participant.profilPicture) }}"
@@ -19,18 +19,25 @@
     </div>
 
     <div class="events-container">
-        <p><strong>Événements organisés :</strong></p>
+        <p class="events-title"><strong>Mes événements :</strong></p>
         {% if events|length != 0 %}
-            {% include 'event/event.html.twig' %}
+            {% include 'includes/event.html.twig' %}
         {% else %}
             <div class="event-date-container">
-                <p>Cette personne n'est inscrite à aucun événement actuellement actif.</p>
+                <p>Vous n'avez aucun événement en cours</p>
             </div>
         {% endif %}
     </div>
 
-    <div class="return">
-        <a href="{{ path('event_list') }}">Retour</a>
-    </div>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('app_update', {'id' : participant.id }) }}">
+            <div class="link-btn deactivate">Éditer ce profil</div>
+        </a>
+    {% endif %}
+
+    <a href="{{ path('event_list') }}">
+        <div class="return link-btn">Retour</div>
+    </a>
 
 {% endblock %}

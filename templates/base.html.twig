@@ -12,13 +12,13 @@
     <link rel="stylesheet" href="{{ asset('styles/preferences/user-preferences.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/user/user.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/user/list.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/events/event.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/events/event-list.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
     {% block javascripts %}
-
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
         {% block importmap %}{{ importmap('app') }}{% endblock %}
         <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -39,18 +39,23 @@
     {% endblock %}
 
     {% block stylesheets %}
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     {% endblock %}
 
 </head>
 <body data-controller="themes">
 <header>
     <div class="logo-nav">
-        <a href="{{ path('app_main') }}"><img src="" alt="logo"></a>
-        <a href="{{ path('app_main') }}"><h1>ENI SORTIR</h1></a>
-        {% if is_granted('IS_AUTHENTICATED') %}
-            <a class="nav-responsive" href="{{ path('event_list') }}">Événements</a>
-            <a class="nav-responsive" href="{{ path('place_list') }}">Lieux</a>
-        {% endif %}
+        <a href="{{ path('app_main') }}"><img src="{{ asset('images/logo.gif') }}" alt="logo"></a>
+        <div class="title-nav">
+            <a href="{{ path('app_main') }}"><h1>ENI SORTIR</h1></a>
+            {% if is_granted('IS_AUTHENTICATED') %}
+                <a class="nav-responsive" href="{{ path('event_list') }}">Événements</a>
+                <a class="nav-responsive" href="{{ path('place_list') }}">Lieux</a>
+            {% endif %}
+        </div>
     </div>
     <nav data-controller="burger">
         <div class="burger-container" data-action="click->burger#menu">
@@ -81,17 +86,46 @@
                     </li>
                 </ul>
                 <ul>
-                    <li><a href="{{ path('event_list') }}">Liste des événements</a></li>
-                    <li><a href="{{ path('event_create') }}">Créer un événement</a></li>
+                    <li>
+                        <a href="{{ path('event_list') }}">
+                            {{ ux_icon('tabler:layout-list') }}
+                            Liste des événements
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('event_create') }}">
+                            {{ ux_icon('tabler:browser-plus') }}
+                            Créer un événement
+                        </a>
+                    </li>
                 </ul>
                 <ul>
-                    <li><a href="{{ path('place_list') }}">Liste des lieux de sortie</a></li>
-                    <li><a href="{{ path('place_create') }}">Créer un lieu de sortie</a></li>
+                    <li>
+                        <a href="{{ path('place_list') }}">
+                            {{ ux_icon('tabler:layout-list') }}
+                            Liste des lieux de sortie
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('place_create') }}">
+                            {{ ux_icon('tabler:map-pin-plus') }}
+                            Créer un lieu de sortie
+                        </a>
+                    </li>
 
                 </ul>
                 <ul>
-                    <li><a href="{{ path('group_list') }}">Liste de mes groupes privés</a></li>
-                    <li><a href="{{ path('group_create') }}">Créer un groupe privé</a></li>
+                    <li>
+                        <a href="{{ path('group_list') }}">
+                            {{ ux_icon('tabler:layout-list') }}
+                            Liste de mes groupes privés
+                        </a>
+                    </li>
+                    <li><a href="{{ path('group_create') }}">
+                            {{ ux_icon('tabler:users-plus') }}
+                            Créer un groupe privé
+                        </a>
+                    </li>
                 </ul>
 
             {% else %}
@@ -113,8 +147,18 @@
 
             {% if is_granted('ROLE_ADMIN') %}
                 <ul>
-                    <li><a href="{{ path('app_users_list') }}">Liste des utilisateurs</a></li>
-                    <li><a href="{{ path('app_register') }}">Ajouter un utilisateur</a></li>
+                    <li>
+                        <a href="{{ path('app_users_list') }}">
+                            {{ ux_icon('tabler:layout-list') }}
+                            Liste des utilisateurs
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ path('app_register') }}">
+                            {{ ux_icon('tabler:user-plus') }}
+                            Ajouter un utilisateur
+                        </a>
+                    </li>
                 </ul>
             {% endif %}
         </div>
@@ -132,8 +176,7 @@
     {% block main %}
         <h2>Bienvenue sur le site de Sortir.com !</h2>
 
-        {# pour charger le form de création de gruopes privés #}
-        {#        <div id="form-container"></div> #}
+        <p>Salut !</p>
         <p>Connectez-vous ou créez un compte pour accéder à nos événements</p>
 
         <div class="swiper mySwiper">
@@ -152,6 +195,7 @@
         </div>
     {% endblock %}
 </main>
+
 <footer></footer>
 
 </body>

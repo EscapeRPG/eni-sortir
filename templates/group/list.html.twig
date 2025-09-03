@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer un super event{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('styles/groups/group-list.css') }}">
+{% endblock %}
 
 {% block main %}
-
+    <div class="group-container">
     <h2>Liste de mes groupes privés</h2>
-    <ul>
-        {% for group in groups %}
-            <li>
-                <a href="{{ path('group_detail', {id:group.id }) }}">
-                    {{ group.name }} </a>
-            </li>
-        {% endfor %}
-    </ul>
 
+        {% for group in groups %}
+                    <a href="{{ path('group_detail', {id:group.id }) }}" class="group-card">
+                        <h2>{{ group.name }} </h2></a>
+        {% endfor %}
+
+</div>
 {% endblock %}

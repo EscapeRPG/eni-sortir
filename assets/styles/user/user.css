@@ -18,15 +18,32 @@
 
     a {
         text-decoration: none;
-        color: var(--header-bg-color);
+        color: var(--a-color);
     }
 
     &:hover {
         background-color: var(--header-bg-color);
 
         a {
-            color: var(--a-color);
+            color: var(--header-bg-color);
             text-decoration: underline;
         }
+    }
+}
+
+@media (max-width: 430px) {
+    .profile-title {
+        padding-top: 20px;
+    }
+    .user-info {
+        width: auto;
+        padding: 5px 0 5px 0;
+        margin: 5px
+    }
+    .events-title {
+        text-align: center;
+    }
+    .return {
+        margin-top: 20px;
     }
 }

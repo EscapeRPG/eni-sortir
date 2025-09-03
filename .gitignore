@@ -7,6 +7,7 @@
 /public/bundles/
 /var/
 /vendor/
+.env
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
@@ -20,5 +21,7 @@
 ###< symfony/asset-mapper ###
 
 .idea
+
 .env
 .env.test
+

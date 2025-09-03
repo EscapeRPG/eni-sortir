@@ -1,10 +1,9 @@
 
 .event-detail-container {
-    max-width: 900px;
+    width: 80%;
     margin: 40px auto;
     padding: 20px;
     border-radius: 20px;
-    font-family: 'Arial', sans-serif;
 }
 
 
@@ -19,35 +18,31 @@
 .event-detail-container h1 {
     font-size: 2em;
     margin-bottom: 10px;
-    color: #ff5f5f;
+    color: var(--events-a-color);
 }
 
 .event-detail-container h3 {
     margin-bottom: 10px;
-    color: #ff5f5f;
+    color: var(--events-a-color);
 }
-
 
 .event-detail-container p {
     font-size: 1em;
     margin: 5px 0;
 }
 
-.event-detail-container a {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 10px 10px 0 0;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: bold;
-    color: #fff;
-    background-color: #FF8E8EFF;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+.event-detail-container .detail-links {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    gap: 5px;
 }
 
-.event-detail-container a:hover {
-    background-color: #ff5f5f;
-    transform: scale(1.05);
+.event-detail-container a {
+    width: 20%;
+    padding: 10px 20px;
+    border-radius: 10px;
 }
 
 .event-detail-container iframe {
@@ -78,7 +73,7 @@
 }
 
 .event-detail-frame{
-    background-color: #ffc3c3;
+    background-color: var(--event-bg-color);
     border-radius : 20px;
     padding : 30px;
     max-width : 900px;
@@ -88,6 +83,3 @@
     gap: 20px;
     color: #333;
 }
-
-
-

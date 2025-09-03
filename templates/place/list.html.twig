@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
-
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/places/place-list.css') }}">
+{% endblock %}
 {% block title %}Créer un super event{% endblock %}
 
 {% block main %}
-
-    <h1> Liste des endroits de jeunes !! </h1>
-
+<div class= "places-container" >
+    <h1> Lieux de sorties </h1>
+<p>Choissisez ou créer de nouveaux lieux !</p>
     {% for place in places %}
-        <a href="{{ path('place_detail', {id:place.id }) }}">
-    <h2>Titre : {{ place.name }}</h2>
+        <a href="{{ path('place_detail', {id:place.id }) }}" class="place-card">
+            <h2>{{ place.name }}</h2> </a>
+
     {% endfor %}
-
-
-
-
+</div>
 {% endblock %}

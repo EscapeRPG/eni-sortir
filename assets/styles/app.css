@@ -1,21 +1,21 @@
 :root {
     --header-bg-color: #3d86e1;
-    --other-bg-color: #b9e1ff;
+    --other-bg-color: #8ed7ff;
     --bg-main-color: #fff8f3;
     --txt-main-color: #114565;
     --event-bg-color: #ffffff;
     --a-color: #ffffff;
     --a-color-hover: #114565;
     --event-shadow: rgba(20, 115, 168, 0.6);
-    --events-dates-container-bg-color: #c3f1ff;
+    --events-dates-container-bg-color: #d3faff;
     --events-dates-bg-color: #8ed7ff;
-    --events-a-color: #8eddff;
-    --events-a-color-hover: #5fc7ff;
+    --events-a-color: #37baed;
+    --events-a-color-hover: #147cb1;
     --events-color: #2e5268;
     --green: #89df45;
     --orange: #f67749;
     --red: #f64949;
-    --margin-top: 67px;
+    --margin-top: 77px;
 }
 
 body {
@@ -24,8 +24,9 @@ body {
     padding: 0;
     overflow-x: hidden;
     color: var(--txt-main-color);
+    font-family: 'Roboto', sans-serif;
 
-    &:hover{
+    &:hover {
         cursor: var(--cursor);
     }
 
@@ -43,8 +44,14 @@ body {
 
         .logo-nav {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             gap: 20px;
+
+            .title-nav {
+                display: flex;
+                align-items: baseline;
+                gap: 20px;
+            }
 
             h1 {
                 margin: 0;
@@ -179,11 +186,15 @@ body {
     }
 
     main {
-        width: calc(100% - 60px);
+        width: 100%;
         margin-top: var(--margin-top);
-        padding: 30px;
 
         h2 {
+            text-align: center;
+            padding: 20px;
+        }
+
+        p {
             text-align: center;
         }
     }
@@ -234,13 +245,133 @@ body {
     }
 }
 
-@media screen and (max-width: 430px) {
-    .nav-responsive {
-        display: none;
-    }
-}
-
 .alert {
     padding: 10px;
     text-align: center;
+}
+
+.delete, .activate, .deactivate, .return {
+    width: 20%;
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: var(--a-color);
+    text-decoration: none;
+
+    &:hover {
+        background-color: var(--a-color) !important;
+        color: var(--header-bg-color) !important;
+        text-decoration: underline;
+    }
+}
+
+.delete {
+    background-color: var(--red) !important;
+
+    &:hover {
+        color: var(--red) !important;
+    }
+}
+
+.activate {
+    background-color: var(--green) !important;
+
+    &:hover {
+        color: var(--green) !important;
+    }
+}
+
+.deactivate {
+    background-color: var(--orange) !important;
+
+    &:hover {
+        color: var(--orange) !important;
+    }
+}
+
+.return {
+    background-color: var(--events-a-color);
+}
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+    color: var(--header-bg-color);
+
+    &:hover {
+        color: var(--a-color-hover);
+    }
+}
+
+.link-btn {
+    margin: 10px auto;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    text-decoration: none;
+    background-color: var(--header-bg-color);
+    color: var(--bg-main-color);
+    transform-origin: center;
+
+    &:hover {
+        background-color: var(--bg-main-color);
+        color: var(--header-bg-color);
+        box-shadow: 5px 5px 5px var(--event-shadow);
+        transform: scale(1.05);
+    }
+}
+
+@media (max-width: 430px) {
+
+    .nav-responsive {
+        display: none;
+    }
+
+    body {
+        .swiper {
+            width: 100%;
+        }
+
+        header {
+            padding: 5px 40px;
+            min-height: 57px;
+
+            .logo-nav {
+                gap: 10px;
+
+                img {
+                    width: 75px
+                }
+
+                h1 {
+                    font-size: 1.6em;
+                }
+            }
+
+            nav {
+                .burger-container {
+
+                    width: 22px;
+                    height: 22px;
+                }
+            }
+        }
+
+        main {
+            h2 {
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            h1 {
+                padding-top: 5px;
+                font-size: 1.2em;
+                text-align: center;
+            }
+        }
+
+        .place-title {
+            text-align: center;
+            font-size: 1.2em;
+            padding-top: 10px;
+        }
+    }
 }

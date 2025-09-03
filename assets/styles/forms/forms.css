@@ -48,12 +48,12 @@ form {
     }
 
     a {
-        color: var(--red);
+        color: var(--header-bg-color);
         text-decoration: none;
         font-weight: bold;
 
         &:hover {
-            color: var(--a-color);
+            color: var(--a-color-hover);
             text-decoration: underline;
         }
     }
@@ -104,33 +104,10 @@ form {
     align-items: center;
     justify-content: space-evenly;
     flex-wrap: wrap;
+    gap: 10px;
 
-    .delete, .activate, .deactivate, .return {
-        padding: 10px 20px;
-        border-radius: 5px;
-        text-decoration: none;
-        color: var(--a-color);
-
-        &:hover {
-            background-color: var(--a-color);
-            color: var(--header-bg-color);
-        }
-    }
-
-    .delete {
-        background-color: var(--red);
-    }
-
-    .activate {
-        background-color: var(--green);
-    }
-
-    .deactivate {
-        background-color: var(--orange);
-    }
-
-    .return {
-        background-color: var(--events-a-color);
+    button {
+        min-width: 40%;
     }
 }
 
@@ -328,7 +305,7 @@ form {
     }
 
     .save-btn {
-        width: 60%;
+        width: 100%;
 
         button {
             width: 100%;

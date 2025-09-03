@@ -1,9 +1,11 @@
 .group-container {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: 1.5em;
     width: 70%;
     margin: 40px auto;
+
 }
 
 .group-container h1 {
@@ -13,7 +15,7 @@
     color: var(--events-a-color);
 }
 
-.place-card {
+.group-card {
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -23,13 +25,13 @@
     color: var(--events-a-color);
 }
 
-.place-card:hover {
+.group-card:hover {
     transform: scale(1.02);
     background-color: var(--events-a-color);
     text-decoration: none;
 }
 
-.place-card h2 {
+.group-card h2 {
     margin: 0;
     padding: 10px 0;
     font-size: 1.5em;

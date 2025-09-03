@@ -1,9 +1,13 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('styles/groups/group-detail.css') }}">
+{% endblock %}
+
 {% block title %}Créer un super event{% endblock %}
 
 {% block main %}
-
+    <div class="group-detail-container">
     <h2>Liste de mes groupes privés</h2>
     <ul>
         {% for group in groups %}
@@ -13,5 +17,5 @@
             </li>
         {% endfor %}
     </ul>
-
+</div>
 {% endblock %}

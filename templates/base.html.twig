@@ -90,8 +90,6 @@
 
                 </ul>
                 <ul>
-                    <li><a id="create-group-link" href="{{ path('group_create') }}">Créer un groupe privé</a></li>
-
                     <li><a href="{{ path('group_list') }}">Liste de mes groupes privés</a></li>
                     <li><a href="{{ path('group_create') }}">Créer un groupe privé</a></li>
 
@@ -134,10 +132,6 @@
 
     {% block main %}
         <h2>Bienvenue sur le site de Sortir.com !</h2>
-        <p>Salut !</p>
-        <button data-themes-id-param="dark-mode" data-action="click->themes#setTheme"></button>
-        <button data-themes-id-param="pochi-pink" data-action="click->themes#setTheme"></button>
-    {% endblock %}
 
         {# pour charger le form de création de gruopes privés #}
         {#        <div id="form-container"></div> #}

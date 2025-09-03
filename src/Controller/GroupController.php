@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Group;
+use App\Entity\Place;
 use App\Entity\User;
 use App\Form\GroupType;
+use App\Form\PlaceType;
 use App\Repository\GroupRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,6 +25,8 @@ final class GroupController extends AbstractController
     #[Route('/create', name: '_create')]
     public function create(Request $request, EntityManagerInterface $em, #[CurrentUser]?User $userConnecter): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $group = new Group();
         $form = $this->createForm(GroupType::class, $group);
         $form->handleRequest($request);
@@ -50,8 +54,10 @@ final class GroupController extends AbstractController
      * @throws Exception
      */
     #[Route('/list', name: '_list',requirements: ['page' => '\d+'])]
-    public function list(GroupRepository $groupRepository, ParameterBagInterface $param, #[CurrentUser] ?user $user): Response
+    public function list(GroupRepository $groupRepository, #[CurrentUser] ?user $user): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $userId = $user->getId();
 
         $groups = $groupRepository->findAllMyGroups($userId);
@@ -65,12 +71,20 @@ final class GroupController extends AbstractController
      * @throws Exception
      */
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
-    public function detail(GroupRepository $groupRepository,int $id, ParameterBagInterface $param): Response
+    public function detail(GroupRepository $groupRepository,int $id, #[CurrentUser] $userConnected) : Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $groupDetails = $groupRepository->findGroupDetails($id);
 
         if(!$groupDetails){
-            throw $this->createNotFoundException('Ce groupe n\'existe pas');
+            $this->addFlash('error','Ce groupe n\'existe pas');
+            return $this->redirectToRoute('group_list');
+        }
+
+        if (!$groupDetails->getUserList()->contains($userConnected)) {
+            $this->addFlash('error', 'Vous ne faites pas partie de ce groupe');
+            return $this->redirectToRoute('group_list');
         }
 
         return $this->render('group/detail.html.twig', [
@@ -92,4 +106,31 @@ final class GroupController extends AbstractController
         return count($listUsers);
     }
 
+    #[Route('/create/modal', name: '_createInModal')]
+    public function createInModal(Request $request, EntityManagerInterface $em): Response
+        {
+            $referer = $request->headers->get('referer');
+            if (!$referer || !str_contains($referer, '/event/create')) {
+                $this->addFlash('error','Accès interdit');
+                return $this->redirectToRoute('event_create');
+            }
+
+        $group = new Group();
+        $form = $this->createForm(GroupType::class, $group);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($group);
+            $em->flush();
+
+            return $this->json([
+                'id' => $group->getId(),
+                'name' => $group->getName(),
+            ]);
+        }
+
+        return $this->json([
+            'errors' => (string) $form->getErrors(true, false),
+        ], 400);
+    }
 }

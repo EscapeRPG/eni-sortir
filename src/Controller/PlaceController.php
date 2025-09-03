@@ -23,13 +23,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/place', name: 'place')]
 final class PlaceController extends AbstractController
 {
-
     #[Route('/create', name: '_create')]
     public function create(Request $request, EntityManagerInterface $em): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $place = new Place();
-
-
         $form = $this->createForm(PlaceType::class, $place);
         $form->handleRequest($request);
 
@@ -50,6 +49,14 @@ final class PlaceController extends AbstractController
     #[Route('/create/modal', name: '_createInModal')]
     public function createInModal(Request $request, EntityManagerInterface $em): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        $referer = $request->headers->get('referer');
+        if (!$referer || !str_contains($referer, '/event/create')) {
+            $this->addFlash('error','Accès interdit');
+            return $this->redirectToRoute('event_create');
+        }
+
         $place = new Place();
         $form = $this->createForm(PlaceType::class, $place);
         $form->handleRequest($request);
@@ -60,7 +67,7 @@ final class PlaceController extends AbstractController
 
             return $this->json([
                 'id' => $place->getId(),
-                'name' => $place->getName(), // ou autre champ utile
+                'name' => $place->getName(),
             ]);
         }
 
@@ -69,9 +76,11 @@ final class PlaceController extends AbstractController
         ], 400);
     }
 
-    #[Route('/list{page}', name: '_list',requirements: ['page' => '\d+'],defaults: ['page' => 1])]
+    #[Route('/list/{page}', name: '_list',requirements: ['page' => '\d+'],defaults: ['page' => 1])]
     public function list(PlaceRepository $placeRepository, ParameterBagInterface $param, int $page, #[CurrentUser] ?user $user): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $nbParPage = $param->get('place')['nb_max'];
         $offset = ($page - 1) * $nbParPage;
         $campus = $user->getCampus()->getId();
@@ -89,6 +98,8 @@ final class PlaceController extends AbstractController
     #[Route('/detail/{id}', name: '_detail', requirements: ['id' => '\d+'])]
     public function detail(PlaceRepository $placeRepository,int $id, ParameterBagInterface $param): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $place = $placeRepository->find($id);
 
         if(!$place){
@@ -102,28 +113,36 @@ final class PlaceController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
-    #[ISGranted('ROLE_ADMIN')]
-    public function edit(Place $place, Request $request, EntityManagerInterface $em, Security $security): Response
+    public function edit(Place $place, Request $request, EntityManagerInterface $em, #[CurrentUser] $userConnected): Response
     {
-    $form = $this->createForm(PlaceType::class, $place);
-    $form->handleRequest($request);
+        if ($redirect = $this->checkUserAdmin($userConnected))
+            {
+                return $redirect;
+            };
 
-    if($form->isSubmitted() && $form->isValid()){
-    $em->flush();
-    $this->addFlash('success', 'Lieu mis à jour !');
-    return $this->redirectToRoute('place_list', ['id' => $place->getId()]);
+        $form = $this->createForm(PlaceType::class, $place);
+        $form->handleRequest($request);
 
-    }
-    return $this->render('place/place.html.twig', [
-        'place_create' => $form->createView(),
-        'place' => $place,
-    ]);
+        if($form->isSubmitted() && $form->isValid()){
+        $em->flush();
+        $this->addFlash('success', 'Lieu mis à jour !');
+        return $this->redirectToRoute('place_list', ['id' => $place->getId()]);
+
+        }
+        return $this->render('place/place.html.twig', [
+            'place_create' => $form->createView(),
+            'place' => $place,
+        ]);
     }
 
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
-    #[ISGranted('ROLE_ADMIN')]
-public function delete(Place $place, Request $request, EntityManagerInterface $em, Security $security): Response
+public function delete(Place $place, Request $request, EntityManagerInterface $em, #[CurrentUser] $userConnected): Response
     {
+        if ($redirect = $this->checkUserAdmin($userConnected))
+        {
+            return $redirect;
+        };
+
         if($this->isCsrfTokenValid('delete'.$place->getId(), $request->get('token'))){
         $this->addFlash('danger', 'impossible de supprimer');
         return $this->redirectToRoute('place_list');
@@ -139,5 +158,12 @@ public function delete(Place $place, Request $request, EntityManagerInterface $e
         return $this->redirectToRoute('place_list');
     }
 
+    private function checkUserAdmin(#[CurrentUser] ?User $userConnected): Response
+    {
+        if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
+            $this->addFlash('error','Cette page est réservée aux administrateurs');
+            return $this->redirectToRoute('app_main');
+        }
+    }
 
 }

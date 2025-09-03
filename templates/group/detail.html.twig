@@ -25,17 +25,17 @@
 
     <h2>Membres du groupe :</h2>
 
-<div class="participants-list">
-
-    <ul>
+    <div class="participants-list">
         {% for member in groupDetails.userList %}
-            <li>{{ member.firstName }} {{ member.name }}</li>
-        {% endfor %}
-    </ul>
 
 
+        <a href="{{ path('app_profile', {id: member.id}) }}">
+            <img src="{{ asset('uploads/users/' ~ member.profilPicture) }}" alt="Image de {{ member.firstName }}">
+            <p>{{ member.firstName }} </p>
+        </a>
         {% endfor %}
-</div>
+    </div>
+
 
 </div>
 {% endblock %}

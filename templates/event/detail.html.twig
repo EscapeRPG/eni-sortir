@@ -57,11 +57,13 @@
                         <a href="{{ path('event_withdraw', { id: event.id }) }}" class="link-btn">Se désister</a>
                     {% endif %}
                 {% endif %}
+                {% endif %}
 
 
                 {% if event.state.label == 'Annulée' %}
                     <p><b>Raison d'annulation : </b>{{ event.cancellationReason }}</p>
                 {% endif %}
+            {% endif %}
 
 
         {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}

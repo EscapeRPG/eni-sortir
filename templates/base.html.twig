@@ -49,11 +49,13 @@
 <header>
     <div class="logo-nav">
         <a href="{{ path('app_main') }}"><img src="{{ asset('images/logo.gif') }}" alt="logo"></a>
-        <a href="{{ path('app_main') }}"><h1>ENI SORTIR</h1></a>
-        {% if is_granted('IS_AUTHENTICATED') %}
-            <a class="nav-responsive" href="{{ path('event_list') }}">Événements</a>
-            <a class="nav-responsive" href="{{ path('place_list') }}">Lieux</a>
-        {% endif %}
+        <div class="title-nav">
+            <a href="{{ path('app_main') }}"><h1>ENI SORTIR</h1></a>
+            {% if is_granted('IS_AUTHENTICATED') %}
+                <a class="nav-responsive" href="{{ path('event_list') }}">Événements</a>
+                <a class="nav-responsive" href="{{ path('place_list') }}">Lieux</a>
+            {% endif %}
+        </div>
     </div>
     <nav data-controller="burger">
         <div class="burger-container" data-action="click->burger#menu">

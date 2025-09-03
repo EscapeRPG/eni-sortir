@@ -27,6 +27,9 @@
     </div>
 
     <button type="submit" class="btn link-btn">Valider</button>
-    <p>Déjà un compte ? <a href="{{ path('app_login') }}">Connectez-vous</a> !</p>
     {{ form_end(registrationForm) }}
+
+    {% if not is_granted('ROLE_USER') %}
+        <p>Déjà un compte ? <a href="{{ path('app_login') }}">Connectez-vous</a> !</p>
+    {% endif %}
 {% endblock %}

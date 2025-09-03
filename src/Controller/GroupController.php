@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Group;
+use App\Entity\Place;
 use App\Entity\User;
 use App\Form\GroupType;
+use App\Form\PlaceType;
 use App\Repository\GroupRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
@@ -104,4 +106,25 @@ final class GroupController extends AbstractController
         return count($listUsers);
     }
 
+    #[Route('/create/modal', name: '_createInModal')]
+    public function createInModal(Request $request, EntityManagerInterface $em): Response
+    {
+        $group = new Group();
+        $form = $this->createForm(GroupType::class, $group);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($group);
+            $em->flush();
+
+            return $this->json([
+                'id' => $group->getId(),
+                'name' => $group->getName(),
+            ]);
+        }
+
+        return $this->json([
+            'errors' => (string) $form->getErrors(true, false),
+        ], 400);
+    }
 }

@@ -43,7 +43,6 @@
         {% endif %}
     {% endfor %}
 
-
     {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
     <div class="detail-links">
         {% if event.state.label == 'Ouverte' %}

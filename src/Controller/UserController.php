@@ -19,6 +19,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -184,8 +187,11 @@ class UserController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('users/delete/{id}', name: 'app_users_delete', requirements: ['id' => '\d+'])]
-    public function deleteUser(Request $request, User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    public function deleteUser(Request $request, User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected, MailerInterface $mailer): Response
     {
         if ($redirect = $this->checkUserAdmin($userConnected))
         {
@@ -203,10 +209,23 @@ class UserController extends AbstractController
             }
             $em->flush();
 
+            $email = (new Email())
+                ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
+                ->to($user->getEmail())
+                ->subject('Suppression de compte utilisateur')
+                ->html($this->renderView('email/deleteUser.html.twig', [
+                    'user' => $user,
+                ]));
+
+            $mailer->send($email);
+
             $em->remove($user);
+
             $em->flush();
 
             $this->addFlash('success', "L'utilisateur a été supprimé");
+
+
 
         } else {
             $this->addFlash('success', "Impossible de supprimer l'utilisateur");
@@ -214,8 +233,11 @@ class UserController extends AbstractController
         return $this->redirectToRoute('app_users_list');
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('users/disable/{id}', name: 'app_users_disable', requirements: ['id' => '\d+'])]
-    public function disableUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    public function disableUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected, MailerInterface $mailer): Response
     {
         if ($redirect = $this->checkUserAdmin($userConnected))
         {
@@ -236,6 +258,16 @@ class UserController extends AbstractController
             $em->flush();
             $em->persist($user);
 
+            $email = (new Email())
+                ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
+                ->to($user->getEmail())
+                ->subject('Désactivation de compte utilisateur')
+                ->html($this->renderView('email/desactivate.html.twig', [
+                    'user' => $user,
+                ]));
+
+            $mailer->send($email);
+
             $this->addFlash('success', "L'utilisateur a été désactivé");
 
         } else {
@@ -250,14 +282,27 @@ class UserController extends AbstractController
             $em->flush();
             $em->persist($user);
 
+            $email = (new Email())
+                ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
+                ->to($user->getEmail())
+                ->subject('Activation de compte utilisateur')
+                ->html($this->renderView('email/activate.html.twig', [
+                    'user' => $user,
+                ]));
+
+            $mailer->send($email);
+
             $this->addFlash('success', "L'utilisateur a été activé");
         }
 
         return $this->redirectToRoute('app_update', ['id' => $user->getId()]);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     */
     #[Route('users/promote/{id}', name: 'app_users_promote', requirements: ['id' => '\d+'])]
-    public function promoteUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected): Response
+    public function promoteUser(User $user, EntityManagerInterface $em, #[CurrentUser] ?User $userConnected, MailerInterface $mailer): Response
     {
         if ($redirect = $this->checkUserAdmin($userConnected))
         {
@@ -269,11 +314,32 @@ class UserController extends AbstractController
             $em->flush();
             $em->persist($user);
 
+            $email = (new Email())
+                ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
+                ->to($user->getEmail())
+                ->subject('Nouveau rôle : administrateur d\'ENI-SORTIR')
+                ->html($this->renderView('email/promote.html.twig', [
+                    'user' => $user,
+                ]));
+
+            $mailer->send($email);
+
             $this->addFlash('success', "L'utilisateur est maintenant administrateur");
 
         } else {
             $user->setIsAdmin(false);
             $em->flush();
+
+            $email = (new Email())
+                ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
+                ->to($user->getEmail())
+                ->subject('Rétrogradation de votre rôle d\'administrateur d\'ENI-SORTIR')
+                ->html($this->renderView('email/downgrade.html.twig', [
+                    'user' => $user,
+                ]));
+
+            $mailer->send($email);
+
             $em->persist($user);
 
             $this->addFlash('success', "L'utilisateur n'est plus administrateur");

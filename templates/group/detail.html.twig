@@ -28,12 +28,14 @@
     <div class="participants-list">
         {% for member in groupDetails.userList %}
 
+
         <a href="{{ path('app_profile', {id: member.id}) }}">
             <img src="{{ asset('uploads/users/' ~ member.profilPicture) }}" alt="Image de {{ member.firstName }}">
             <p>{{ member.firstName }} </p>
         </a>
         {% endfor %}
     </div>
+
 
 </div>
 {% endblock %}

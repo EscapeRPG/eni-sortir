@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\GroupType;
 use App\Form\PlaceType;
 use App\Repository\GroupRepository;
+use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,9 +24,20 @@ final class GroupController extends AbstractController
 {
 
     #[Route('/create', name: '_create')]
-    public function create(Request $request, EntityManagerInterface $em, #[CurrentUser]?User $userConnecter): Response
+    public function create(Request $request, EntityManagerInterface $em, #[CurrentUser]?User $userConnecter, DeviceDetector $deviceDetector): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        //Détection des mobiles et restriction. NB: il existe aussi isMobile au lieu de isSmartphone mais cela bloque aussi sur tablette, et !isDesktop pour tout sauf les ordi
+        $userAgent = $request->headers->get('User-Agent');
+        $deviceDetector->setUserAgent($userAgent);
+        $deviceDetector->parse();
+
+        if ($deviceDetector->isSmartphone()) {
+
+            $this->addFlash('alert', 'La création d\'un groupe privé n\'est pas disponible sur mobile.');
+            return $this->redirectToRoute('event_list');
+        }
 
         $group = new Group();
         $form = $this->createForm(GroupType::class, $group);

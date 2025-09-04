@@ -17,11 +17,12 @@
 
 
     <h2>Événement associé :</h2>
-    {% if groupDetails.name is not null %}
-        <p>{{ groupDetails.name }}</p>
+    {% if events[0].event_name is not null %}
+        <p>{{ events[0].event_name }}</p>
     {% else %}
         <p><em>Pas d’événement associé pour l’instant.</em></p>
     {% endif %}
+
 
     <h2>Membres du groupe :</h2>
 

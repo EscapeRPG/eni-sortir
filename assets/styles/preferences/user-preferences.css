@@ -116,3 +116,125 @@
         }
     }
 }
+
+@media (max-width: 430px) {
+    .preferences-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: absolute;
+
+        button {
+            margin : 0;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            width: 85%;
+            padding: 7px;
+            position: static;
+            top: 150px;
+            left: 10%;
+        }
+
+        .preferences {
+            display: flex;
+            width: calc(100% - 10px);
+            position: static;
+            top: calc(150px - var(--margin-top));
+            left: calc(30% + 50px);
+            right: 0;
+
+            #profile {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                width: 95%;
+            }
+
+            .profile-pic {
+                display: none;
+            }
+            #themes {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+
+                button {
+                    width: 60%;
+                    margin: auto;
+                }
+
+                #default {
+                    background-color: lightskyblue;
+                    color: white;
+                    border-bottom: 2px solid #3d86e1;
+
+                    &:hover {
+                        background-color: #3d86e1;
+                        color: white;
+                    }
+                }
+
+                #dark-mode {
+                    background-color: #606060;
+                    color: white;
+                    border-bottom: 2px solid #101010;
+
+                    &:hover {
+                        background-color: #101010;
+                        color: white;
+                    }
+                }
+
+                #pochi-pink {
+                    background-color: #ff8e8e;
+                    color: white;
+                    border-bottom: 2px solid #ff5f5f;
+
+                    &:hover {
+                        background-color: #ff5f5f;
+                        color: white;
+                    }
+                }
+
+                #green-rex {
+                    background-color: #254e11;
+                    color: white;
+                    border-bottom: 2px solid darkorange;
+
+                    &:hover {
+                        background-color: #162c0b;
+                        color: orange;
+                    }
+                }
+
+                #brown-poop {
+                    background-color: #602b17;
+                    color: white;
+                    border-bottom: 2px solid #9c3211;
+
+                    &:hover {
+                        background-color: #9c3211;
+                        color: #c8926c;
+                    }
+                }
+
+                #creamy-rainbow {
+                    background-color:#fa408c;
+                    color: white;
+                    border-bottom: 2px solid  #dd2c47;
+
+                    &:hover {
+                        background-color: #ff005f;
+                        color: #f8b1c2;
+                    }
+                }
+            }
+        }
+    }
+}

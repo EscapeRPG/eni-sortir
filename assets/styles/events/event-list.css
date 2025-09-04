@@ -10,7 +10,7 @@
         padding: 20px;
         box-shadow: 5px 5px 5px var(--event-shadow);
         border-radius: 20px;
-        background-color: var(--events-dates-container-bg-color);
+        background: var(--events-dates-container-bg-color);
 
         .event-date {
             width: calc(100% - 20px);

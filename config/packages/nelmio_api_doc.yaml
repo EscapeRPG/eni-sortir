@@ -1,0 +1,9 @@
+nelmio_api_doc:
+  documentation:
+    info:
+      title: "API Documentation"
+      description: "Documentation de l'API de votre projet"
+      version: "1.0.0"
+  areas:
+    default:
+      path_patterns: [ 'event/api' ]

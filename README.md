@@ -42,3 +42,7 @@ The project uses a My SQL Database
 | Name  | User          | Password | Port |
 | :--------------- |:---------------:| -----:| -----:|
 | eni-sortir  |   root       |  none | 3306
+
+### Api
+
+APi documentation is available from the application on the **api/doc** route.

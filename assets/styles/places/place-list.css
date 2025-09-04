@@ -19,9 +19,9 @@
     flex-direction: column;
     padding: 20px;
     border-radius: 20px;
-    background-color: var(--events-a-color-hover);
+    background-color: var(--events-dates-bg-color);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    color: var(--events-a-color-hover);
+    color: var(--a-color-hover);
 }
 
 .place-card:hover {
@@ -36,7 +36,7 @@
     font-size: 1.5em;
     font-weight: bold;
     position: relative;
-    color: #fff;
+    color: var(--txt-main-color);
 }
 
 @media (max-width: 430px) {

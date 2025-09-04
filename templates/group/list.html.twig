@@ -1,15 +1,17 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}{{ parent() }} - Mes groupes privés{% endblock %}
+
 {% block stylesheets %}
-<link rel="stylesheet" href="{{ asset('styles/groups/group-list.css') }}">
+<link rel="stylesheet" href="{{ asset('styles/places/place-list.css') }}">
 {% endblock %}
 
 {% block main %}
-    <div class="group-container">
+    <div class="places-container">
     <h2>Liste de mes groupes privés</h2>
 
         {% for group in groups %}
-                    <a href="{{ path('group_detail', {id:group.id }) }}" class="group-card">
+                    <a href="{{ path('group_detail', {id:group.id }) }}" class="place-card">
                         <h2>{{ group.name }} </h2></a>
         {% endfor %}
 

@@ -1,4 +1,8 @@
 {% extends 'base.html.twig' %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/events/event-detail.css') }}">
+{% endblock %}
+
 
 {% block title %}
 {{ parent() }} - Détails du groupe
@@ -6,7 +10,11 @@
 
 {% block main %}
 
+<div class="event-detail-container">
+
+
     <h1>Détail du groupe : {{ groupDetails.name }}</h1>
+
 
     <h2>Événement associé :</h2>
     {% if groupDetails.name is not null %}
@@ -16,13 +24,20 @@
     {% endif %}
 
     <h2>Membres du groupe :</h2>
-    <ul>
+
+    <div class="participants-list">
         {% for member in groupDetails.userList %}
-            <li>{{ member.firstName }} {{ member.name }}</li>
+
+
+        <a href="{{ path('app_profile', {id: member.id}) }}">
+            <img src="{{ asset('uploads/users/' ~ member.profilPicture) }}" alt="Image de {{ member.firstName }}">
+            <p>{{ member.firstName }} </p>
+        </a>
         {% endfor %}
-    </ul>
+    </div>
 
 
+</div>
 {% endblock %}
 
 

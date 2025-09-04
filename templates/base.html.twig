@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{ asset('styles/user/list.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/events/event.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/events/event-list.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/places/place-detail.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 
     {% block javascripts %}
@@ -23,6 +24,7 @@
 
         {% block importmap %}{{ importmap('app') }}{% endblock %}
         <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 let swiper = new Swiper(".mySwiper", {
@@ -37,6 +39,7 @@
                 });
             });
         </script>
+
     {% endblock %}
 
     {% block stylesheets %}
@@ -178,8 +181,9 @@
         <h2>Bienvenue sur le site de Sortir.com !</h2>
 
         <p>Salut !</p>
+        {% if not is_granted('IS_AUTHENTICATED') %}
         <p>Connectez-vous ou créez un compte pour accéder à nos événements</p>
-
+        {% endif %}
         <div class="swiper mySwiper">
             <div class="swiper-wrapper">
                 <div class="swiper-slide"><img src="{{ asset('slider/GroupeSymfony.jpg') }}" alt=""></div>

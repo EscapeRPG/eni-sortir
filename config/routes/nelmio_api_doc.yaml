@@ -1,0 +1,10 @@
+# Configuration de la route pour obtenir le JSON de la documentation
+app.swagger:
+  path: /api/doc.json
+  methods: GET
+  defaults: { _controller: nelmio_api_doc.controller.swagger }
+
+# Configuration de la route pour la vue Swagger UI
+app.swagger_ui:
+  path: /api/doc
+  defaults: { _controller: nelmio_api_doc.controller.swagger_ui }

@@ -42,6 +42,7 @@ SQL;
     /*public function findGroupDetails(int $groupId): Group
     {
         $sql = <<<SQL
+
             SELECT
                 g.id,
                 g.name AS group_name,
@@ -54,6 +55,7 @@ SQL;
             LEFT JOIN event e ON g.id = e.group_id
             WHERE g.id = :group_id
             SQL;
+
         $stmt = $this->getEntityManager()->getConnection();
         return $stmt->prepare($sql)
             ->executeQuery(['group_id' => $groupId])

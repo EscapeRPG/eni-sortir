@@ -1,4 +1,4 @@
-<h2>Profil {{ user.firstName|first|lower in "aeiouy" ? "d'" : "de" }}{{ user.firstName }}</h2>
+<h2>Profil {{ user.firstName|first|lower in "aeiouy" ? "d'" : "de " }}{{ user.firstName }}</h2>
 
 <div class="profile-pic">
     <img src="{{ asset('uploads/users/' ~ user.profilPicture) }}" id="profile-pic"

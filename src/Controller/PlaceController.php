@@ -34,7 +34,7 @@ final class PlaceController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Lieu crée !');
-            return $this->redirectToRoute('event_create');
+            return $this->redirectToRoute('place_list');
         }
         return $this->render('place/place.html.twig', [
             'place_create' => $form->createView(),

@@ -79,3 +79,20 @@
     flex-wrap: wrap;
     gap: 5px;
 }
+
+@media screen and (max-width: 430px) {
+    .place-detail-frame {
+        padding: 0;
+        margin: 0;
+        gap: 2px;
+    }
+    .detail-links {
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+
+        .link-btn {
+            width: 100%;
+        }
+    }
+}

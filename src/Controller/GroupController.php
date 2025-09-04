@@ -83,6 +83,7 @@ final class GroupController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
+        $groupeEvents = $groupRepository->findGroupEvents($id);
         $groupDetails = $groupRepository->findGroupDetails($id);
 
         if(!$groupDetails){
@@ -97,6 +98,7 @@ final class GroupController extends AbstractController
 
         return $this->render('group/detail.html.twig', [
             'groupDetails' => $groupDetails,
+            'events' => $groupeEvents,
             'id' => $id
         ]);
     }

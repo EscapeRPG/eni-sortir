@@ -5,16 +5,9 @@
         border: none;
         border-radius: 5px;
         padding: 10px 20px;
-        background-color: var(--other-bg-color);
         cursor: pointer;
         font-weight: bold;
         margin: 10px;
-        color: var(--a-color);
-
-        &:hover {
-            background-color: var(--bg-main-color);
-            color: var(--a-color);
-        }
     }
 
     .menu {
@@ -29,23 +22,6 @@
         position: fixed;
         top: 150px;
         left: 10%;
-
-        button {
-            background-color: var(--header-bg-color);
-            border-bottom: 2px solid transparent;
-        }
-
-        button:hover {
-            background-color: var(--bg-main-color);
-            color: var(--a-color);
-            border-bottom: 2px solid var(--header-bg-color);
-        }
-
-        .active-tag {
-            background-color: var(--bg-main-color);
-            color: var(--a-color);
-            border-bottom: 2px solid var(--header-bg-color);
-        }
     }
 
     .preferences {
@@ -102,6 +78,28 @@
                 &:hover {
                     background-color: #ff5f5f;
                     color: white;
+                }
+            }
+
+            #green-rex {
+                background-color: #254e11;
+                color: white;
+                border-bottom: 2px solid darkorange;
+
+                &:hover {
+                    background-color: #162c0b;
+                    color: orange;
+                }
+            }
+
+            #brown-poop {
+                background-color: #602b17;
+                color: white;
+                border-bottom: 2px solid #9c3211;
+
+                &:hover {
+                    background-color: #9c3211;
+                    color: #c8926c;
                 }
             }
         }

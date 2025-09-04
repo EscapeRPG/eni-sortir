@@ -58,7 +58,6 @@
         {% endif %}
         {% endif %}
 
-
         {% if event.state.label == 'Annulée' %}
             <p><b>Raison d'annulation : </b>{{ event.cancellationReason }}</p>
         {% endif %}
@@ -76,7 +75,7 @@
 
         {% if event.organizer %}
             {% if event.state.label == 'Annulée' %}
-                <a href="{{ path('event_reactivate', {id:event.id}) }}" class="link-btn activate"> Réactiver</a>
+                <a href="{{ path('event_reactivate', {id:event.id}) }}" class="link-btn activate">Réactiver</a>
             {% endif %}
         {% endif %}
     </div>
@@ -107,10 +106,7 @@
                         src="{{ asset('uploads/users/' ~ participant.profil_picture) }}"
                         alt="Image de {{ participant.first_name }}" class="link-btn">
                 <p>{{ participant.first_name }}</p></a>
-
         {% endfor %}
     </div>
 </div>
 {% endblock %}
-
-

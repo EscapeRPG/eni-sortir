@@ -29,15 +29,16 @@
         {% endif %}
     </div>
 
+    <div class="detail-links">
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_update', {'id' : participant.id }) }}" class="link-btn deactivate">
+                Éditer ce profil
+            </a>
+        {% endif %}
 
-    {% if is_granted('ROLE_ADMIN') %}
-        <a href="{{ path('app_update', {'id' : participant.id }) }}">
-            <div class="link-btn deactivate">Éditer ce profil</div>
+        <a href="{{ path('event_list') }}" class="return link-btn">
+            Retour
         </a>
-    {% endif %}
-
-    <a href="{{ path('event_list') }}">
-        <div class="return link-btn">Retour</div>
-    </a>
+    </div>
 
 {% endblock %}

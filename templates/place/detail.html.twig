@@ -5,21 +5,21 @@
 {% endblock %}
 
 {% block title %}
-{{ parent() }} - Détails
+    {{ parent() }} - Détails
 {% endblock %}
 
 {% block main %}
-<div class="place-detail-container">
-    <h1>Détail du lieu : </h1>
-    <div class="place-detail-frame">
-    <p><strong>{{ place.name }}</strong></p>
+    <div class="place-detail-container">
+        <h1>Détail du lieu : </h1>
+        <div class="place-detail-frame">
+            <p><strong>{{ place.name }}</strong></p>
 
-    {# si on a une adresse #}
+            {# si on a une adresse #}
 
-    {% if place.street and place.postalCode and place.city %}
-        <p>{{ place.street }}</p>
-        <p>{{ place.city }}</p>
-        <p>{{ place.postalCode }}</p>
+            {% if place.street and place.postalCode and place.city %}
+            <p>{{ place.street }}</p>
+            <p>{{ place.city }}</p>
+            <p>{{ place.postalCode }}</p>
         </div>
         {% set address = place.street ~ ', ' ~ place.postalCode ~ ' ' ~ place.city %}
         {% set addressGoogle = address|replace({' ': '+'}) %}
@@ -27,27 +27,29 @@
         <iframe src="https://maps.google.com/maps?q={{ addressGoogle }}&amp;output=embed"
                 allowfullscreen loading="lazy">
         </iframe>
-    {% endif %}
+        {% endif %}
 
-    {# si on a des coordonnées GPS #}
-    {% if place.latitude is not null and place.longitude is not null %}
-        <p>Coordonnées GPS : </p>
-        <ul>
-            <li>Latitude : {{ place.latitude }}</li>
-            <li>Longitude : {{ place.longitude }}</li>
-        </ul>
+        {# si on a des coordonnées GPS #}
+        {% if place.latitude is not null and place.longitude is not null %}
+            <p>Coordonnées GPS : </p>
+            <ul>
+                <li>Latitude : {{ place.latitude }}</li>
+                <li>Longitude : {{ place.longitude }}</li>
+            </ul>
 
-        <iframe src="https://maps.google.com/maps?q={{ place.latitude }},{{ place.longitude }}&amp;output=embed"
-                allowfullscreen loading="lazy">
-        </iframe>
-    {% endif %}
+            <iframe src="https://maps.google.com/maps?q={{ place.latitude }},{{ place.longitude }}&amp;output=embed"
+                    allowfullscreen loading="lazy">
+            </iframe>
+        {% endif %}
 
-    {% if app.user and app.user.admin == app.user.id %}
-    <a href="{{ path('place_edit', { id: place.id}) }}"> Modifier ce lieu</a>
-    <a href="{{ path('place_delete',{id:place.id}) }}"> Supprimer ce lieu</a>
-    {% endif %}
+        {% if app.user and app.user.admin == app.user.id %}
+            <div class="detail-links">
+                <a href="{{ path('place_edit', { id: place.id}) }}" class="link-btn"> Modifier ce lieu</a>
+                <a href="{{ path('place_delete',{id:place.id}) }}" class="link-btn delete"> Supprimer ce lieu</a>
+            </div>
+        {% endif %}
 
-</div>
+    </div>
 
 {% endblock %}
 

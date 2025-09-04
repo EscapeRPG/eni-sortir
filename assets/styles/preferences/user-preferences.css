@@ -102,6 +102,17 @@
                     color: #c8926c;
                 }
             }
+
+            #creamy-rainbow {
+                background-color:#fa408c;
+                color: white;
+                border-bottom: 2px solid  #dd2c47;
+
+                &:hover {
+                    background-color: #ff005f;
+                    color: #f8b1c2;
+                }
+            }
         }
     }
 }

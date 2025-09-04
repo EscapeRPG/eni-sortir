@@ -22,6 +22,7 @@
     --green: #33a347;
     --orange: #bc5822;
     --red: #912a2d;
+    --group-select-active:#bc5822
 }
 
 .pochi-pink {
@@ -47,6 +48,7 @@
     --green: #b6f7c1;
     --orange: #ffc3a0;
     --red: #ff9a9e;
+    --group-select-active:#ff80bf;
     --cursor: url('/images/pochi.png')4 4, auto;
 }
 
@@ -74,6 +76,7 @@
     --green: #1fd340;
     --orange: #f65b0a;
     --red: #dd0d14;
+    --group-select-active:#254e11;
     --cursor: url('/images/rex.png') 4 4, auto;
 }
 
@@ -101,6 +104,7 @@
     --green: #1fd340;
     --orange: #f65b0a;
     --red: #dd0d14;
+    --group-select-active:#4e2611;
     --cursor: url('/images/caca.png') 4 4, auto;
 }
 
@@ -108,7 +112,7 @@
     --header-bg-color: linear-gradient(90deg, red, orange, yellow, #6dbc2b, green, blue, purple, deeppink);
     --other-bg-color: #d3887e;
     --bg-main-color: #fde6d4;
-    --txt-main-color: #504737;
+    --txt-main-color: #a3216f;
     --event-bg-color: #fde6d4;
     --a-color: #dd2c47;
     --a-color-hover: #ff005f;
@@ -116,7 +120,7 @@
     --events-dates-bg-color: #d3887e;
     --events-a-color: #ff531f;
     --events-a-color-hover: #bc2f0f;
-    --events-color: #504737;
+    --events-color: #a3216f;
     --buttons-bg-color: #dd2c47;
     --buttons-bg-color-hover: #b10c26;
     --buttons-color: #f8b1c2;
@@ -128,5 +132,6 @@
     --green: #1fd340;
     --orange: #f65b0a;
     --red: #dd0d14;
+    --group-select-active:#fa408c;
     --cursor: url('/images/unicorn.png') 4 4, auto;
 }

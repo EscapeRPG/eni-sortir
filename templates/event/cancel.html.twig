@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer un super event{% endblock %}
+{% block title %}{{ parent() }} - Annuler un événement{% endblock %}
 
 {% block main %}
-    <h1> Votre motif d'annulation snif snif </h1>
+    <h1>Votre motif d'annulation snif snif</h1>
 
     {{ form_start(cancel_form) }}
 

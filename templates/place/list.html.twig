@@ -2,16 +2,15 @@
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/places/place-list.css') }}">
 {% endblock %}
-{% block title %}Créer un super event{% endblock %}
+{% block title %}{{ parent() }} - Liste des lieux de sortie{% endblock %}
 
 {% block main %}
-<div class= "places-container" >
-    <h1> Lieux de sorties </h1>
-<p>Choissisez ou créer de nouveaux lieux !</p>
-    {% for place in places %}
-        <a href="{{ path('place_detail', {id:place.id }) }}" class="place-card">
-            <h2>{{ place.name }}</h2> </a>
-
-    {% endfor %}
-</div>
+    <div class="places-container">
+        <h1> Lieux de sorties </h1>
+        <p>Choisissez ou créez de nouveaux lieux !</p>
+        {% for place in places %}
+            <a href="{{ path('place_detail', {id:place.id }) }}" class="place-card">
+                <h2>{{ place.name }}</h2></a>
+        {% endfor %}
+    </div>
 {% endblock %}

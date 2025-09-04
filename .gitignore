@@ -24,4 +24,5 @@
 
 .env
 .env.test
+.env.prod
 

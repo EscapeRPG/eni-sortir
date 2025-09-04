@@ -158,12 +158,13 @@ public function delete(Place $place, Request $request, EntityManagerInterface $e
         return $this->redirectToRoute('place_list');
     }
 
-    private function checkUserAdmin(#[CurrentUser] ?User $userConnected): Response
+    private function checkUserAdmin(#[CurrentUser] ?User $userConnected): ?Response
     {
         if (!$userConnected || !in_array('ROLE_ADMIN', $userConnected->getRoles())) {
             $this->addFlash('error','Cette page est réservée aux administrateurs');
             return $this->redirectToRoute('app_main');
         }
+        return null;
     }
 
 }

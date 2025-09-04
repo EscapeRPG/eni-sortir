@@ -48,6 +48,8 @@
     --green: #b6f7c1;
     --orange: #ffc3a0;
     --red: #ff9a9e;
+    --cursor :url('/images/icon.png')4 4, auto;
+
     --group-select-active:#ff80bf;
     --cursor: url('/images/pochi.png')4 4, auto;
 }
@@ -78,6 +80,7 @@
     --red: #dd0d14;
     --group-select-active:#254e11;
     --cursor: url('/images/rex.png') 4 4, auto;
+
 }
 
 .brown-poop {

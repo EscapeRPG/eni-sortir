@@ -1,35 +1,137 @@
 .dark-mode {
-    --header-bg-color: #101010;
-    --other-bg-color: #2b2b2b;
-    --bg-main-color: #1a1a1a;
-    --txt-main-color: #f5f5f5;
-    --event-bg-color: #2a2a2a;
+    --header-bg-color: linear-gradient(180deg, #101010, #101010);
+    --other-bg-color: #272727;
+    --bg-main-color: #303030;
+    --txt-main-color: #dddddd;
+    --event-bg-color: #404040;
     --a-color: #f5f5f5;
     --a-color-hover: #ffd280;
-    --events-dates-container-bg-color: #1c1c1c;
-    --events-dates-bg-color: #444444;
+    --events-dates-container-bg-color: #222222;
+    --events-dates-bg-color: #757575;
     --events-a-color: #ff8d1a;
     --events-a-color-hover: #ffffff;
     --events-color: #f5f5f5;
-    --event-shadow: rgba(0, 0, 168, 0.6);
-
+    --buttons-bg-color: #101010;
+    --buttons-bg-color-hover: #404040;
+    --buttons-color: #dddddd;
+    --buttons-color-hover: #ffd280;
+    --event-shadow: rgba(78, 47, 26, 0.4);
+    --active-tag-bg: #fff8f3;
+    --active-tag: #101010;
+    --active-tag-border: #ff8d1a;
+    --green: #33a347;
+    --orange: #bc5822;
+    --red: #912a2d;
+    --group-select-active:#bc5822
 }
 
 .pochi-pink {
-    --header-bg-color: #f8c8dc;
+    --header-bg-color: linear-gradient(180deg, #ffa7cd, #ffa7cd);
     --other-bg-color: #ffe0f0;
     --bg-main-color: #fff8fb;
     --txt-main-color: #5a3c4f;
     --event-bg-color: #ffffff;
-    --a-color: #ff9acb;
+    --a-color: #ffeef7;
     --a-color-hover: #e85a9f;
     --events-dates-container-bg-color: #ffd6e8;
     --events-dates-bg-color: #ffb6d9;
     --events-a-color: #ff80bf;
     --events-a-color-hover: #ff5ca9;
     --events-color: #803d67;
+    --buttons-bg-color: #ff80bf;
+    --buttons-bg-color-hover: #ff5ca9;
+    --buttons-color: #5a3c4f;
+    --buttons-color-hover: #fff8fb;
+    --active-tag-bg: #fff8f3;
+    --active-tag: #5a3c4f;
+    --active-tag-border: #ff5ca9;
     --green: #b6f7c1;
     --orange: #ffc3a0;
     --red: #ff9a9e;
-    --cursor :url('/images/pochi.png')4 4, auto;
+    --group-select-active:#ff80bf;
+    --cursor: url('/images/pochi.png')4 4, auto;
+}
+
+.green-rex {
+    --header-bg-color: linear-gradient(180deg, #254e11, #254e11);
+    --other-bg-color: #789e38;
+    --bg-main-color: #b6cd6f;
+    --txt-main-color: #162c0b;
+    --event-bg-color: #c1e8ac;
+    --a-color: #e4ffd7;
+    --a-color-hover: #ed9231;
+    --events-dates-container-bg-color: #587724;
+    --events-dates-bg-color: #ed9231;
+    --events-a-color: #162c0b;
+    --events-a-color-hover: #ed9231;
+    --events-color: #162c0b;
+    --buttons-bg-color: #254e11;
+    --buttons-bg-color-hover: #162c0b;
+    --buttons-color: #e4ffd7;
+    --buttons-color-hover: #ed9231;
+    --event-shadow: rgba(78, 47, 26, 0.4);
+    --active-tag-bg: #e4ffd7;
+    --active-tag: #254e11;
+    --active-tag-border: orange;
+    --green: #1fd340;
+    --orange: #f65b0a;
+    --red: #dd0d14;
+    --group-select-active:#254e11;
+    --cursor: url('/images/rex.png') 4 4, auto;
+}
+
+.brown-poop {
+    --header-bg-color: linear-gradient(180deg, #511f0e, #511f0e);
+    --other-bg-color: #986b47;
+    --bg-main-color: #c8926c;
+    --txt-main-color: #3e1e09;
+    --event-bg-color: #a86942;
+    --a-color: #efb597;
+    --a-color-hover: #af5320;
+    --events-dates-container-bg-color: #602b17;
+    --events-dates-bg-color: #a8541a;
+    --events-a-color: #602b17;
+    --events-a-color-hover: #ff901e;
+    --events-color: #4c2311;
+    --buttons-bg-color: #4e2311;
+    --buttons-bg-color-hover: #2c150b;
+    --buttons-color: #f8d0b1;
+    --buttons-color-hover: #cf562b;
+    --event-shadow: rgba(67, 27, 20, 0.4);
+    --active-tag-bg: #ffe3d7;
+    --active-tag: #4e2611;
+    --active-tag-border: #9c3211;
+    --green: #1fd340;
+    --orange: #f65b0a;
+    --red: #dd0d14;
+    --group-select-active:#4e2611;
+    --cursor: url('/images/caca.png') 4 4, auto;
+}
+
+.creamy-rainbow {
+    --header-bg-color: linear-gradient(90deg, red, orange, yellow, #6dbc2b, green, blue, purple, deeppink);
+    --other-bg-color: #d3887e;
+    --bg-main-color: #fde6d4;
+    --txt-main-color: #a3216f;
+    --event-bg-color: #fde6d4;
+    --a-color: #dd2c47;
+    --a-color-hover: #ff005f;
+    --events-dates-container-bg-color: linear-gradient(180deg, red, orange, yellow, #6dbc2b, green, blue, purple, deeppink);
+    --events-dates-bg-color: #d3887e;
+    --events-a-color: #ff531f;
+    --events-a-color-hover: #bc2f0f;
+    --events-color: #a3216f;
+    --buttons-bg-color: #dd2c47;
+    --buttons-bg-color-hover: #b10c26;
+    --buttons-color: #f8b1c2;
+    --buttons-color-hover: #fa408c;
+    --event-shadow: rgba(17, 76, 103, 0.4);
+    --active-tag-bg: #ffe3d7;
+    --active-tag: #fb7c17;
+    --active-tag-border: #fb7c17;
+    --green: #1fd340;
+    --orange: #f65b0a;
+    --red: #dd0d14;
+    --group-select-active:#fa408c;
+    --cursor: url('/images/unicorn.png') 4 4, auto;
 }

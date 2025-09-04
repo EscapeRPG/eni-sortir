@@ -1,8 +1,8 @@
 import { Controller } from '@hotwired/stimulus';
 export default class extends Controller {
     activeTag({ params: { tag1, tag2 } }) {
-        document.getElementById(tag1).classList.add = "active-tag";
-        document.getElementById(tag2).classList.remove = "active-tag";
+        document.getElementById(tag1).classList.add("active-tag");
+        document.getElementById(tag2).classList.remove("active-tag");
 
         const profile = document.getElementById("profile"),
             themes = document.getElementById("themes");

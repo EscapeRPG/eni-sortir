@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Créer un super event{% endblock %}
+{% block title %}{{ parent() }} - Créer un événement{% endblock %}
 
 {% block main %}
     <div data-controller="modals">
-        <h2> Créez votre événement</h2>
+        <h2>Créez votre événement</h2>
         <div class="author">
             <p>
                 Créé par {{ app.user.firstName }}
@@ -74,7 +74,7 @@
 
                     <div class="tag-container">
                         <button type="button" id="address-btn"
-                                class="active-tag"
+                                class="link-btn active-tag"
                                 data-action="click->modals#activeTag"
                                 data-modals-tag1-param="address-btn"
                                 data-modals-tag2-param="coordinates-btn">
@@ -83,7 +83,8 @@
                         <button type="button" id="coordinates-btn"
                                 data-action="click->modals#activeTag"
                                 data-modals-tag1-param="coordinates-btn"
-                                data-modals-tag2-param="address-btn">
+                                data-modals-tag2-param="address-btn"
+                                class="link-btn">
                             Ajout par coordonnées
                         </button>
                     </div>
@@ -114,7 +115,7 @@
                         {{ form_label(group_form.userList) }}
                         {{ form_widget(group_form.userList) }}
                     </div>
-                    <button data-action="click->modals#sendGroup">Enregistrer</button>
+                    <button data-action="click->modals#sendGroup" class="link-btn">Enregistrer</button>
                     {{ form_end(group_form) }}
                 </div>
             </div>

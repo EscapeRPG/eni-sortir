@@ -40,8 +40,5 @@ return [
     'swiper' => [
         'version' => '11.2.10',
     ],
-    'swiper_controller' => [
-        'path' => './assets/controllers/swiper_controller.js',
-    ],
 
 ];

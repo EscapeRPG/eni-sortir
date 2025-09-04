@@ -43,11 +43,3 @@ class EventFixtures extends Fixture implements DependentFixtureInterface
 
     }
 }
-
-/*if ($event->getEndDateHour() < new \DateTime('-1month')) {
-    $this->getReference(StateFixtures::STATE . '_6', State::class);
-} elseif ($event->getEndDateHour() < new \DateTime()) {
-    $this->getReference(StateFixtures::STATE . '_4', State::class);
-} elseif ($event->getStartingDateHour() >= new \DateTime($event->getEndDateHour())) {}
-$this->getReference(StateFixtures::STATE . '_' . $faker->numberBetween(0,6), State::class));*/
-

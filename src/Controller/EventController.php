@@ -33,7 +33,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Routing\Attribute\Route;
@@ -182,8 +181,6 @@ final class EventController extends AbstractController
                 $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_dir']);
                 $event->setPosterFile($name);
             }
-
-            //$event->setPosterFile($name);
 
             $em->flush();
             $this->addFlash('success', 'Événement édité!');
@@ -351,20 +348,6 @@ final class EventController extends AbstractController
         }
     }
 
-    #todo non utilisé à supprimer?
-    /*public function closeIfOutDate(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, EntityManagerInterface $entityManager): void
-    {
-        $event = $sortieRepository->find($id);
-        $today = new \DateTime();
-        $closureDate = $event->getRegistrationDeadline();
-        $closureState = $stateRepository->find(3);
-
-        if ($closureDate == $today) {
-            $event->setState($closureState);
-            $entityManager->persist($event);
-            $entityManager->flush();
-        }
-    }*/
 
     /**
      * @throws Exception

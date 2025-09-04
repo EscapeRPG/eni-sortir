@@ -2,20 +2,14 @@
 
 namespace App\Form;
 
-use App\Entity\Campus;
+
 use App\Entity\Event;
-use App\Entity\Place;
-use App\Entity\State;
-use App\Entity\User;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ButtonType;
-use Symfony\Component\Form\Extension\Core\Type\ResetType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use function Sodium\add;
+
 
 class CancellationReasonType extends AbstractType
 {
@@ -33,7 +27,6 @@ class CancellationReasonType extends AbstractType
                     'class' => 'link-btn',
                 ]
             ]);
-
         ;
     }
 

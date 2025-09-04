@@ -3,17 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Group;
-use App\Entity\Place;
 use App\Entity\User;
 use App\Form\GroupType;
-use App\Form\PlaceType;
 use App\Repository\GroupRepository;
 use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -104,8 +100,6 @@ final class GroupController extends AbstractController
             'id' => $id
         ]);
     }
-
-    // src/Controller/GroupController.php
 
     /**
      * @throws Exception

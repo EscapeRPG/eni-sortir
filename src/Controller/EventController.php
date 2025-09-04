@@ -17,6 +17,7 @@ use App\Helper\FileUploader;
 use App\Message\SendMailReminder;
 use App\Repository\GroupRepository;
 use App\Repository\StateRepository;
+use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\SortieRepository;
@@ -39,7 +40,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\Serializer\SerializerInterface; 
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/event', name: 'event')]
 final class EventController extends AbstractController
@@ -57,9 +58,20 @@ final class EventController extends AbstractController
      * @throws TransportExceptionInterface
      */
     #[Route('/create', name: '_create')]
-    public function create(Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, GroupRepository $groupRepository, MailerInterface $mailer): Response
+    public function create(DeviceDetector $deviceDetector, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, #[CurrentUser] ?User $user, GroupRepository $groupRepository, MailerInterface $mailer): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
+        //Détection des mobiles et restriction. NB: il existe aussi isMobile au lieu de isSmartphone mais cela bloque aussi sur tablette, et !isDesktop pour tout sauf les ordi
+        $userAgent = $request->headers->get('User-Agent');
+        $deviceDetector->setUserAgent($userAgent);
+        $deviceDetector->parse();
+
+        if ($deviceDetector->isSmartphone()) {
+
+            $this->addFlash('alert', 'La création d\'événement n\'est pas disponible sur mobile.');
+            return $this->redirectToRoute('event_list');
+        }
 
         $event = new Event();
         $place = new Place();
@@ -149,15 +161,14 @@ final class EventController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
-    public function edit(Event $event,#[CurrentUser] ?User  $user, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
+    public function edit(Event $event, #[CurrentUser] ?User $user, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
-        if ($redirect = $this->checkStatusUser($event, $user, $security ))
-        {
-           return $redirect;
+        if ($redirect = $this->checkStatusUser($event, $user, $security)) {
+            return $redirect;
         };
 
         $form = $this->createForm(EventType::class, $event, [
-            'user'=> $user,
+            'user' => $user,
             'group_repository' => $em->getRepository(Group::class),
         ]);
         $placeForm = $this->createForm(PlaceType::class, new Place());
@@ -306,7 +317,7 @@ final class EventController extends AbstractController
 
 
         if (!$event) {
-            $this->addFlash('error','Cet évènement n\'existe pas');
+            $this->addFlash('error', 'Cet évènement n\'existe pas');
             return $this->redirectToRoute('event_list');
         }
 
@@ -368,7 +379,7 @@ final class EventController extends AbstractController
         $user = $userConnected->getId();
 
         if ($event->getState()->getId() !== 2) {
-            $this->addFlash('error',"Tu ne peux pas t'inscrire à cet évènement");
+            $this->addFlash('error', "Tu ne peux pas t'inscrire à cet évènement");
             return $this->redirectToRoute('event_list');
         }
 
@@ -490,10 +501,9 @@ final class EventController extends AbstractController
 
 
     #[Route ('/cancel/{id}', name: '_cancel', requirements: ['id' => '\d+'])]
-    public function cancel(Event $event,#[CurrentUser] ?User  $user, EntityManagerInterface $em, Security $security, StateRepository $stateRepository, Request $request): Response
+    public function cancel(Event $event, #[CurrentUser] ?User $user, EntityManagerInterface $em, Security $security, StateRepository $stateRepository, Request $request): Response
     {
-        if ($redirect = $this->checkStatusUser($event, $user, $security))
-        {
+        if ($redirect = $this->checkStatusUser($event, $user, $security)) {
             return $redirect;
         };
 
@@ -519,10 +529,9 @@ final class EventController extends AbstractController
     }
 
     #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
-    public function reactivate(Event $event,#[CurrentUser] ?User  $user, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
+    public function reactivate(Event $event, #[CurrentUser] ?User $user, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
     {
-        if ($redirect = $this->checkStatusUser($event,$user, $security))
-        {
+        if ($redirect = $this->checkStatusUser($event, $user, $security)) {
             return $redirect;
         };
 
@@ -538,10 +547,9 @@ final class EventController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
-    public function delete(Event $event,#[CurrentUser] ?User  $user, Request $request, EntityManagerInterface $em, Security $security): Response
+    public function delete(Event $event, #[CurrentUser] ?User $user, Request $request, EntityManagerInterface $em, Security $security): Response
     {
-        if ($redirect = $this->checkStatusUser($event,$user, $security))
-        {
+        if ($redirect = $this->checkStatusUser($event, $user, $security)) {
             return $redirect;
         };
 
@@ -557,7 +565,6 @@ final class EventController extends AbstractController
         }
         return $this->redirectToRoute('event_list');
     }
-
 
 
     #[Route('/api/events/filterByDate', name: '_api_events', methods: ['GET'])]
@@ -581,19 +588,19 @@ final class EventController extends AbstractController
         return new JsonResponse($jsonContent, 200, [], true);
     }
 
-#[Route('/api/events/filterByState/{id}', name: '_api_events_filter_by_state', requirements: ['id' => '\d+'], methods: ['GET'])]
-#[OA\Get(
-    path: '/api/events/filterByState/{id}',
-    description: 'Cette méthode retourne les événements en fonction de l\'état spécifié.',
-    summary: 'Récupérer tous les événements par état',
-    parameters: [
-        new OA\Parameter(name: 'id', description: 'ID de l\'état de l\'événement', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
-    ],
-    responses: [
-        new OA\Response(response: 200, description: 'Liste des événements correspondant à l\'état filtré'),
-        new OA\Response(response: 400, description: 'État d\'évènement non valide')
-    ]
-)]
+    #[Route('/api/events/filterByState/{id}', name: '_api_events_filter_by_state', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[OA\Get(
+        path: '/api/events/filterByState/{id}',
+        description: 'Cette méthode retourne les événements en fonction de l\'état spécifié.',
+        summary: 'Récupérer tous les événements par état',
+        parameters: [
+            new OA\Parameter(name: 'id', description: 'ID de l\'état de l\'événement', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Liste des événements correspondant à l\'état filtré'),
+            new OA\Response(response: 400, description: 'État d\'évènement non valide')
+        ]
+    )]
     public function apiGetEventsByState(SortieRepository $sortieRepository, int $id): JsonResponse
     {
         $stateIdAuthorized = [2, 3, 4]; // les états que je peux choisir pour mon tri : ouverte, clôturée et en cours
@@ -618,7 +625,7 @@ final class EventController extends AbstractController
     {
 
         if ($event->getOrganizer() !== $user && !$security->isGranted('ROLE_ADMIN')) {
-            $this->addFlash('error',"Accès interdit");
+            $this->addFlash('error', "Accès interdit");
             return $this->redirectToRoute('app_main');
         }
         return null;

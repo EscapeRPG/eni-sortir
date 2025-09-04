@@ -1,5 +1,5 @@
 :root {
-    --header-bg-color: #3d86e1;
+    --header-bg-color: linear-gradient(180deg, #3d86e1, #3d86e1);
     --other-bg-color: #8ed7ff;
     --bg-main-color: #fff8f3;
     --txt-main-color: #114565;
@@ -7,14 +7,22 @@
     --a-color: #ffffff;
     --a-color-hover: #114565;
     --event-shadow: rgba(20, 115, 168, 0.6);
-    --events-dates-container-bg-color: #d3faff;
+    --events-dates-container-bg-color: linear-gradient(180deg, #d3faff, #d3faff);
     --events-dates-bg-color: #8ed7ff;
     --events-a-color: #37baed;
     --events-a-color-hover: #147cb1;
     --events-color: #2e5268;
+    --buttons-bg-color: #3d86e1;
+    --buttons-bg-color-hover: #fff8f3;
+    --buttons-color: #fff8f3;
+    --buttons-color-hover: #3d86e1;
+    --active-tag-bg: #fff8f3;
+    --active-tag: #114565;
+    --active-tag-border: #3d86e1;
     --green: #89df45;
     --orange: #f67749;
     --red: #f64949;
+    --group-select-active: #3d86e1;
     --margin-top: 77px;
 }
 
@@ -35,7 +43,7 @@ body {
         align-items: center;
         justify-content: space-between;
         width: calc(100% - 80px);
-        background-color: var(--header-bg-color);
+        background: var(--header-bg-color);
         padding: 15px 40px;
         position: fixed;
         top: 0;
@@ -146,7 +154,7 @@ body {
                 right: 0;
                 transform: translateX(100%);
                 transition: transform .4s ease;
-                background-color: var(--header-bg-color);
+                background: var(--header-bg-color);
                 margin: 0;
 
                 &.open {
@@ -307,15 +315,29 @@ a {
     transition: background-color 0.3s ease, transform 0.2s ease;
     text-align: center;
     text-decoration: none;
-    background-color: var(--header-bg-color);
-    color: var(--bg-main-color);
+    background-color: var(--buttons-bg-color);
+    color: var(--buttons-color);
     transform-origin: center;
 
     &:hover {
-        background-color: var(--bg-main-color);
-        color: var(--header-bg-color);
+        background-color: var(--buttons-bg-color-hover);
+        color: var(--buttons-color-hover);
         box-shadow: 5px 5px 5px var(--event-shadow);
         transform: scale(1.05);
+    }
+}
+
+.active-tag {
+    background-color: var(--active-tag-bg);
+    color: var(--active-tag);
+    border-bottom: 2px solid var(--active-tag-border) !important;
+
+    &:hover {
+        background-color: var(--active-tag-bg);
+        color: var(--active-tag);
+        border-bottom: 2px solid var(--active-tag-border);
+        box-shadow: none;
+        transform: scale(1);
     }
 }
 

@@ -369,7 +369,9 @@ final class EventController extends AbstractController
      * @throws Exception
      */
     #[Route('/join/{id}', name: '_join', requirements: ['id' => '\d+'])]
-    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager, MailerInterface $mailer, LoggerInterface $logger, MessageBusInterface $bus): Response
+    public function join(StateRepository $stateRepository, SortieRepository $sortieRepository, #[CurrentUser] ?User $userConnected, int $id, ParameterBagInterface $bag, EntityManagerInterface $entityManager,
+                         MailerInterface $mailer, LoggerInterface $logger, MessageBusInterface $bus): Response
+
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
@@ -429,7 +431,6 @@ final class EventController extends AbstractController
 
             $bus->dispatch(new SendMailReminder($eventId), [new DelayStamp($delay)]);
             //si -48h alors on programme le message avec un delaystamp
-
 
         }
         return $this->redirectToRoute('event_list', [

@@ -66,3 +66,14 @@
         margin: 0;
     }
 }
+
+@media (max-width: 430px) {
+    .users-list {
+
+        & .user {
+            .user-pic {
+                width: 30%;
+            }
+        }
+    }
+}

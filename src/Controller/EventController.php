@@ -66,7 +66,7 @@ final class EventController extends AbstractController
         $group = new Group();
 
         $placeForm = $this->createForm(PlaceType::class, $place);
-        $groupForm = $this->createForm(GroupType::class, $group, []);
+        $groupForm = $this->createForm(GroupType::class, $group);
         $form = $this->createForm(EventType::class, $event, [
             'user' => $user,
             'group_repository' => $groupRepository,
@@ -149,15 +149,19 @@ final class EventController extends AbstractController
     }
 
     #[Route('/edit/{id}', name: '_edit', requirements: ['id' => '\d+'])]
-    public function edit(Event $event, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
+    public function edit(Event $event,#[CurrentUser] ?User  $user, Request $request, EntityManagerInterface $em, ParameterBagInterface $parameterBag, FileUploader $fileUploader, Security $security): Response
     {
-        if ($redirect = $this->checkStatusUser($event, $security))
+        if ($redirect = $this->checkStatusUser($event, $user, $security ))
         {
            return $redirect;
         };
 
-        $form = $this->createForm(EventType::class, $event);
+        $form = $this->createForm(EventType::class, $event, [
+            'user'=> $user,
+            'group_repository' => $em->getRepository(Group::class),
+        ]);
         $placeForm = $this->createForm(PlaceType::class, new Place());
+        $groupForm = $this->createForm(GroupType::class, new Group());
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -172,12 +176,13 @@ final class EventController extends AbstractController
 
             $em->flush();
             $this->addFlash('success', 'Événement édité!');
-            return $this->redirectToRoute('event_list', ['id' => $event->getId()]);
+            return $this->redirectToRoute('event_detail', ['id' => $event->getId()]);
         }
 
         return $this->render('event/create.html.twig', [
             'event_form' => $form,
             'place_form' => $placeForm->createView(),
+            'group_form' => $groupForm->createView(),
         ]);
     }
 
@@ -402,7 +407,7 @@ final class EventController extends AbstractController
 
             $this->addFlash('success', 'Vous êtes inscrit à l\'événement ! Un mail de confirmation va vous être envoyé');
 
-            $this->closeIfFullParticipants($stateRepository, $sortieRepository, $event->getId(), $bag, $entityManager);
+            $this->closeIfFullParticipants($stateRepository, $sortieRepository, $event->getId(), $entityManager);
 
 
             //pour le mail délai 48h !
@@ -486,9 +491,9 @@ final class EventController extends AbstractController
 
 
     #[Route ('/cancel/{id}', name: '_cancel', requirements: ['id' => '\d+'])]
-    public function cancel(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository, Request $request): Response
+    public function cancel(Event $event,#[CurrentUser] ?User  $user, EntityManagerInterface $em, Security $security, StateRepository $stateRepository, Request $request): Response
     {
-        if ($redirect = $this->checkStatusUser($event, $security))
+        if ($redirect = $this->checkStatusUser($event, $user, $security))
         {
             return $redirect;
         };
@@ -515,9 +520,9 @@ final class EventController extends AbstractController
     }
 
     #[Route ('/reactivate/{id}', name: '_reactivate', requirements: ['id' => '\d+'])]
-    public function reactivate(Event $event, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
+    public function reactivate(Event $event,#[CurrentUser] ?User  $user, EntityManagerInterface $em, Security $security, StateRepository $stateRepository): Response
     {
-        if ($redirect = $this->checkStatusUser($event, $security))
+        if ($redirect = $this->checkStatusUser($event,$user, $security))
         {
             return $redirect;
         };
@@ -534,9 +539,9 @@ final class EventController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: '_delete', requirements: ['id' => '\d+'])]
-    public function delete(Event $event, Request $request, EntityManagerInterface $em, Security $security): Response
+    public function delete(Event $event,#[CurrentUser] ?User  $user, Request $request, EntityManagerInterface $em, Security $security): Response
     {
-        if ($redirect = $this->checkStatusUser($event, $security))
+        if ($redirect = $this->checkStatusUser($event,$user, $security))
         {
             return $redirect;
         };
@@ -554,15 +559,7 @@ final class EventController extends AbstractController
         return $this->redirectToRoute('event_list');
     }
 
-    private function checkStatusUser(Event $event, Security $security): Response
-    {
-        if ($event->getOrganizer() !== $security->getUser() && !$security->isGranted('ROLE_ADMIN')) {
-            $this->addFlash('error',"Accès interdit");
-            return $this->redirectToRoute('app_main');
-        }
-      
 
-    }
 
     #[Route('/api/events/filterByDate', name: '_api_events', methods: ['GET'])]
     #[OA\Get(
@@ -615,6 +612,18 @@ final class EventController extends AbstractController
         $jsonContent = $this->serializer->serialize($events, 'json', ['groups' => 'event:read']);
 
         return new JsonResponse($jsonContent, 200, [], true);
+    }
+
+
+    private function checkStatusUser(Event $event, #[CurrentUser] ?User $user, Security $security): ?Response
+    {
+
+        if ($event->getOrganizer() !== $user && !$security->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error',"Accès interdit");
+            return $this->redirectToRoute('app_main');
+        }
+        return null;
+
     }
 
 }

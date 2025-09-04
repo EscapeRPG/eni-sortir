@@ -25,7 +25,6 @@ return [
     '@hotwired/turbo' => [
         'version' => '7.3.0',
     ],
-
     'burger_controller' => [
         'path' => './assets/controllers/burger_controller.js',
     ],
@@ -38,4 +37,11 @@ return [
     'select2_controller' => [
         'path' => './assets/controllers/select2_controller.js',
     ],
+    'swiper' => [
+        'version' => '11.2.10',
+    ],
+    'swiper_controller' => [
+        'path' => './assets/controllers/swiper_controller.js',
+    ],
+
 ];

@@ -1,11 +1,14 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class PlaceCreatorController extends Controller {
-    showForm({ params: { div1, div2 } }) {
+    showForm({ params: { div1, div2, btn1, btn2 } }) {
         const address = document.getElementById('address'),
             gps = document.getElementById('gps'),
             addressFields = ['place_street', 'place_postalCode', 'place_city'],
             gpsFields = ['place_latitude', 'place_longitude'];
+
+        document.getElementById(btn1).classList.add('active-tag');
+        document.getElementById(btn2).classList.remove("active-tag");
 
         if (div1 === 'address') {
             addressFields.forEach(id => document.getElementById(id).required = true);

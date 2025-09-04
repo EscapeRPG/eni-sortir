@@ -48,8 +48,8 @@ export default class extends Controller {
     }
 
     activeTag({ params: { tag1, tag2 } }) {
-        document.getElementById(tag1).className = "active-tag";
-        document.getElementById(tag2).className = "";
+        document.getElementById(tag1).classList.add("active-tag");
+        document.getElementById(tag2).classList.remove("active-tag");
 
         const address = document.getElementById("address"),
             coordinates = document.getElementById("coordinates");

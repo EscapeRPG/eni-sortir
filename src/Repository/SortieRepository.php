@@ -26,7 +26,7 @@ class SortieRepository extends ServiceEntityRepository
 
         $sql = <<<SQL
 
-SELECT u.profil_picture, u.id, u.first_name FROM USER u JOIN user_event ue ON u.ID = ue.user_id WHERE ue.event_id =:id              
+SELECT u.profil_picture, u.id, u.first_name FROM `user` u JOIN user_event ue ON u.id = ue.user_id WHERE ue.event_id =:id              
 
 SQL;
         $stmt = $this->getEntityManager()->getConnection();

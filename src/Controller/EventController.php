@@ -138,7 +138,7 @@ final class EventController extends AbstractController
                     }
 
                     $email = (new Email())
-                        ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
+                        ->from('postmaster@syrphin.com') // @TODO à changer en fonction déploiement si on le fait
                         ->to($member->getEmail())
                         ->subject('Invitation à un nouvel événement : ' . $event->getName())
                         ->html($this->renderView('email/invitation.html.twig', [
@@ -311,7 +311,6 @@ final class EventController extends AbstractController
     public function detail(SortieRepository $sortieRepository, int $id, #[CurrentUser] ?User $userConnected): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
         $event = $sortieRepository->find($id);
         $userConnectedId = $userConnected->getId();
 

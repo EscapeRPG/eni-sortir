@@ -26,7 +26,7 @@ class GroupRepository extends ServiceEntityRepository
 
         $sql = <<<SQL
 
-SELECT g.name, g.id FROM `group` g JOIN GROUP_USER gu ON g.id = gu.group_id WHERE gu.user_id =:id              
+SELECT g.name, g.id FROM `group` g JOIN `group_user` gu ON g.id = gu.group_id WHERE gu.user_id =:id              
 
 SQL;
         $stmt = $this->getEntityManager()->getConnection();
@@ -39,7 +39,7 @@ SQL;
     /**
      * @throws Exception
      */
-    /*public function findGroupDetails(int $groupId): Group
+    /*public function findGroupDetails(int $groupId): array
     {
         $sql = <<<SQL
 
@@ -86,9 +86,9 @@ SQL;
 SELECT 
     u.name AS last_name
 FROM `group` g
-LEFT JOIN group_user gu ON gu.group_id = g.id
-LEFT JOIN user u ON gu.user_id = u.id
-LEFT JOIN event e ON g.id = e.group_id
+LEFT JOIN `group_user` gu ON gu.group_id = g.id
+LEFT JOIN `user` u ON gu.user_id = u.id
+LEFT JOIN `event` e ON g.id = e.group_id
 WHERE g.id = :group_id
 SQL;
         $stmt = $this->getEntityManager()->getConnection();

@@ -1,5 +1,5 @@
 .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
-    background-color: var(--header-bg-color)
+    background-color: var(--group-select-active)
 }
 .select2-selection__choice__remove {
     margin:0;

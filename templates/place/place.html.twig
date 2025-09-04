@@ -16,19 +16,20 @@
                 data-action="click->placemaker#showForm"
                 data-placemaker-div1-param="address"
                 data-placemaker-div2-param="gps"
-                class="link-btn">
+                class="link-btn active-tag">
             Ajout avec l'adresse
         </button>
+        OU
         <button type="button"
                 data-action="click->placemaker#showForm"
                 data-placemaker-div1-param="gps"
                 data-placemaker-div2-param="address"
                 class="link-btn">
-            Ou avec les coordonnées GPS
+            Ajout avec les coordonnées GPS
         </button>
     </div>
 
-    <div id="address" style="display: none;">
+    <div id="address">
         {{ form_row(place_create.street) }}
         {{ form_row(place_create.postalCode) }}
         {{ form_row(place_create.city) }}

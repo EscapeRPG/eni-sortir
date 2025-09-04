@@ -7,7 +7,6 @@
     margin-top: 20px;
     background-color: var(--event-bg-color);
     transition: transform .3s ease;
-    color: var(--events-color);
     box-shadow: 2px 2px 5px var(--event-shadow);
 
     &:hover {

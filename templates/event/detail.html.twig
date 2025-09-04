@@ -45,43 +45,42 @@
 
 
         {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
-            <div class="detail-links">
-                {% if event.state.label == 'Ouverte' %}
-                    {% if not found %}
-                        <a href="{{ path('event_join', { id: event.id }) }}" class="link-btn">S'inscrire</a>
-                    {% endif %}
-                {% endif %}
-
-                {% if event.state.label in ['Ouverte', 'Cloturée'] %}
-                    {% if found %}
-                        <a href="{{ path('event_withdraw', { id: event.id }) }}" class="link-btn">Se désister</a>
-                    {% endif %}
-                {% endif %}
-                {% endif %}
-
-
-                {% if event.state.label == 'Annulée' %}
-                    <p><b>Raison d'annulation : </b>{{ event.cancellationReason }}</p>
+        <div class="detail-links">
+            {% if event.state.label == 'Ouverte' %}
+                {% if not found %}
+                    <a href="{{ path('event_join', { id: event.id }) }}" class="link-btn">S'inscrire</a>
                 {% endif %}
             {% endif %}
 
-
-        {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
-                <a href="{{ path('event_edit', { id: event.id}) }}" class="link-btn">Éditer</a>
-
-                <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}"
-                   onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')" class="link-btn delete">Supprimer</a>
-
-                {% if event.state.label != 'Annulée' %}
-                    <a href="{{ path('event_cancel', {id:event.id}) }}" class="link-btn deactivate">Annuler</a>
+            {% if event.state.label in ['Ouverte', 'Cloturée'] %}
+                {% if found %}
+                    <a href="{{ path('event_withdraw', { id: event.id }) }}" class="link-btn">Se désister</a>
                 {% endif %}
+            {% endif %}
+            {% endif %}
 
-                {% if event.organizer %}
-                    {% if event.state.label == 'Annulée' %}
-                        <a href="{{ path('event_reactivate', {id:event.id}) }}" class="link-btn activate"> Réactiver</a>
-                    {% endif %}
+
+            {% if event.state.label == 'Annulée' %}
+                <p><b>Raison d'annulation : </b>{{ event.cancellationReason }}</p>
+            {% endif %}
+
+
+            {% if app.user and (app.user == event.organizer or is_granted('ROLE_ADMIN')) %}
+            <a href="{{ path('event_edit', { id: event.id}) }}" class="link-btn">Éditer</a>
+
+            <a href="{{ path('event_delete', { id: event.id, token : csrf_token('delete' ~event.id)}) }}"
+               onclick="return confirm('êtes-vous sûr.e de vouloir supprimer votre event ?')" class="link-btn delete">Supprimer</a>
+
+            {% if event.state.label != 'Annulée' %}
+                <a href="{{ path('event_cancel', {id:event.id}) }}" class="link-btn deactivate">Annuler</a>
+            {% endif %}
+
+            {% if event.organizer %}
+                {% if event.state.label == 'Annulée' %}
+                    <a href="{{ path('event_reactivate', {id:event.id}) }}" class="link-btn activate"> Réactiver</a>
                 {% endif %}
-            </div>
+            {% endif %}
+        </div>
         {% endif %}
 
         {# si on a une adresse #}

@@ -82,6 +82,18 @@ class RegistrationFormType extends AbstractType
                     ]),
                 ],
             ])
+
+            ->add('agreeRules', CheckboxType::class, [
+                'mapped' => false,
+                'required' => true,
+                'label'=> 'J\'accepte le règlement utilisateur',
+                'constraints' => [
+                    new IsTrue([
+                        'message' => "Veuillez accepter le réglement utilisateur",
+                ]),
+            ],
+            ])
+
             ->add('plainPassword', PasswordType::class, [
                                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller

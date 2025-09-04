@@ -420,7 +420,6 @@ final class EventController extends AbstractController
             $bus->dispatch(new SendMailReminder($eventId), [new DelayStamp($delay)]);
             //si -48h alors on programme le message avec un delaystamp
 
-
         }
         return $this->redirectToRoute('event_list', [
             'participants' => $participants,

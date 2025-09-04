@@ -23,11 +23,34 @@
         <div>
             {{ form_widget(registrationForm.agreeTerms) }}
             {{ form_label(registrationForm.agreeTerms) }}
+
+            {{ form_widget(registrationForm.agreeRules) }}
+            <label for="{{ registrationForm.agreeRules.vars.id }} ">
+            <!-- vars.id pour faire le lien entre le label et le checkbox.-->
+               <span data-controller="modals" data-action="click->modals#showRulesModal" class="modal-btn link-btn">
+                    J'accepte le règlement utilisateur
+               </span>
+            </label>
         </div>
     </div>
 
     <button type="submit" class="btn link-btn">Valider</button>
     {{ form_end(registrationForm) }}
+
+    <!--Modal pour le réglement-->
+    <div id="modal-container" class="modal-container" data-controller="modals">
+        <div class="modal" data-modals-target="modal">
+            <span id="close-modal" data-action="click->modals#closeModal">&times;</span>
+
+            <div id="terms-modal" data-modals-target="rules" style="display: none;">
+                <h2>Réglement utilisateur</h2>
+                {{ include('/user/rules.html.twig') }}
+            </div>
+        </div>
+
+    </div>
+
+
 
     {% if not is_granted('ROLE_USER') %}
         <p>Déjà un compte ? <a href="{{ path('app_login') }}">Connectez-vous</a> !</p>

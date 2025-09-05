@@ -46,3 +46,9 @@ The project uses a My SQL Database
 ### Api
 
 APi documentation is available from the application on the **api/doc** route.
+
+### Particular dependencies
+
+- device detector : acsiomatic
+- api doc : nelmio
+- templating : twig

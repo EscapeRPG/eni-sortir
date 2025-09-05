@@ -30,6 +30,11 @@
                                     {{ event.startingDateHour | date('H:i:s') }}
                                 </div>
                                 <div>
+                                    {{ ux_icon('tabler:clock-hour-7') }}
+                                    <strong>Durée :</strong>
+                                    {{ event.duration | duration }}
+                                </div>
+                                <div>
                                     {{ ux_icon('tabler:map-pin') }}
                                     <strong>Adresse :</strong>
                                     {{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}

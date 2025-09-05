@@ -183,7 +183,14 @@ final class EventController extends AbstractController
                 $event->setPosterFile($name);
             }
 
-            //$event->setPosterFile($name);
+            //si c'est cloturé et qu'on change la date d'inscription, pour que ca repasse en ouverte
+            $now = new \DateTimeImmutable();
+            if($event->getRegistrationDeadline()>$now && $event->getState()->getId()===3){
+                $openstate = $em->getRepository(State::class)->find(2);
+                if($openstate){
+                    $event->setState($openstate);
+                }
+            }
 
             $em->flush();
             $this->addFlash('success', 'Événement édité!');

@@ -311,6 +311,7 @@ class UserController extends AbstractController
 
         if ($user->isAdmin() === false) {
             $user->setIsAdmin(true);
+            $user->setRoles(['ROLE_ADMIN']);
             $em->flush();
             $em->persist($user);
 
@@ -328,6 +329,7 @@ class UserController extends AbstractController
 
         } else {
             $user->setIsAdmin(false);
+            $user->setRoles(['ROLE_USER']);
             $em->flush();
 
             $email = (new Email())

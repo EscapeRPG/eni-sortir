@@ -37,7 +37,11 @@
                                 <div>
                                     {{ ux_icon('tabler:map-pin') }}
                                     <strong>Adresse :</strong>
-                                    {{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}
+                                    {% if event.place.street %}
+                                        {{ event.place.street ~ ' - ' ~ event.place.postalCode ~ ' ' ~ event.place.city }}
+                                    {% else %}
+                                        Coordonnées GPS en description !
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="participants">

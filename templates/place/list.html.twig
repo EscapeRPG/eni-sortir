@@ -13,4 +13,6 @@
                 <h2>{{ place.name }}</h2></a>
         {% endfor %}
     </div>
+
+    <a href="{{ path('place_create') }}" class="plus">{{ ux_icon('tabler:plus') }}</a>
 {% endblock %}

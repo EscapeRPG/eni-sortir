@@ -33,6 +33,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Routing\Attribute\Route;
@@ -137,7 +138,7 @@ final class EventController extends AbstractController
                     }
 
                     $email = (new Email())
-                        ->from('no-reply@eni-sortir.com') // @TODO à changer en fonction déploiement si on le fait
+                        ->from('postmaster@syrphin.com') // @TODO à changer en fonction déploiement si on le fait
                         ->to($member->getEmail())
                         ->subject('Invitation à un nouvel événement : ' . $event->getName())
                         ->html($this->renderView('email/invitation.html.twig', [
@@ -180,6 +181,15 @@ final class EventController extends AbstractController
             if ($file instanceof UploadedFile) {
                 $name = $fileUploader->upload($file, $event->getName(), $parameterBag->get('event')['poster_dir']);
                 $event->setPosterFile($name);
+            }
+
+            //si c'est cloturé et qu'on change la date d'inscription, pour que ca repasse en ouverte
+            $now = new \DateTimeImmutable();
+            if($event->getRegistrationDeadline()>$now && $event->getState()->getId()===3){
+                $openstate = $em->getRepository(State::class)->find(2);
+                if($openstate){
+                    $event->setState($openstate);
+                }
             }
 
             $em->flush();

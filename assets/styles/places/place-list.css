@@ -28,6 +28,10 @@
     transform: scale(1.02);
     background-color: var(--events-a-color);
     text-decoration: none;
+
+    h2 {
+        color: var(--a-color-hover);
+    }
 }
 
 .place-card h2 {

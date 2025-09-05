@@ -9,6 +9,7 @@
 
 .event-detail-container img {
     width: 100%;
+    height: 500px;
     border-radius: 20px;
     margin-bottom: 20px;
     object-fit: cover;

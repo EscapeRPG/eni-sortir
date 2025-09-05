@@ -26,10 +26,12 @@ class PlaceType extends AbstractType
             ->add('latitude', NumberType::class, [
                 'label' => 'Latitude',
                 'scale' => 6,
+                'required' => false
             ])
             ->add('longitude', NumberType::class, [
                 'label' => 'Longitude',
                 'scale' => 6,
+                'required' => false
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Enregistrer',

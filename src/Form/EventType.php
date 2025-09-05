@@ -2,23 +2,13 @@
 
 namespace App\Form;
 
-use App\Controller\PlaceController;
-use App\Entity\Campus;
+
 use App\Entity\Event;
 use App\Entity\Group;
 use App\Entity\Place;
-use App\Entity\State;
-use App\Entity\User;
-use App\Repository\GroupRepository;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ButtonType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -48,18 +38,6 @@ class EventType extends AbstractType
             'query_builder' => fn() => $groupRepository->findGroupsOfUserConnected($userId),
         ])
 
-
-//@TODO supprimer la case à cocher si JS ne se lance pas
-//
-//            ->add('groupePrive', CheckboxType::class, [
-//                'label' => 'Groupe privé',
-//                'required' => false,
-//                'mapped' => false,
-//                'attr' => ['id' => 'groupePriveCheckbox']
-//            ])
-
-
-
             ->add('name', TextType::class, [
                 'label' => 'Nom de l\'événement',
                 'required' => true,
@@ -68,9 +46,6 @@ class EventType extends AbstractType
                 'label'=>'Date de début',
                 'widget' => 'single_text',
                 'required' => true,
-                /*'attr' => [
-                    'placeholder' => date('d/m/y H:i'),
-                ]*/
             ])
             ->add('endDateHour', DateTimeType::class, [
                 'label'=>'Date de fin',
@@ -93,23 +68,7 @@ class EventType extends AbstractType
                     'rows' => 10,
                 ]
             ])
-            /*la personne qui crée l'événement est l'oganisateur, à ajouter*/
 
-//            ->add('state', EntityType::class, [
-//                'placeholder'=>'--Choisir un "état--',
-//                'class' => State::class,
-//                'choice_label' => function (State $state) {
-//                    return sprintf('%s (%s)', $state->getLabel(), count($state->getEvents()));
-//                },
-//            ])
-//
-//            ->add('campus', EntityType::class, [
-//                'placeholder'=>'--Choisir un campus--',
-//                'class' => Campus::class,
-//                'choice_label' => function (Campus $campus) {
-//                    return sprintf('%s (%s)', $campus->getName(), count($campus->getEvents()));
-//                }
-//            ])
             ->add('place', EntityType::class, [
                 'class' => Place::class,
                 'label'=>'Choisissez un lieu',

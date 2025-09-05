@@ -318,6 +318,7 @@ final class EventController extends AbstractController
     public function detail(SortieRepository $sortieRepository, int $id, #[CurrentUser] ?User $userConnected): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         $event = $sortieRepository->find($id);
         $userConnectedId = $userConnected->getId();
 
@@ -357,20 +358,6 @@ final class EventController extends AbstractController
         }
     }
 
-    #todo non utilisé à supprimer?
-    /*public function closeIfOutDate(StateRepository $stateRepository, SortieRepository $sortieRepository, int $id, EntityManagerInterface $entityManager): void
-    {
-        $event = $sortieRepository->find($id);
-        $today = new \DateTime();
-        $closureDate = $event->getRegistrationDeadline();
-        $closureState = $stateRepository->find(3);
-
-        if ($closureDate == $today) {
-            $event->setState($closureState);
-            $entityManager->persist($event);
-            $entityManager->flush();
-        }
-    }*/
 
     /**
      * @throws Exception

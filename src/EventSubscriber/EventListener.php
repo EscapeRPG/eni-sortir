@@ -2,7 +2,6 @@
 
 namespace App\EventSubscriber;
 
-use App\Entity\State;
 use App\Repository\SortieRepository;
 use App\Repository\StateRepository;
 use Doctrine\ORM\EntityManagerInterface;

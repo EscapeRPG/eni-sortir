@@ -35,7 +35,7 @@ SQL;
             ->fetchAllAssociative();
     }
 
-    #todo ancien repository à supprimer?
+
     /**
      * @throws Exception
      */
@@ -61,6 +61,7 @@ SQL;
             ->fetchAllAssociative();
 
     }
+
 
     public function findGroupDetails(int $groupId): ?Group
     {
